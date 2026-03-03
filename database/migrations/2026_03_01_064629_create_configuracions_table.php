@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->text('direccion');
             $table->string('telefono');
+            $table->string('divisa');
             $table->string('correo_electronico');
             $table->string('web')->nullable();
             $table->text('logo');
