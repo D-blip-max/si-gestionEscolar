@@ -4,6 +4,7 @@
 
 @section('content_header')
     <h1>Datos del Sistema</h1>
+    <hr>
 @stop
 
 @section('content')

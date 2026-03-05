@@ -61,7 +61,8 @@ class ConfiguracionController extends Controller
       $configuracion->save();
 
       return redirect()->route('admin.configuracion.index')
-        ->with('success', 'Configuración actualizada correctamente.');
+        ->with('mensaje', 'Configuración actualizada correctamente.')
+        ->with('icono', 'success');
     } else {
       // --- CASO: CREAR NUEVA ---
       $configuracion = new Configuracion();
@@ -85,7 +86,8 @@ class ConfiguracionController extends Controller
       $configuracion->save();
 
       return redirect()->route('admin.configuracion.index')
-        ->with('success', 'Configuración creada correctamente.');
+        ->with('mensaje', 'Configuración creada correctamente.')
+        ->with('icono', 'success');
     }
   }
 }
