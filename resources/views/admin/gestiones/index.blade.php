@@ -28,7 +28,7 @@
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="preguntar{{ $gestion->id }}(event)">
-                                    <i class="bi bi-trash"></i> Eliminar
+                                    <i class="fas fa-trash-alt"></i> Eliminar
                                 </button>
                             </form>
 
