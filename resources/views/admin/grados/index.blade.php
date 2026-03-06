@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1><b>Listado de periodos academicos</b></h1>
+    <h1><b>Listado de grados registrados</b></h1>
     <hr>
 @stop
 
@@ -11,13 +11,13 @@
         <div class="col-md-6">
             <div class="card card-outline card-primary">
                 <div class="card-header">
-                    <h3 class="card-title">Periodos Registrados</h3>
+                    <h3 class="card-title">Grados Registrados</h3>
 
                     <div class="card-tools">
 
                         <!-- Button trigger modal -->
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ModalCreate">
-                            Crear nuevo Periodo
+                            Crear nuevo Grado
                         </button>
 
                         <!-- Modal de Creacion -->
@@ -26,36 +26,36 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header" style="background-color: #007bff; color: white;">
-                                        <h5 class="modal-title" id="exampleModalLabel">Registro de un nuevo periodo</h5>
+                                        <h5 class="modal-title" id="exampleModalLabel">Registro de un nuevo grado</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form action="{{ url('/admin/periodos/create') }}" method="POST">
+                                        <form action="{{ url('/admin/grados/create') }}" method="POST">
                                             @csrf
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label for="">Gestiones</label><b> (*)</b>
+                                                        <label for="">Niveles</label><b> (*)</b>
                                                         <div class="input-group mb-3">
                                                             <div class="input-group-prepend">
                                                                 <span class="input-group-text"><i
-                                                                        class="fas fa-university"></i></span>
+                                                                        class="fas fa-layer-group"></i></span>
                                                             </div>
 
-                                                            <select class="form-control" name="gestion_id_create"
-                                                                id="gestion_id_create" required>
-                                                                <option value="">Seleccione una gestión</option>
-                                                                @foreach ($gestiones as $gestion)
-                                                                    <option value="{{ $gestion->id }}">
-                                                                        {{ $gestion->nombre }}
+                                                            <select class="form-control" name="nivel_id_create"
+                                                                id="nivel_id_create" required>
+                                                                <option value="">Seleccione una nivel</option>
+                                                                @foreach ($niveles as $nivel)
+                                                                    <option value="{{ $nivel->id }}">
+                                                                        {{ $nivel->nombre }}
                                                                     </option>
                                                                 @endforeach
                                                             </select>
 
                                                         </div>
-                                                        @error('gestion_id_create')
+                                                        @error('nivel_id_create')
                                                             <small style="color: red;">{{ $message }}</small>
                                                         @enderror
                                                     </div>
@@ -65,11 +65,11 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label for="">Nombre del periodo</label><b> (*)</b>
+                                                        <label for="">Nombre del grado</label><b> (*)</b>
                                                         <div class="input-group mb-3">
                                                             <div class="input-group-prepend">
                                                                 <span class="input-group-text"><i
-                                                                        class="fas fa-layer-group"></i></span>
+                                                                        class="fas fa-list-alt"></i></span>
                                                             </div>
                                                             <input type="text" class="form-control" name="nombre_create"
                                                                 value="{{ old('nombre_create') }}"
@@ -105,40 +105,38 @@
                         <thead>
                             <tr>
                                 <th>Nro</th>
-                                <th>Gestion</th>
-                                <th>Periodos</th>
+                                <th>Niveles</th>
+                                <th>Grados</th>
                                 <th>Acciones</th>
                             </tr>
+
                         </thead>
                         <tbody>
-
-                            @foreach ($gestiones as $gestion)
+                            @foreach ($niveles as $nivel)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $gestion->nombre }}</td>
+                                    <td>{{ $nivel->nombre }}</td>
                                     <td>
-                                        @foreach ($gestion->periodos as $periodo)
-                                       
-                                             
-                                        <span class="badge badge-info">{{ $periodo->nombre }}</span><br>
+                                        @foreach ($nivel->grados as $grado)
+                                            <span class="badge badge-info">{{ $grado->nombre }}</span><br>
                                         @endforeach
                                     </td>
 
                                     <td>
-                                        @foreach ($gestion->periodos as $periodo)
+                                        @foreach ($nivel->grados as $grado)
                                             <div class="row d-flex justify-content-center">
-                                                <button type="button" style="margin: 4px" class="btn btn-success btn-sm" data-toggle="modal"
-                                                    data-target="#ModalUpdate{{ $periodo->id }}">
+                                                <button type="button" style="margin: 4px" class="btn btn-success btn-sm"
+                                                    data-toggle="modal" data-target="#ModalUpdate{{ $grado->id }}">
                                                     <i class="fas fa-pencil-alt"></i> Editar
                                                 </button>
 
 
-                                                <form action="{{ url('/admin/periodos/' . $periodo->id) }}" method="post"
-                                                    id="miFormulario{{ $periodo->id }}">
+                                                <form action="{{ url('/admin/grados/' . $grado->id) }}" method="post"
+                                                    id="miFormulario{{ $grado->id }}">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" style="margin: 4px" class="btn btn-danger btn-sm"
-                                                        onclick="preguntar{{ $periodo->id }}(event)">
+                                                        onclick="preguntar{{ $grado->id }}(event)">
                                                         <i class="fas fa-trash-alt"></i> Eliminar
                                                     </button>
                                                 </form>
@@ -148,7 +146,7 @@
 
 
                                             <script>
-                                                function preguntar{{ $periodo->id }}(event) {
+                                                function preguntar{{ $grado->id }}(event) {
                                                     event.preventDefault();
                                                     Swal.fire({
                                                         title: '¿Desea eliminar este registro?',
@@ -162,7 +160,7 @@
                                                     }).then((result) => {
                                                         if (result.isConfirmed) {
                                                             // JavaScript puro para enviar el formulario
-                                                            document.getElementById('miFormulario{{ $periodo->id }}').submit();
+                                                            document.getElementById('miFormulario{{ $grado->id }}').submit();
                                                         }
                                                     });
                                                 }
@@ -172,13 +170,13 @@
 
 
                                             <!-- Modal de Edicion -->
-                                            <div class="modal fade" id="ModalUpdate{{ $periodo->id }}" tabindex="-1"
+                                            <div class="modal fade" id="ModalUpdate{{ $grado->id }}" tabindex="-1"
                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header"
                                                             style="background-color: #09ae5b; color: white;">
-                                                            <h5 class="modal-title" id="exampleModalLabel">Editar periodo
+                                                            <h5 class="modal-title" id="exampleModalLabel">Editar Grado
                                                             </h5>
                                                             <button type="button" class="close" data-dismiss="modal"
                                                                 aria-label="Close">
@@ -186,7 +184,7 @@
                                                             </button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <form action="{{ url('/admin/periodos/' . $periodo->id) }}"
+                                                            <form action="{{ url('/admin/grados/' . $grado->id) }}"
                                                                 method="POST">
                                                                 @csrf
                                                                 @method('PUT')
@@ -194,29 +192,31 @@
                                                                 <div class="row">
                                                                     <div class="col-md-12">
                                                                         <div class="form-group">
-                                                                            <label for="">Gestiones</label><b>
-                                                                                (*)</b>
+                                                                            <label for="">Niveles</label><b>
+                                                                                (*)
+                                                                            </b>
                                                                             <div class="input-group mb-3">
                                                                                 <div class="input-group-prepend">
                                                                                     <span class="input-group-text"><i
-                                                                                            class="fas fa-university"></i></span>
+                                                                                            class="fas fa-layer-group"></i></span>
                                                                                 </div>
 
                                                                                 <select class="form-control"
-                                                                                    name="gestion_id"
-                                                                                    id="gestion_id" required>
+                                                                                    name="nivel_id" id="nivel_id"
+                                                                                    required>
                                                                                     <option value="">Seleccione una
-                                                                                        gestión</option>
-                                                                                    @foreach ($gestiones as $gestion)
+                                                                                        nivel</option>
+                                                                                    @foreach ($niveles as $nivel)
                                                                                         <option
-                                                                                            value="{{ $gestion->id }}" {{ $gestion->id == $periodo->gestion_id ? 'selected' : '' }}>
-                                                                                            {{ $gestion->nombre }}
+                                                                                            value="{{ $nivel->id }}"
+                                                                                            {{ $nivel->id == $grado->nivel_id ? 'selected' : '' }}>
+                                                                                            {{ $nivel->nombre }}
                                                                                         </option>
                                                                                     @endforeach
                                                                                 </select>
 
                                                                             </div>
-                                                                            @error('gestion_id')
+                                                                            @error('nivel_id')
                                                                                 <small
                                                                                     style="color: red;">{{ $message }}</small>
                                                                             @enderror
@@ -228,17 +228,17 @@
                                                                     <div class="col-md-12">
                                                                         <div class="form-group">
                                                                             <label for="">Nombre del
-                                                                                periodo</label><b>
+                                                                                Grado</label><b>
                                                                                 (*)
                                                                             </b>
                                                                             <div class="input-group mb-3">
                                                                                 <div class="input-group-prepend">
                                                                                     <span class="input-group-text"><i
-                                                                                            class="fas fa-layer-group"></i></span>
+                                                                                            class="fas fa-list-alt"></i></span>
                                                                                 </div>
                                                                                 <input type="text" class="form-control"
                                                                                     name="nombre"
-                                                                                    value="{{ old('nombre', $periodo->nombre) }}"
+                                                                                    value="{{ old('nombre', $grado->nombre) }}"
                                                                                     placeholder="Escriba aquí..." required>
                                                                             </div>
                                                                             @error('nombre')
@@ -267,8 +267,10 @@
                                         @endforeach
 
                                     </td>
+                                    
                                 </tr>
                             @endforeach
+
 
                         </tbody>
                     </table>

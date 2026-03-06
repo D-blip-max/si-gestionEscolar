@@ -327,7 +327,15 @@ return [
             'url'     => 'admin/niveles',
             'icon'    => 'fas fa-fw fa-layer-group',
             'classes' => 'bg-blue text-white',
-        ], //Turnos
+        ],
+        //Grados
+        [
+            'text'    => 'Grados',
+            'url'     => 'admin/grados',
+            'icon'    => 'fas fa-fw fa-list-alt',
+            'classes' => 'bg-blue text-white',
+        ],
+         //Turnos
         [
             'text'    => 'Turnos',
             'url'     => 'admin/turnos',

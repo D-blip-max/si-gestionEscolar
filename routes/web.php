@@ -41,6 +41,14 @@ Route::put('/admin/niveles/{id}', [App\Http\Controllers\NivelController::class, 
 Route::delete('/admin/niveles/{id}', [App\Http\Controllers\NivelController::class, 'destroy'])->name('admin.niveles.destroy')->middleware('auth');//Delete
 
 
+//rutas que van a ser de grados del sitema CreateReadUpdateDelete
+//Trabajando con Modals
+Route::get('/admin/grados', [App\Http\Controllers\GradoController::class, 'index'])->name('admin.grados.index')->middleware('auth');
+Route::post('/admin/grados/create', [App\Http\Controllers\GradoController::class, 'store'])->name('admin.grados.create')->middleware('auth');//Create
+Route::put('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, 'update'])->name('admin.grados.update')->middleware('auth');//Update
+Route::delete('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, 'destroy'])->name('admin.grados.destroy')->middleware('auth');//Delete
+
+
 //rutas que van a ser de Turnos del sitema CreateReadUpdateDelete
 //trabajando con vistas
 Route::get('/admin/turnos', [App\Http\Controllers\TurnoController::class, 'index'])->name('admin.turnos.index')->middleware('auth');

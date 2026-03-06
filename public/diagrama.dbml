@@ -31,4 +31,9 @@ nombre varchar
 getion_id int [ref: > gestiones.id]
 }
 
+Table grados{
+id int [pk,increment]
+nombre varchar
+nivel_id int [ref: > niveles.id] 
+}
 
