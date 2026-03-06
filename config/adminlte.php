@@ -313,6 +313,13 @@ return [
             'url'     => 'admin/gestiones',
             'icon'    => 'fas fa-fw fa-tasks',
             'classes' => 'bg-blue text-white',
+        ], 
+        //periodos
+        [
+            'text'    => 'Periodos',
+            'url'     => 'admin/periodos',
+            'icon'    => 'fas fa-fw fa-calendar-alt',
+            'classes' => 'bg-blue text-white',
         ],
         //niveles
         [

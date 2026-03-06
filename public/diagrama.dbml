@@ -24,3 +24,11 @@ Table turnos{
 id int [pk,increment]
 nombre varchar
 }
+
+Table periodos{
+id int [pk,increment]
+nombre varchar
+getion_id int [ref: > gestiones.id]
+}
+
+
