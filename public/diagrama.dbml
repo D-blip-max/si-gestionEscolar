@@ -19,3 +19,8 @@ Table niveles{
 id int [pk,increment]
 nombre varchar
 }
+
+Table turnos{
+id int [pk,increment]
+nombre varchar
+}
