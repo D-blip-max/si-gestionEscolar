@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\paralelo;
+use App\Models\Paralelo;
 use Illuminate\Http\Request;
 use App\Models\Grado;
 use Illuminate\Support\Facades\Validator;
@@ -45,7 +45,7 @@ class ParaleloController extends Controller
             'grado_id_create' => 'required|exists:grados,id',
         ]);
 
-        $paralelo = new paralelo();
+        $paralelo = new Paralelo();
         $paralelo->nombre = $request->nombre_create;
         $paralelo->grado_id = $request->grado_id_create;
         $paralelo->save();
@@ -91,7 +91,7 @@ class ParaleloController extends Controller
                 ->with('modal_id', $id);
         }
 
-        $paralelo = paralelo::find($id);
+        $paralelo = Paralelo::find($id);
         $paralelo->nombre = $request->nombre;
         $paralelo->grado_id = $request->grado_id;
         $paralelo->save();
@@ -105,7 +105,7 @@ class ParaleloController extends Controller
      */
     public function destroy( $id)
     {
-        $paralelo = paralelo::find($id);
+        $paralelo = Paralelo::find($id);
         $paralelo->delete();
         return redirect()->route('admin.paralelos.index')
             ->with('mensaje', 'El paralelo se ha eliminado correctamente')

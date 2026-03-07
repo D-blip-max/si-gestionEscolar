@@ -9,34 +9,83 @@
 
 @section('content')
 
+    <div class="row">
 
-
-        <div class="row">
-            
-            <div class="col-md-3 col-sm-6 col-12">
-                <div class="info-box zoomP">
-                    <img src="{{ url('/img/colegio.gif') }}" width="70px" alt="">
-                    <div class="info-box-content">
-                        <span class="info-box-text"><b>Gestiones registrados</b></span>
-                        <span class="info-box-number">{{ $total_gestiones }} gestiones</span>
-                    </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/gestion.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Gestiones registrados</b></span>
+                    <span class="info-box-number">{{ $total_gestiones }} gestiones</span>
                 </div>
             </div>
-
-            <div class="col-md-3 col-sm-6 col-12">
-                <div class="info-box zoomP">
-                    <img src="{{ url('/img/calendario.gif') }}" width="70px" alt="">
-                    <div class="info-box-content">
-                        <span class="info-box-text"><b>Gestiones registrados</b></span>
-                        <span class="info-box-number">{{ $total_periodos }} gestiones</span>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/periodo.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Periodos registrados</b></span>
+                    <span class="info-box-number">{{ $total_periodos }} periodos</span>
+                </div>
+            </div>
+        </div>
 
-    
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/grado.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Grados registrados</b></span>
+                    <span class="info-box-number">{{ $total_grados }} grados</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/nivel.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Niveles registrados</b></span>
+                    <span class="info-box-number">{{ $total_niveles }} niveles</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/turno.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Turnos registrados</b></span>
+                    <span class="info-box-number">{{ $total_turnos }} turnos</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/paralelo.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Paralelos registrados</b></span>
+                    <span class="info-box-number">{{ $total_paralelos }} paralelos</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/materia.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Materias registradas</b></span>
+                    <span class="info-box-number">{{ $total_materias }} Materias</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
 @stop
 
 @section('css')

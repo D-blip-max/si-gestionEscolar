@@ -43,3 +43,9 @@ nombre varchar
 grado_id int [ref: > grados.id]
 }
 
+Table materias{
+id int [pk,increment]
+nombre varchar
+
+}
+

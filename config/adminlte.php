@@ -348,6 +348,13 @@ return [
             'url'     => 'admin/turnos',
             'icon'    => 'fas fa-fw fa-clock',
             'classes' => 'bg-blue text-white',
+        ], 
+        //Materias
+        [
+            'text'    => 'Materias',
+            'url'     => 'admin/materias',
+            'icon'    => 'fas fa-fw fa-book ',
+            'classes' => 'bg-blue text-white',
         ],
     ],
 
