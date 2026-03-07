@@ -335,6 +335,13 @@ return [
             'icon'    => 'fas fa-fw fa-list-alt',
             'classes' => 'bg-blue text-white',
         ],
+        //Paralelos
+        [
+            'text'    => 'Paralelos',
+            'url'     => 'admin/paralelos',
+            'icon'    => 'fas fa-fw fa-clone',
+            'classes' => 'bg-blue text-white',
+        ],
          //Turnos
         [
             'text'    => 'Turnos',

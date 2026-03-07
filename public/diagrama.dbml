@@ -37,3 +37,9 @@ nombre varchar
 nivel_id int [ref: > niveles.id] 
 }
 
+Table paralelos{
+id int [pk,increment]
+nombre varchar
+grado_id int [ref: > grados.id]
+}
+

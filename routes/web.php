@@ -50,6 +50,14 @@ Route::put('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, '
 Route::delete('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, 'destroy'])->name('admin.grados.destroy')->middleware('auth');//Delete
 
 
+//rutas que van a ser de Paralelos del sitema CreateReadUpdateDelete
+//Trabajando con Modals
+Route::get('/admin/paralelos', [App\Http\Controllers\ParaleloController::class, 'index'])->name('admin.paralelos.index')->middleware('auth');
+Route::post('/admin/paralelos/create', [App\Http\Controllers\ParaleloController::class, 'store'])->name('admin.paralelos.create')->middleware('auth');//Create
+Route::put('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController::class, 'update'])->name('admin.paralelos.update')->middleware('auth');//Update
+Route::delete('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController::class, 'destroy'])->name('admin.paralelos.destroy')->middleware('auth');//Delete
+
+
 //rutas que van a ser de Turnos del sitema CreateReadUpdateDelete
 //trabajando con vistas
 Route::get('/admin/turnos', [App\Http\Controllers\TurnoController::class, 'index'])->name('admin.turnos.index')->middleware('auth');
