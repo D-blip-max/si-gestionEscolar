@@ -9,6 +9,7 @@ use App\Models\Grado;
 use App\Models\Turno;
 use App\Models\Paralelo;
 use App\Models\Materia;
+use Spatie\Permission\Models\Role;
 
 class AdminController extends Controller
 {
@@ -22,8 +23,9 @@ class AdminController extends Controller
         $total_turnos= Turno::count();
         $total_paralelos= Paralelo::count();
         $total_materias= Materia::count();
+        $total_roles= Role::count();
 
 
-        return view('admin.index',compact('total_gestiones','total_periodos','total_niveles','total_grados','total_turnos','total_paralelos','total_materias'));
+        return view('admin.index',compact('total_gestiones','total_periodos','total_niveles','total_grados','total_turnos','total_paralelos','total_materias','total_roles'));
     }
 }

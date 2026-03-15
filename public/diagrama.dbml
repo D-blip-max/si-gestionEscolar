@@ -49,3 +49,32 @@ nombre varchar
 
 }
 
+Table personals {
+  id int [pk, increment] // Primary key
+  usuario_id int [ref: > users.id]
+  tipo varchar
+  nombres varchar
+  apellidos varchar
+  ci varchar
+  fecha_nacimiento date
+  direccion varchar
+  telefono varchar
+  profesion varchar
+  foto varchar
+}
+
+Table users {
+  id int [pk, increment] // Primary key
+  name varchar
+  email varchar
+  password varchar
+}
+Table formaciones {
+  id int [pk, increment] // Primary key
+  personal_id int [ref: > personals.id]
+  titulo varchar
+  institucion varchar
+  nivel varchar
+  ano_graduacion date
+  archivo varchar
+}

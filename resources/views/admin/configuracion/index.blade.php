@@ -17,7 +17,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ url('/admin/configuracion/create') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ url('/admin/configuracion/create') }}" method="POST" >
                         @csrf
                         <div class="row">
                             <div class="col-md-4">

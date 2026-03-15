@@ -14,7 +14,6 @@ class Periodo extends Model
     
     public function gestion(){  //1 Periodo tiene 1 gestion
         return $this->belongsTo(Gestion::class);
-    }
-    
+    }   
 
 }
