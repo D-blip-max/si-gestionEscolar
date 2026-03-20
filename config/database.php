@@ -44,7 +44,7 @@ return [
         ],
 
         'mysql' => [
-            'driver' => 'mysql',
+            'driver' => 'mysql',       
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
@@ -57,7 +57,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
-            'engine' => 'InnoDB',
+            'engine' => 'InnoDB',//porque se coloca esto y no se deja en null siosi
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? \Pdo\Mysql::ATTR_SSL_CA : \PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],

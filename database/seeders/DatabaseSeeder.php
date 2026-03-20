@@ -241,5 +241,105 @@ class DatabaseSeeder extends Seeder
             'foto' => 'uploads/fotos/' . time() . '_ricardo.jpg',
             'created_at' => now()->subYears(3) // Fecha de ingreso hace 3 años
         ]);
+
+        // Docente 1 - Patrón: Puro Par (Ascendente)
+        $user1 = User::create([
+            'name' => 'María Fernández',
+            'email' => 'maria.fernandez@escuela.com',
+            'password' => Hash::make('24680246')
+        ])->assignRole('DOCENTE');
+
+        Personal::create([
+            'user_id' => $user1->id, // Relación directa
+            'tipo' => 'docente',
+            'nombres' => 'María',
+            'apellidos' => 'Fernández',
+            'ci' => '24680246',
+            'fecha_nacimiento' => '1980-03-15',
+            'direccion' => 'Calle Las Flores 245',
+            'telefono' => '79123456',
+            'profesion' => 'Lic. en Lengua y Literatura',
+            'foto' => 'uploads/fotos/' . time() . '_maria.jpg'
+        ]);
+
+        // Docente 2 - Patrón: Puro Impar (Descendente)
+        $user2 = User::create([
+            'name' => 'Carlos Ríos',
+            'email' => 'carlos.rios@escuela.com',
+            'password' => Hash::make('97531975')
+        ])->assignRole('DOCENTE');
+
+        Personal::create([
+            'user_id' => $user2->id,
+            'tipo' => 'docente',
+            'nombres' => 'Carlos',
+            'apellidos' => 'Ríos',
+            'ci' => '97531975',
+            'fecha_nacimiento' => '1975-07-22',
+            'direccion' => 'Av. Ciencias 789',
+            'telefono' => '71234567',
+            'profesion' => 'Magíster en Matemáticas',
+            'foto' => 'uploads/fotos/' . time() . '_carlos.jpg'
+        ]);
+
+        // Docente 3 - Patrón: Ascendente Simple
+        $user3 = User::create([
+            'name' => 'Ricardo Méndez',
+            'email' => 'ricardo.mendez@escuela.com',
+            'password' => Hash::make('12345678')
+        ])->assignRole('DOCENTE');
+
+        Personal::create([
+            'user_id' => $user3->id,
+            'tipo' => 'docente',
+            'nombres' => 'Ricardo',
+            'apellidos' => 'Méndez',
+            'ci' => '12345678',
+            'fecha_nacimiento' => '1988-06-10',
+            'direccion' => 'Barrio Lindo 123',
+            'telefono' => '70011223',
+            'profesion' => 'Ingeniero Civil',
+            'foto' => 'uploads/fotos/' . time() . '_ricardo.jpg'
+        ]);
+
+        // Docente 4 - Patrón: Descendente Simple
+        $user4 = User::create([
+            'name' => 'Elena Suárez',
+            'email' => 'elena.suarez@escuela.com',
+            'password' => Hash::make('8765321')
+        ])->assignRole('DOCENTE');
+
+        Personal::create([
+            'user_id' => $user4->id,
+            'tipo' => 'docente',
+            'nombres' => 'Elena',
+            'apellidos' => 'Suárez',
+            'ci' => '8765321',
+            'fecha_nacimiento' => '1992-02-28',
+            'direccion' => 'Calle Junín 456',
+            'telefono' => '70044556',
+            'profesion' => 'Lic. en Historia',
+            'foto' => 'uploads/fotos/' . time() . '_elena.jpg'
+        ]);
+
+        // Docente 5 - Patrón: Espejo (Capicúa)
+        $user5 = User::create([
+            'name' => 'Jorge Vaca',
+            'email' => 'jorge.vaca@escuela.com',
+            'password' => Hash::make('13577531')
+        ])->assignRole('DOCENTE');
+
+        Personal::create([
+            'user_id' => $user5->id,
+            'tipo' => 'docente',
+            'nombres' => 'Jorge',
+            'apellidos' => 'Vaca',
+            'ci' => '13577531',
+            'fecha_nacimiento' => '1985-11-20',
+            'direccion' => 'UV 45, Av. Bush',
+            'telefono' => '70088990',
+            'profesion' => 'Lic. en Geografía',
+            'foto' => 'uploads/fotos/' . time() . '_jorge.jpg'
+        ]);
     }
 }

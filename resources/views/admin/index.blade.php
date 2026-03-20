@@ -92,6 +92,27 @@
         </div>
 
     </div>
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/administrativo.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Personal Administrativo</b></span>
+                    <span class="info-box-number">{{ $total_personal_administrativos}} Administrativos</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box zoomP">
+                <img src="{{ url('/img/docente.gif') }}" width="70px" alt="">
+                <div class="info-box-content">
+                    <span class="info-box-text"><b>Personal docente</b></span>
+                    <span class="info-box-number">{{ $total_personal_docentes}} docentes</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 
 

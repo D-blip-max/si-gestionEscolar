@@ -1,7 +1,5 @@
 @extends('adminlte::page')
-
-@section('title', 'Dashboard')
-
+@section('title', 'Confuguracion del Sistema')
 @section('content_header')
     <h1>Datos del Sistema</h1>
     <hr>

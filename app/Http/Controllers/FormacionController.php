@@ -73,24 +73,65 @@ class FormacionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Formacion $formacion)
+    public function edit($id)
     {
-        //
+        $formacion = Formacion::find($id);
+        return view('admin.formaciones.edit', compact('formacion'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Formacion $formacion)
+    public function update(Request $request,  $id)
     {
-        //
+        $request->validate([
+            'titulo' => 'required',
+            'institucion' => 'required',
+            'nivel' => 'required',
+            'fecha_graduacion' => 'required',
+        ]);
+
+        $formacion = Formacion::findOrFail($id);
+        $formacion->titulo = $request->titulo;
+        $formacion->institucion = $request->institucion;
+        $formacion->nivel = $request->nivel;
+        $formacion->fecha_graduacion = $request->fecha_graduacion;
+
+        if ($request->hasFile('archivo')) {
+            // Eliminar foto anterior
+            if ($formacion->archivo && file_exists(public_path($formacion->archivo))) {
+                unlink(public_path($formacion->archivo));
+            }
+
+            $fotoPath = $request->file('archivo');
+            $nombreArchivo = time() . '_' . $fotoPath->getClientOriginalName();
+            $rutaDestino = public_path('uploads/formaciones');
+            $fotoPath->move($rutaDestino, $nombreArchivo);
+            $formacion->archivo = 'uploads/formaciones/' . $nombreArchivo;
+        }
+
+        $formacion->save();
+
+        return redirect()->route('admin.personal.formaciones.index', $formacion->personal_id)
+            ->with('mensaje', 'La formacion se ha actualizado correctamente')
+            ->with('icono', 'success');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Formacion $formacion)
+    public function destroy($id)
     {
-        //
+        $formacion = Formacion::findOrFail($id);
+
+        if ($formacion->archivo && file_exists(public_path($formacion->archivo))) {
+            unlink(public_path($formacion->archivo));
+        }
+
+        $formacion->delete();
+
+        return redirect()->route('admin.personal.formaciones.index', $formacion->personal_id)
+            ->with('mensaje', 'La formacion se ha eliminado correctamente')
+            ->with('icono', 'success');
     }
 }

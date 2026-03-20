@@ -239,8 +239,9 @@
                 <div class="card-header">
                     <h3 class="card-title">Formaciones Registradas</h3>
                     <div class="card-tools">
-                        <a href="{{ url('/admin/personal/'.$personal->id.'/formaciones/create') }}" class="btn btn-primary">Registrar nuevo
-                            Personal</a>
+                        <a href="{{ url('/admin/personal/' . $personal->id . '/formaciones/create') }}"
+                            class="btn btn-primary">Registrar nuevo
+                            Formacion</a>
                     </div>
                 </div>
 
@@ -266,19 +267,21 @@
                                     <td>{{ $formacion->institucion }}</td>
                                     <td>{{ $formacion->nivel }}</td>
                                     <td>{{ $formacion->fecha_graduacion }}</td>
-                                    <td>{{ $formacion->archivo }}</td>
+                                    <td style="text-align: center">
+                                        <a href="{{ url($formacion->archivo) }}" target="_blank">Ver archivo</a>
+                                    </td>
                                     <td>
 
                                         <div class="row d-flex justify-content-center">
 
 
 
-                                            <a href="{{ url('/admin/personal/' . $formacion->id . '/edit') }}"
+                                            <a href="{{ url('/admin/personal/formaciones/'.$formacion->id) }}"
                                                 class="btn btn-success btn-sm">
                                                 <i class="fas fa-pencil-alt"></i> Editar
                                             </a>
 
-                                            <form action="{{ url('/admin/personal/' . $formacion->id) }}" method="post"
+                                            <form action="{{ url('/admin/personal/formaciones/'.$formacion->id) }}" method="post"
                                                 id="miFormulario{{ $formacion->id }}">
                                                 @csrf
                                                 @method('DELETE')

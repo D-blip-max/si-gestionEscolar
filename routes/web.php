@@ -103,3 +103,6 @@ Route::delete('/admin/personal/{id}', [App\Http\Controllers\PersonalController::
 Route::get('/admin/personal/{id}/formaciones', [App\Http\Controllers\FormacionController::class, 'index'])->name('admin.personal.formaciones.index')->middleware('auth');//retorna la vista index
 Route::get('/admin/personal/{id}/formaciones/create', [App\Http\Controllers\FormacionController::class, 'create'])->name('admin.personal.formaciones.create')->middleware('auth');//retorna la vista create
 Route::post('/admin/personal/{id}/formaciones/create', [App\Http\Controllers\FormacionController::class, 'store'])->name('admin.personal.formaciones.store')->middleware('auth');//Create
+Route::get('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'edit'])->name('admin.personal.formaciones.edit')->middleware('auth');//Edit vista
+Route::put('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'update'])->name('admin.personal.formaciones.update')->middleware('auth');//Edit vista
+Route::delete('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'destroy'])->name('admin.personal.formaciones.destroy')->middleware('auth');//Edit vista
