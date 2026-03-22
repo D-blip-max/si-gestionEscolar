@@ -78,3 +78,31 @@ Table formaciones {
   ano_graduacion date
   archivo varchar
 }
+
+// Tabla de Padres de Familia (ppffs)
+Table ppffs {
+  id int [pk, increment] // Primary key
+  nombres varchar
+  apellidos varchar
+  ci varchar
+  fecha_nacimiento date
+  telefono varchar
+  parentesco varchar
+  ocupacion varchar
+  direccion varchar
+}
+
+// Tabla de Estudiantes
+Table estudiantes {
+  id int [pk, increment] // Primary key
+  usuario_id int [ref: > users.id]
+  ppff_id int [ref: > ppffs.id]
+  nombres varchar
+  apellidos varchar
+  ci varchar
+  fecha_nacimiento date
+  direccion varchar
+  telefono varchar
+  foto varchar
+  estado varchar
+}

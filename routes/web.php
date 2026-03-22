@@ -106,3 +106,17 @@ Route::post('/admin/personal/{id}/formaciones/create', [App\Http\Controllers\For
 Route::get('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'edit'])->name('admin.personal.formaciones.edit')->middleware('auth');//Edit vista
 Route::put('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'update'])->name('admin.personal.formaciones.update')->middleware('auth');//Edit vista
 Route::delete('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'destroy'])->name('admin.personal.formaciones.destroy')->middleware('auth');//Edit vista
+
+
+//rutas que van a ser de Estudiantes del sitema CreateReadUpdateDelete
+//trabajando con vistas
+Route::get('/admin/estudiantes/', [App\Http\Controllers\EstudianteController::class,'index'])->name('admin.estudiantes.index')->middleware('auth');
+Route::get('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class,'create'])->name('admin.estudiantes.create')->middleware('auth');
+Route::post('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class,'store'])->name('admin.estudiantes.store')->middleware('auth');
+Route::get('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class,'show'])->name('admin.estudiantes.show')->middleware('auth');
+Route::get('/admin/estudiantes/{id}/edit', [App\Http\Controllers\EstudianteController::class,'edit'])->name('admin.estudiantes.edit')->middleware('auth');
+Route::put('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class,'update'])->name('admin.estudiantes.update')->middleware('auth');
+Route::delete('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class,'destroy'])->name('admin.estudiantes.destroy')->middleware('auth');
+
+//ruta para registrar a padre de familia
+Route::post('/admin/estudiantes/ppffs/create',[App\Http\Controllers\PpffController::class,'store'])->name('admin.ppffs.store')->middleware('auth');

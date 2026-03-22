@@ -382,6 +382,13 @@ return [
                 ],
             ],
         ],
+          //Estudiantes
+        [
+            'text'    => 'Estudiantes',
+            'icon'    => 'fas fa-fw fa-user-graduate',
+            'classes' => 'bg-blue text-white',
+             'url'  => 'admin/estudiantes',
+        ],
     ],
 
     /*
@@ -417,7 +424,7 @@ return [
     | https://github.com/jeroennoten/Laravel-AdminLTE/wiki/Plugins-Configuration
     |
     */
-     //se añadieron plugins para transformar a pdf y tambien a excel
+    //se añadieron plugins para transformar a pdf y tambien a excel
     'plugins' => [
         'Datatables' => [
             'active' => true,
