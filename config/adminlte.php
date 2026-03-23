@@ -382,13 +382,28 @@ return [
                 ],
             ],
         ],
-          //Estudiantes
+        //Padres de Fmailia
+        [
+            'text'    => 'Padres de familia',
+            'icon'    => 'fas fa-fw fa-house-user',
+            'classes' => 'bg-blue text-white',
+            'url'     => 'admin/ppffs',
+        ],
+        //Estudiantes
         [
             'text'    => 'Estudiantes',
             'icon'    => 'fas fa-fw fa-user-graduate',
             'classes' => 'bg-blue text-white',
-             'url'  => 'admin/estudiantes',
+            'url'  => 'admin/estudiantes',
         ],
+        // matriculaciones
+        [
+            'text'    => 'Matriculaciones',
+            'url'     => 'admin/matriculaciones',
+            'icon'    => 'fas fa-fw fa-clipboard-list',
+            'classes' => 'bg-blue text-white',
+        ],
+
     ],
 
     /*

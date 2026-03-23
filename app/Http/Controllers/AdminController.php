@@ -11,6 +11,8 @@ use App\Models\Paralelo;
 use App\Models\Materia;
 use Spatie\Permission\Models\Role;
 use App\Models\Personal;
+use App\Models\Estudiante;
+use App\Models\Ppff;
 
 class AdminController extends Controller
 {
@@ -27,10 +29,14 @@ class AdminController extends Controller
         $total_roles= Role::count();
         $total_personal_administrativos= Personal::where('tipo', 'administrativo')->count();
         $total_personal_docentes= Personal::where('tipo', 'docente')->count();
+        $total_estudiantes= Estudiante::count();
+        $total_ppffs=Ppff::count();
+
 
 
 
         return view('admin.index',compact('total_gestiones','total_periodos','total_niveles','total_grados'
-        ,'total_turnos','total_paralelos','total_materias','total_roles','total_personal_administrativos','total_personal_docentes'));
+        ,'total_turnos','total_paralelos','total_materias','total_roles','total_personal_administrativos','total_personal_docentes',
+        'total_estudiantes','total_ppffs'));
     }
 }

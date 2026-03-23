@@ -106,3 +106,13 @@ Table estudiantes {
   foto varchar
   estado varchar
 }
+
+Table matriculaciones{
+  id int [pk, increment]
+  estudiante_id int [ref: > estudiantes.id]
+  turno_id int [ref: > turnos.id]
+  gestion_id int [ref: > gestiones.id]
+  nivel_id int [ref: > niveles.id]
+  grado_id int [ref: > grados.id]
+  paralelo_id int [ref: > paralelos.id]
+}

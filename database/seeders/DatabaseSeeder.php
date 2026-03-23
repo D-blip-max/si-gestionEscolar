@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\Materia;
 use Spatie\Permission\Models\Role;
 use App\Models\Personal;
+use App\Models\Ppff;
+use App\Models\Estudiante;
 
 
 
@@ -341,5 +343,116 @@ class DatabaseSeeder extends Seeder
             'profesion' => 'Lic. en Geografía',
             'foto' => 'uploads/fotos/' . time() . '_jorge.jpg'
         ]);
+        //padres de familia
+        $p1 = Ppff::create(['nombres' => 'Ricardo', 'apellidos' => 'Mendoza Luna', 'ci' => '1000001', 'fecha_nacimiento' => '1975-04-12', 'telefono' => '71000001', 'parentesco' => 'Padre', 'ocupacion' => 'Ingeniero Civil', 'direccion' => 'Av. Banzer, Calle 4 Este #45']);
+        $p2 = Ppff::create(['nombres' => 'Beatriz', 'apellidos' => 'Sosa Villalba', 'ci' => '1000002', 'fecha_nacimiento' => '1978-08-22', 'telefono' => '71000002', 'parentesco' => 'Madre', 'ocupacion' => 'Contadora', 'direccion' => 'Barrio Equipetrol, Calle Tucumán #12']);
+        $p3 = Ppff::create(['nombres' => 'Humberto', 'apellidos' => 'Guzmán Rico', 'ci' => '1000003', 'fecha_nacimiento' => '1980-01-30', 'telefono' => '71000003', 'parentesco' => 'Tutor', 'ocupacion' => 'Abogado', 'direccion' => 'Zona Sur, Av. Las Lomas#300']);
+        $p4 = Ppff::create(['nombres' => 'Elena', 'apellidos' => 'Paredes Soliz', 'ci' => '1000004', 'fecha_nacimiento' => '1982-11-15', 'telefono' => '71000004', 'parentesco' => 'Madre', 'ocupacion' => 'Médico Pediatra', 'direccion' => 'Condominio La Riviera, dpto 4B']);
+        $p5 = Ppff::create(['nombres' => 'Marcos', 'apellidos' => 'Peña Durán', 'ci' => '1000005', 'fecha_nacimiento' => '1976-06-05', 'telefono' => '71000005', 'parentesco' => 'Padre', 'ocupacion' => 'Arquitecto', 'direccion' => 'Urb. Los Pinos, Pasaje C #5']);
+        $p6 = Ppff::create(['nombres' => 'Raquel', 'apellidos' => 'Ortiz Bravo', 'ci' => '1000006', 'fecha_nacimiento' => '1979-09-18', 'telefono' => '71000006', 'parentesco' => 'Madre', 'ocupacion' => 'Diseñadora Gráfica', 'direccion' => 'Av. Piraí, 4to Anillo #88']);
+        $p7 = Ppff::create(['nombres' => 'Gustavo', 'apellidos' => 'Ramos Calle', 'ci' => '1000007', 'fecha_nacimiento' => '1981-03-25', 'telefono' => '71000007', 'parentesco' => 'Padre', 'ocupacion' => 'Chef Ejecutiva', 'direccion' => 'Barrio Lujan, Av. San Aurelio#150']);
+        $p8 = Ppff::create(['nombres' => 'Clara', 'apellidos' => 'Vaca Méndez', 'ci' => '1000008', 'fecha_nacimiento' => '1983-12-10', 'telefono' => '71000008', 'parentesco' => 'Madre', 'ocupacion' => 'Administradora', 'direccion' => 'Villa Primero de Mayo, Calle 7']);
+        $p9 = Ppff::create(['nombres' => 'Silvia', 'apellidos' => 'Rojas Terceros', 'ci' => '1000009', 'fecha_nacimiento' => '1977-05-20', 'telefono' => '71000009', 'parentesco' => 'Tutor', 'ocupacion' => 'Periodista', 'direccion' => 'Plan 3000, Av. Principal #22']);
+        $p10 = Ppff::create(['nombres' => 'Andrés', 'apellidos' => 'Zeballos Paz', 'ci' => '1000010', 'fecha_nacimiento' => '1974-02-28', 'telefono' => '71000010', 'parentesco' => 'Padre', 'ocupacion' => 'Transportista', 'direccion' => 'Av. Santos Dumont, Calle Lanza #10']);
+
+        // --- HIJOS DE P1 ---
+        $u1 = User::create(['name' => 'Daniel Mendoza', 'email' => 'daniel.m@estudiante.com', 'password' => Hash::make('111001')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u1->id, 'ppff_id' => $p1->id, 'nombres' => 'Daniel', 'apellidos' => 'Mendoza', 'ci' => '111001', 'fecha_nacimiento' => '2010-05-10', 'telefono' => '60000001', 'direccion' => 'Av. Banzer #45', 'foto' => 'uploads/estudiantes/est1.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u2 = User::create(['name' => 'Carla Mendoza', 'email' => 'carla.m@estudiante.com', 'password' => Hash::make('111002')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u2->id, 'ppff_id' => $p1->id, 'nombres' => 'Carla', 'apellidos' => 'Mendoza', 'ci' => '111002', 'fecha_nacimiento' => '2012-08-15', 'telefono' => '60000002', 'direccion' => 'Av. Banzer #45', 'foto' => 'uploads/estudiantes/est2.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u3 = User::create(['name' => 'Roberto Mendoza', 'email' => 'roberto.m@estudiante.com', 'password' => Hash::make('111003')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u3->id, 'ppff_id' => $p1->id, 'nombres' => 'Roberto', 'apellidos' => 'Mendoza', 'ci' => '111003', 'fecha_nacimiento' => '2014-03-20', 'telefono' => '60000003', 'direccion' => 'Av. Banzer #45', 'foto' => 'uploads/estudiantes/est3.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        // --- HIJOS DE P2 ---
+        $u4 = User::create(['name' => 'Luis Sosa', 'email' => 'luis.s@estudiante.com', 'password' => Hash::make('111004')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u4->id, 'ppff_id' => $p2->id, 'nombres' => 'Luis', 'apellidos' => 'Sosa', 'ci' => '111004', 'fecha_nacimiento' => '2009-01-20', 'telefono' => '60000004', 'direccion' => 'Barrio Equipetrol #12', 'foto' => 'uploads/estudiantes/est4.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u5 = User::create(['name' => 'Ana Sosa', 'email' => 'ana.s@estudiante.com', 'password' => Hash::make('111005')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u5->id, 'ppff_id' => $p2->id, 'nombres' => 'Ana', 'apellidos' => 'Sosa', 'ci' => '111005', 'fecha_nacimiento' => '2011-03-12', 'telefono' => '60000005', 'direccion' => 'Barrio Equipetrol #12', 'foto' => 'uploads/estudiantes/est5.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u6 = User::create(['name' => 'Mario Sosa', 'email' => 'mario.s@estudiante.com', 'password' => Hash::make('111006')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u6->id, 'ppff_id' => $p2->id, 'nombres' => 'Mario', 'apellidos' => 'Sosa', 'ci' => '111006', 'fecha_nacimiento' => '2013-05-05', 'telefono' => '60000006', 'direccion' => 'Barrio Equipetrol #12', 'foto' => 'uploads/estudiantes/est6.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        // --- HIJOS DE P3 ---
+        $u7 = User::create(['name' => 'Hugo Guzmán', 'email' => 'hugo.g@estudiante.com', 'password' => Hash::make('111007')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u7->id, 'ppff_id' => $p3->id, 'nombres' => 'Hugo', 'apellidos' => 'Guzmán', 'ci' => '111007', 'fecha_nacimiento' => '2008-11-30', 'telefono' => '60000007', 'direccion' => 'Zona Sur #300', 'foto' => 'uploads/estudiantes/est7.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u8 = User::create(['name' => 'Sofia Guzmán', 'email' => 'sofia.g@estudiante.com', 'password' => Hash::make('111008')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u8->id, 'ppff_id' => $p3->id, 'nombres' => 'Sofia', 'apellidos' => 'Guzmán', 'ci' => '111008', 'fecha_nacimiento' => '2013-02-14', 'telefono' => '60000008', 'direccion' => 'Zona Sur #300', 'foto' => 'uploads/estudiantes/est8.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u9 = User::create(['name' => 'Mateo Guzmán', 'email' => 'mateo.g@estudiante.com', 'password' => Hash::make('111009')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u9->id, 'ppff_id' => $p3->id, 'nombres' => 'Mateo', 'apellidos' => 'Guzmán', 'ci' => '111009', 'fecha_nacimiento' => '2015-06-10', 'telefono' => '60000009', 'direccion' => 'Zona Sur #300', 'foto' => 'uploads/estudiantes/est9.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        // --- HIJOS DE P4 ---
+        $u10 = User::create(['name' => 'Pedro Paredes', 'email' => 'pedro.p@estudiante.com', 'password' => Hash::make('111010')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u10->id, 'ppff_id' => $p4->id, 'nombres' => 'Pedro', 'apellidos' => 'Paredes', 'ci' => '111010', 'fecha_nacimiento' => '2010-07-07', 'telefono' => '60000010', 'direccion' => 'Cond. La Riviera', 'foto' => 'uploads/estudiantes/est10.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u11 = User::create(['name' => 'Marta Paredes', 'email' => 'marta.p@estudiante.com', 'password' => Hash::make('111011')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u11->id, 'ppff_id' => $p4->id, 'nombres' => 'Marta', 'apellidos' => 'Paredes', 'ci' => '111011', 'fecha_nacimiento' => '2012-12-25', 'telefono' => '60000011', 'direccion' => 'Cond. La Riviera', 'foto' => 'uploads/estudiantes/est11.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u12 = User::create(['name' => 'Lucía Paredes', 'email' => 'lucia.p@estudiante.com', 'password' => Hash::make('111012')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u12->id, 'ppff_id' => $p4->id, 'nombres' => 'Lucía', 'apellidos' => 'Paredes', 'ci' => '111012', 'fecha_nacimiento' => '2014-01-15', 'telefono' => '60000012', 'direccion' => 'Cond. La Riviera', 'foto' => 'uploads/estudiantes/est12.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        // --- HIJOS DE P5 ---
+        $u13 = User::create(['name' => 'Jorge Peña', 'email' => 'jorge.pe@estudiante.com', 'password' => Hash::make('111013')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u13->id, 'ppff_id' => $p5->id, 'nombres' => 'Jorge', 'apellidos' => 'Peña', 'ci' => '111013', 'fecha_nacimiento' => '2009-04-05', 'telefono' => '60000013', 'direccion' => 'Urb. Los Pinos', 'foto' => 'uploads/estudiantes/est13.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u14 = User::create(['name' => 'Lucas Peña', 'email' => 'lucas.pe@estudiante.com', 'password' => Hash::make('111014')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u14->id, 'ppff_id' => $p5->id, 'nombres' => 'Lucas', 'apellidos' => 'Peña', 'ci' => '111014', 'fecha_nacimiento' => '2011-06-18', 'telefono' => '60000014', 'direccion' => 'Urb. Los Pinos', 'foto' => 'uploads/estudiantes/est14.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u15 = User::create(['name' => 'Sara Peña', 'email' => 'sara.pe@estudiante.com', 'password' => Hash::make('111015')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u15->id, 'ppff_id' => $p5->id, 'nombres' => 'Sara', 'apellidos' => 'Peña', 'ci' => '111015', 'fecha_nacimiento' => '2013-09-22', 'telefono' => '60000015', 'direccion' => 'Urb. Los Pinos', 'foto' => 'uploads/estudiantes/est15.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        // --- HIJOS DE P6 ---
+        $u16 = User::create(['name' => 'Valeria Ortiz', 'email' => 'valeria.o@estudiante.com', 'password' => Hash::make('111016')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u16->id, 'ppff_id' => $p6->id, 'nombres' => 'Valeria', 'apellidos' => 'Ortiz', 'ci' => '111016', 'fecha_nacimiento' => '2010-09-01', 'telefono' => '60000016', 'direccion' => 'Av. Piraí #88', 'foto' => 'uploads/estudiantes/est16.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u17 = User::create(['name' => 'Bruno Ortiz', 'email' => 'bruno.o@estudiante.com', 'password' => Hash::make('111017')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u17->id, 'ppff_id' => $p6->id, 'nombres' => 'Bruno', 'apellidos' => 'Ortiz', 'ci' => '111017', 'fecha_nacimiento' => '2012-10-10', 'telefono' => '60000017', 'direccion' => 'Av. Piraí #88', 'foto' => 'uploads/estudiantes/est17.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u18 = User::create(['name' => 'Claudio Ortiz', 'email' => 'claudio.o@estudiante.com', 'password' => Hash::make('111018')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u18->id, 'ppff_id' => $p6->id, 'nombres' => 'Claudio', 'apellidos' => 'Ortiz', 'ci' => '111018', 'fecha_nacimiento' => '2014-02-28', 'telefono' => '60000018', 'direccion' => 'Av. Piraí #88', 'foto' => 'uploads/estudiantes/est18.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        // --- HIJOS DE P7 ---
+        $u19 = User::create(['name' => 'Fabio Ramos', 'email' => 'fabio.r@estudiante.com', 'password' => Hash::make('111019')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u19->id, 'ppff_id' => $p7->id, 'nombres' => 'Fabio', 'apellidos' => 'Ramos', 'ci' => '111019', 'fecha_nacimiento' => '2008-05-20', 'telefono' => '60000019', 'direccion' => 'Barrio Lujan #150', 'foto' => 'uploads/estudiantes/est19.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u20 = User::create(['name' => 'Andrea Ramos', 'email' => 'andrea.r@estudiante.com', 'password' => Hash::make('111020')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u20->id, 'ppff_id' => $p7->id, 'nombres' => 'Andrea', 'apellidos' => 'Ramos', 'ci' => '111020', 'fecha_nacimiento' => '2010-11-05', 'telefono' => '60000020', 'direccion' => 'Barrio Lujan #150', 'foto' => 'uploads/estudiantes/est20.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u21 = User::create(['name' => 'Iker Ramos', 'email' => 'iker.r@estudiante.com', 'password' => Hash::make('111021')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u21->id, 'ppff_id' => $p7->id, 'nombres' => 'Iker', 'apellidos' => 'Ramos', 'ci' => '111021', 'fecha_nacimiento' => '2013-07-14', 'telefono' => '60000021', 'direccion' => 'Barrio Lujan #150', 'foto' => 'uploads/estudiantes/est21.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        // --- HIJOS DE P8 ---
+        $u22 = User::create(['name' => 'Isabela Vaca', 'email' => 'isabela.v@estudiante.com', 'password' => Hash::make('111022')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u22->id, 'ppff_id' => $p8->id, 'nombres' => 'Isabela', 'apellidos' => 'Vaca', 'ci' => '111022', 'fecha_nacimiento' => '2011-11-11', 'telefono' => '60000022', 'direccion' => 'Villa 1ro de Mayo', 'foto' => 'uploads/estudiantes/est22.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u23 = User::create(['name' => 'Julian Vaca', 'email' => 'julian.v@estudiante.com', 'password' => Hash::make('111023')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u23->id, 'ppff_id' => $p8->id, 'nombres' => 'Julian', 'apellidos' => 'Vaca', 'ci' => '111023', 'fecha_nacimiento' => '2013-01-22', 'telefono' => '60000023', 'direccion' => 'Villa 1ro de Mayo', 'foto' => 'uploads/estudiantes/est23.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u24 = User::create(['name' => 'Noelia Vaca', 'email' => 'noelia.v@estudiante.com', 'password' => Hash::make('111024')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u24->id, 'ppff_id' => $p8->id, 'nombres' => 'Noelia', 'apellidos' => 'Vaca', 'ci' => '111024', 'fecha_nacimiento' => '2015-08-30', 'telefono' => '60000024', 'direccion' => 'Villa 1ro de Mayo', 'foto' => 'uploads/estudiantes/est24.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        // --- HIJOS DE P9 ---
+        $u25 = User::create(['name' => 'Mateo Rojas', 'email' => 'mateo.r@estudiante.com', 'password' => Hash::make('111025')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u25->id, 'ppff_id' => $p9->id, 'nombres' => 'Mateo', 'apellidos' => 'Rojas', 'ci' => '111025', 'fecha_nacimiento' => '2012-01-30', 'telefono' => '60000025', 'direccion' => 'Plan 3000 #22', 'foto' => 'uploads/estudiantes/est25.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u26 = User::create(['name' => 'Elena Rojas', 'email' => 'elena.ro@estudiante.com', 'password' => Hash::make('111026')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u26->id, 'ppff_id' => $p9->id, 'nombres' => 'Elena', 'apellidos' => 'Rojas', 'ci' => '111026', 'fecha_nacimiento' => '2014-04-12', 'telefono' => '60000026', 'direccion' => 'Plan 3000 #22', 'foto' => 'uploads/estudiantes/est26.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u27 = User::create(['name' => 'Victor Rojas', 'email' => 'victor.r@estudiante.com', 'password' => Hash::make('111027')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u27->id, 'ppff_id' => $p9->id, 'nombres' => 'Victor', 'apellidos' => 'Rojas', 'ci' => '111027', 'fecha_nacimiento' => '2016-02-05', 'telefono' => '60000027', 'direccion' => 'Plan 3000 #22', 'foto' => 'uploads/estudiantes/est27.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        // --- HIJOS DE P10 ---
+        $u28 = User::create(['name' => 'Oscar Zeballos', 'email' => 'oscar.z@estudiante.com', 'password' => Hash::make('111028')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u28->id, 'ppff_id' => $p10->id, 'nombres' => 'Oscar', 'apellidos' => 'Zeballos', 'ci' => '111028', 'fecha_nacimiento' => '2009-10-10', 'telefono' => '60000028', 'direccion' => 'Av. Santos Dumont', 'foto' => 'uploads/estudiantes/est28.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+        $u29 = User::create(['name' => 'Paula Zeballos', 'email' => 'paula.z@estudiante.com', 'password' => Hash::make('111029')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u29->id, 'ppff_id' => $p10->id, 'nombres' => 'Paula', 'apellidos' => 'Zeballos', 'ci' => '111029', 'fecha_nacimiento' => '2011-12-01', 'telefono' => '60000029', 'direccion' => 'Av. Santos Dumont', 'foto' => 'uploads/estudiantes/est29.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+
+        $u30 = User::create(['name' => 'Raúl Zeballos', 'email' => 'raul.z@estudiante.com', 'password' => Hash::make('111030')])->assignRole('ESTUDIANTE');
+        Estudiante::create(['usuario_id' => $u30->id, 'ppff_id' => $p10->id, 'nombres' => 'Raúl', 'apellidos' => 'Zeballos', 'ci' => '111030', 'fecha_nacimiento' => '2013-05-18', 'telefono' => '60000030', 'direccion' => 'Av. Santos Dumont', 'foto' => 'uploads/estudiantes/est30.jpg', 'genero' => 'Masculino', 'estado' => 1]);
     }
 }

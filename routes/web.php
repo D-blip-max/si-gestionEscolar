@@ -119,4 +119,11 @@ Route::put('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController
 Route::delete('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class,'destroy'])->name('admin.estudiantes.destroy')->middleware('auth');
 
 //ruta para registrar a padre de familia
-Route::post('/admin/estudiantes/ppffs/create',[App\Http\Controllers\PpffController::class,'store'])->name('admin.ppffs.store')->middleware('auth');
+Route::get('/admin/ppffs',[App\Http\Controllers\PpffController::class,'index'])->name('admin.ppffs.index')->middleware('auth');
+Route::post('/admin/estudiantes/ppffs/create',[App\Http\Controllers\PpffController::class,'store'])->name('admin.estudiantes.ppffs.store')->middleware('auth');
+Route::get('/admin/ppffs/create',[App\Http\Controllers\PpffController::class,'create'])->name('admin.ppffs.create')->middleware('auth');
+Route::post('/admin/ppffs/create',[App\Http\Controllers\PpffController::class,'store_ppffs'])->name('admin.ppffs.store')->middleware('auth');
+Route::get('/admin/ppffs/{id}',[App\Http\Controllers\PpffController::class,'show'])->name('admin.ppffs.show')->middleware('auth');
+Route::get('/admin/ppffs/{id}/edit',[App\Http\Controllers\PpffController::class,'edit'])->name('admin.ppffs.edit')->middleware('auth');
+Route::put('/admin/ppffs/{id}',[App\Http\Controllers\PpffController::class,'update'])->name('admin.ppffs.update')->middleware('auth');
+Route::delete('/admin/ppffs/{id}',[App\Http\Controllers\PpffController::class,'destroy'])->name('admin.ppffs.destroy')->middleware('auth');
