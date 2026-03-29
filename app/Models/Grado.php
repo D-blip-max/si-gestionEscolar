@@ -13,11 +13,17 @@ class Grado extends Model
         'nombre',
         'nivel_id'
     ];
-    public function nivel() {
+    public function nivel()
+    {
         return $this->belongsTo(Nivel::class);
     }
-    public function paralelos() {
+    public function paralelos()
+    {
         return $this->hasMany(Paralelo::class);
     }
-
+    
+    public function matriculaciones()
+    {
+        return $this->hasMany(Matriculacion::class);
+    }
 }

@@ -157,9 +157,10 @@ class EstudianteController extends Controller
 
         $estudiante->save();
 
-        return redirect()->route('admin.estudiantes.index')
+         return redirect()->route('admin.estudiantes.index')
             ->with('mensaje', 'El estudiante se ha actualizado correctamente')
             ->with('icono', 'success');
+
     }
 
     /**

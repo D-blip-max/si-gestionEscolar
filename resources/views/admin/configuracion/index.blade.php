@@ -4,7 +4,7 @@
     <h1>Datos del Sistema</h1>
     <hr>
 @stop
-
+{{-- FORM --}}
 @section('content')
     <div class="row">
         <div class="col-md-12">
@@ -15,7 +15,7 @@
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ url('/admin/configuracion/create') }}" method="POST" >
+                    <form action="{{ url('/admin/configuracion/create') }}" method="POST"  enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-md-4">
@@ -27,20 +27,20 @@
                                         placeholder="Escriba aquí..." onchange="mostrarImagen(event)" accept="image/*">
                                     <br>
                                     {{-- Este es un comentario secreto de Blade --}}
-                                    {{-- esto es lo que hizo el wachicolero del coso coso
+                                    {{-- esto es lo que hizo el wachicolero del coso coso --}}
                                     <center>
                                         <img id="preview" src="{{url($configuracion->logo)}}" style="max-width: 200px; margin-top: 10px;">
                                     </center>
-                                    --}}
+                                    
                                     {{-- esto hizo G --}}
-
+                                    {{--  
                                     <center>
                                         @if ($configuracion && $configuracion->logo)
                                             <img id="preview" src="{{ url($configuracion->logo) }}"
                                                 style="max-width: 200px; margin-top: 10px;">
                                         @endif
                                     </center>
-
+                                    --}}
                                     @error('logo')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror

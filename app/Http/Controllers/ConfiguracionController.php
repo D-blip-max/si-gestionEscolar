@@ -46,7 +46,11 @@ class ConfiguracionController extends Controller
 
       if ($request->hasFile('logo')) {
         // Eliminar el logo anterior físicamente si existe para no llenar el server de basura
-        if ($configuracion->logo) {
+        /* if ($configuracion->logo) {
+          unlink(public_path($configuracion->logo));
+        }
+        */        // Eliminar logo anterior
+        if ($configuracion->logo && file_exists(public_path($configuracion->logo))) {
           unlink(public_path($configuracion->logo));
         }
 

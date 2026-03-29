@@ -7,12 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class Gestion extends Model
 {
     //
-    protected $table="gestions";
+    protected $table = "gestions";
     protected $fillable = [
-        'nombre',];
+        'nombre',
+    ];
 
-    public function periodos()// 1 gestion tiene muchos periodos
+    public function periodos() // 1 gestion tiene muchos periodos
     {
-      return $this->hasMany(Periodo::class);
+        return $this->hasMany(Periodo::class);
+    }
+
+    
+    public function matriculaciones()
+    {
+        return $this->hasMany(Matriculacion::class);
     }
 }

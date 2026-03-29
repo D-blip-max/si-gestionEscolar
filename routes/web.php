@@ -127,3 +127,9 @@ Route::get('/admin/ppffs/{id}',[App\Http\Controllers\PpffController::class,'show
 Route::get('/admin/ppffs/{id}/edit',[App\Http\Controllers\PpffController::class,'edit'])->name('admin.ppffs.edit')->middleware('auth');
 Route::put('/admin/ppffs/{id}',[App\Http\Controllers\PpffController::class,'update'])->name('admin.ppffs.update')->middleware('auth');
 Route::delete('/admin/ppffs/{id}',[App\Http\Controllers\PpffController::class,'destroy'])->name('admin.ppffs.destroy')->middleware('auth');
+
+//ruta para la ruta de matriculaciones
+Route::get('/admin/matriculaciones',[App\Http\Controllers\MatriculacionController::class,'index'])->name('admin.matriculaciones.index')->middleware('auth');
+Route::get('/admin/matriculaciones/create',[App\Http\Controllers\MatriculacionController::class,'create'])->name('admin.matriculaciones.create')->middleware('auth');
+Route::post('/admin/matriculaciones/create',[App\Http\Controllers\MatriculacionController::class,'store'])->name('admin.matriculaciones.store')->middleware('auth');
+Route::get('/admin/matriculaciones/buscar_estudiante/{id}',[App\Http\Controllers\MatriculacionController::class,'buscar_estudiante'])->name('admin.matriculaciones.buscar_estudiante')->middleware('auth');
