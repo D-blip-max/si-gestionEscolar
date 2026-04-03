@@ -157,7 +157,7 @@
 
                     <form action="{{ url('/admin/matriculaciones/create') }}" method="post">
                         @csrf
-                        <input type="text" name="estudiante_id" id="estudiante_id" hidden>
+                        <input type="text" name="estudiante_id" id="estudiante_id" hidden required>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -166,7 +166,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-clock"></i></span>
                                         </div>
-                                        <select name="turno_id" id="" class="form-control">
+                                        <select name="turno_id" id="" class="form-control" required>
                                             <option value="">Seleccione un turno...</option>
                                             @foreach ($turnos as $turno)
                                                 <option value="{{ $turno->id }}">{{ $turno->nombre }}</option>
@@ -185,7 +185,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-university"></i></span>
                                         </div>
-                                        <select name="gestion_id" id="" class="form-control">
+                                        <select name="gestion_id" id="" class="form-control" required>
                                             <option value="">Seleccione una gestión...</option>
                                             @foreach ($gestiones as $gestione)
                                                 <option value="{{ $gestione->id }}">{{ $gestione->nombre }}</option>
@@ -199,14 +199,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Niveles</label><b> (*)</b>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
                                         </div>
-                                        <select name="nivel_id" id="" class="form-control">
+                                        <select name="nivel_id" id="niveles" class="form-control" required>
                                             <option value="">Seleccione un nivel...</option>
                                             @foreach ($niveles as $nivele)
                                                 <option value="{{ $nivele->id }}">{{ $nivele->nombre }}</option>
@@ -214,6 +214,20 @@
                                         </select>
                                     </div>
                                     @error('nivel_id')
+                                        <small style="color: red">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="">Fecha</label><b> (*)</b>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                        </div>
+                                        <input type="date" class="form-control" name="fecha_matriculacion" required>
+                                    </div>
+                                    @error('paralelo_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
                                 </div>
@@ -229,11 +243,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-list-alt"></i></span>
                                         </div>
-                                        <select name="grado_id" id="" class="form-control">
-                                            <option value="">Seleccione un grado...</option>
-                                            @foreach ($grados as $grado)
-                                                <option value="{{ $grado->id }}">{{ $grado->nombre }}</option>
-                                            @endforeach
+                                        <select name="grado_id" id="grados" class="form-control" required>
+                                            <option value="">Primero Seleccione un Nivel...</option>
+
                                         </select>
                                     </div>
                                     @error('grado_id')
@@ -248,16 +260,30 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-clone"></i></span>
                                         </div>
-                                        <select name="paralelo_id" id="" class="form-control">
-                                            <option value="">Seleccione un paralelo...</option>
-                                            @foreach ($paralelos as $paralelo)
-                                                <option value="{{ $paralelo->id }}">{{ $paralelo->nombre }}</option>
-                                            @endforeach
+                                        <select name="paralelo_id" id="paralelos" class="form-control" required>
+                                            <option value="">Primero Seleccione un grado...</option>
+
                                         </select>
                                     </div>
                                     @error('paralelo_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <a href="{{ url('/admin/matriculaciones') }}" class="btn btn-default">
+                                        <i class="fas fa-arrow-left"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Guardar
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -280,6 +306,50 @@
 @section('js')
     <script>
         $('.select2').select2({});
+
+        $('#niveles').on('change', function() {
+            var id = $(this).val();
+            if (id) {
+                $.ajax({
+                    url: "{{ url('/admin/matriculaciones/buscar_grado/') }}" + '/' + id,
+                    type: 'GET',
+                    success: function(grados) {
+                        var options = '<option value="">Seleccione un grado...</option>';
+                        $.each(grados, function(key, value) {
+                            options += '<option value="' + key + '">' + value + '</option>';
+                        });
+                        $('#grados').html(options);
+                    },
+                    error: function() {
+                        alert('No se puede obtener información del nivel');
+                    }
+                });
+            } else {
+                alert('Seleccione un nivel...');
+            }
+        });
+
+        $('#grados').on('change', function() {
+            var id = $(this).val();
+            if (id) {
+                $.ajax({
+                    url: "{{ url('/admin/matriculaciones/buscar_paralelo/') }}" + '/' + id,
+                    type: 'GET',
+                    success: function(paralelos) {
+                        var options = '<option value="">Seleccione un paralelo...</option>';
+                        $.each(paralelos, function(key, value) {
+                            options += '<option value="' + key + '">' + value + '</option>';
+                        });
+                        $('#paralelos').html(options);
+                    },
+                    error: function() {
+                        alert('No se puede obtener información del grado');
+                    }
+                });
+            } else {
+                alert('Seleccione un nivel...');
+            }
+        });
 
         $('#buscar_estudiante').on('change', function() {
             var id = $(this).val();

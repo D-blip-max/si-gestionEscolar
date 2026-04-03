@@ -36,28 +36,42 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($matriculaciones as $matricuacione)
+                            @foreach ($matriculaciones as $matriculacione)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                   <td>
+                                    <td style="text-align: center">{{ $loop->iteration }}</td>
+                                    <td>{{ $matriculacione->estudiante->apellidos . ' ' . $matriculacione->estudiante->nombres }}
+                                    </td>
+                                    <td>{{ $matriculacione->estudiante->ci }}</td>
+                                    <td>{{ $matriculacione->turno->nombre }}</td>
+                                    <td style="text-align: center">{{ $matriculacione->gestion->nombre }}</td>
+                                    <td>{{ $matriculacione->nivel->nombre }}</td>
+                                    <td>{{ $matriculacione->grado->nombre }}</td>
+                                    <td style="text-align: center">{{ $matriculacione->paralelo->nombre }}</td>
+                                    <td style="text-align: center">{{ $matriculacione->fecha_matriculacion }}</td>
+
+
+                                    <td>
 
                                         <div class="row d-flex justify-content-center">
 
-                                            <a href="{{ url('/admin/matriculaciones/' . $matricuacione->id . '/edit') }}"
+                                            <a href="{{ url('/admin/matriculaciones/pdf/' . $matriculacione->id) }}"
+                                                class="btn btn-warning btn-sm"><i class="fas fa-print"></i> Matricula</a>
+                                                
+                                            <a href="{{ url('/admin/matriculaciones/' . $matriculacione->id . '/edit') }}"
                                                 class="btn btn-success btn-sm">
                                                 <i class="fas fa-pencil-alt"></i> Editar
                                             </a>
-                                            <a href="{{ url('/admin/matriculaciones/' . $matricuacione->id) }}"
+                                            <a href="{{ url('/admin/matriculaciones/' . $matriculacione->id) }}"
                                                 class="btn btn-info btn-sm">
                                                 <i class="fas fa-eye"></i> ver
                                             </a>
 
-                                            <form action="{{ url('/admin/matriculaciones/' . $matricuacione->id) }}"
-                                                method="post" id="miFormulario{{ $matricuacione->id }}">
+                                            <form action="{{ url('/admin/matriculaciones/' . $matriculacione->id) }}"
+                                                method="post" id="miFormulario{{ $matriculacione->id }}">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm"
-                                                    onclick="preguntar{{ $matricuacione->id }}(event)">
+                                                    onclick="preguntar{{ $matriculacione->id }}(event)">
                                                     <i class="fas fa-trash-alt"></i> Eliminar
                                                 </button>
                                             </form>
@@ -66,7 +80,7 @@
 
 
                                         <script>
-                                            function preguntar{{ $matricuacione->id }}(event) {
+                                            function preguntar{{ $matriculacione->id }}(event) {
                                                 event.preventDefault();
 
                                                 Swal.fire({
@@ -81,7 +95,7 @@
                                                 }).then((result) => {
                                                     if (result.isConfirmed) {
                                                         // JavaScript puro para enviar el formulario
-                                                        document.getElementById('miFormulario{{ $matricuacione->id }}').submit();
+                                                        document.getElementById('miFormulario{{ $matriculacione->id }}').submit();
                                                     }
                                                 });
                                             }
