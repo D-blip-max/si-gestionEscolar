@@ -13,7 +13,7 @@ use App\Models\Paralelo;
 use App\Models\Ppff;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Configuracion;
-    
+
 
 class MatriculacionController extends Controller
 {
@@ -129,7 +129,7 @@ class MatriculacionController extends Controller
     {
         $configuracion = Configuracion::first();
         $matricula = Matriculacion::with('estudiante', 'turno', 'gestion', 'nivel', 'grado', 'paralelo')->find($id);
-     //  return response()->json($configuracion);
+        //  return response()->json($configuracion);
         $pdf = PDF::loadView('admin.matriculaciones.pdf', compact('configuracion', 'matricula'));
         $pdf->setPaper('letter', 'portrait');
         $pdf->setOptions(['defaultFont' => 'sans-serif']);
@@ -140,32 +140,94 @@ class MatriculacionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Matriculacion $matriculacion)
+    public function show($id)
     {
-        //
+        $matricula = Matriculacion::with('estudiante', 'turno', 'gestion', 'nivel', 'grado', 'paralelo')->find($id);
+        return view('admin.matriculaciones.show', compact('matricula'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Matriculacion $matriculacion)
+    public function edit($id)
     {
-        //
+        $matricula = Matriculacion::with('estudiante', 'turno', 'gestion', 'nivel', 'grado', 'paralelo')->find($id);
+
+        $turnos = Turno::all();
+        $gestiones = Gestion::all();
+        $niveles = Nivel::all();
+        $grados = Grado::where('nivel_id', $matricula->nivel_id)->get();
+        $paralelos = Paralelo::where('grado_id', $matricula->grado_id)->get();
+        $estudiantes = Estudiante::all();
+        return view('admin.matriculaciones.edit', compact(
+            'matricula',
+            'turnos',
+            'gestiones',
+            'niveles',
+            'grados',
+            'paralelos',
+            'estudiantes'
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Matriculacion $matriculacion)
+    public function update(Request $request,  $id)
     {
-        //
+        $matriculacion = Matriculacion::find($id);
+
+        $request->validate([
+            'estudiante_id'     => 'required',
+            'turno_id'          => 'required',
+            'gestion_id'        => 'required',
+            'nivel_id'          => 'required',
+            'grado_id'          => 'required',
+            'paralelo_id'       => 'required',
+            'fecha_matriculacion' => 'required',
+        ]);
+
+        //validacion para estudiantes ya matriculados
+        $estudiante_duplicado = Matriculacion::where('estudiante_id', $request->estudiante_id)
+            ->where('turno_id', $request->turno_id)
+            ->where('gestion_id', $request->gestion_id)
+            ->where('nivel_id', $request->nivel_id)
+            ->where('grado_id', $request->grado_id)
+            ->where('paralelo_id', $request->paralelo_id)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($estudiante_duplicado) {
+            return redirect()->back()->with([
+                'mensaje' => 'El estudiante ya esta matriculado',
+                'icono'   => 'error',
+            ]);
+        }
+
+        $matriculacion->estudiante_id = $request->estudiante_id;
+        $matriculacion->turno_id = $request->turno_id;
+        $matriculacion->gestion_id = $request->gestion_id;
+        $matriculacion->nivel_id = $request->nivel_id;
+        $matriculacion->grado_id = $request->grado_id;
+        $matriculacion->paralelo_id = $request->paralelo_id;
+        $matriculacion->fecha_matriculacion = $request->fecha_matriculacion;
+        $matriculacion->save();
+
+        return redirect()->route('admin.matriculaciones.index')
+            ->with('mensaje', 'La matriculación se ha actualizado correctamente')
+            ->with('icono', 'success');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Matriculacion $matriculacion)
+    public function destroy($id)
     {
-        //
+        $matricula = Matriculacion::find($id);
+        $matricula->delete();
+
+        return redirect()->route('admin.matriculaciones.index')
+            ->with('mensaje', 'La matriculación se ha eliminado correctamente')
+            ->with('icono', 'success');
     }
 }

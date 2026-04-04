@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1>Modificacion de la Matriculacion del Estudiante</h1>
+    <h1>Datos de la Matriculacion del Estudiante</h1>
     <hr>
 @stop
 
@@ -11,37 +11,13 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-success">
+                    <div class="card card-info">
                         <div class="card-header">
                             <h3 class="card-title">Datos del Estudiante</h3>
                         </div>
 
                         <div class="card-body">
 
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="">Buscar estudiante: <b>(*)</b></label>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fas fa-users"></i></span>
-                                            </div>
-                                            <select name="" id="buscar_estudiante" class="form-control select2">
-                                                <option value="">Selecciona un estudiante...</option>
-                                                @foreach ($estudiantes as $estudiante)
-                                                    <option value="{{ $estudiante->id }}"
-                                                        {{ $matricula->estudiante_id == $estudiante->id ? 'selected' : '' }}>
-                                                        {{ $estudiante->apellidos . ' ' . $estudiante->nombres . ' - ' . $estudiante->ci }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        @error('nombre')
-                                            <small style="color: red">{{ $message }}</small>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
                             <div id="datos_estudiante">
                                 <div class="row">
 
@@ -128,39 +104,34 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <div class="card card-success">
+                    <div class="card card-info">
                         <div class="card-header">
                             <h3 class="card-title">Historial Academico</h3>
                         </div>
 
                         <div class="card-body">
-                            <div id="tabla_historial">
-                                <div id="tabla_bd">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Turno</th>
-                                                <th>Gestión</th>
-                                                <th>Nivel</th>
-                                                <th>Grado</th>
-                                                <th>Paralelo</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($matricula->estudiante->matriculaciones as $datos)
-                                                <tr>
-                                                    <td>{{ $datos->turno->nombre }}</td>
-                                                    <td>{{ $datos->gestion->nombre }}</td>
-                                                    <td>{{ $datos->nivel->nombre }}</td>
-                                                    <td>{{ $datos->grado->nombre }}</td>
-                                                    <td>{{ $datos->paralelo->nombre }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Turno</th>
+                                        <th>Gestión</th>
+                                        <th>Nivel</th>
+                                        <th>Grado</th>
+                                        <th>Paralelo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($matricula->estudiante->matriculaciones as $datos)
+                                        <tr>
+                                            <td>{{ $datos->turno->nombre }}</td>
+                                            <td>{{ $datos->gestion->nombre }}</td>
+                                            <td>{{ $datos->nivel->nombre }}</td>
+                                            <td>{{ $datos->grado->nombre }}</td>
+                                            <td>{{ $datos->paralelo->nombre }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
 
                         </div>
 
@@ -174,35 +145,21 @@
 
         <div class="col-md-4">
 
-            <div class="card card-success">
+            <div class="card card-info">
                 <div class="card-header">
                     <h3 class="card-title">Llene los datos del formulario</h3>
                 </div>
 
                 <div class="card-body">
 
-                    <form action="{{ url('/admin/matriculaciones/' . $matricula->id) }}" method="post">
-                        @csrf
-                        @method('PUT')
-                        <input type="text" value="{{ $matricula->estudiante->id }}" name="estudiante_id"
-                            id="estudiante_id" hidden required>
+                        <input type="text" name="estudiante_id" id="estudiante_id" hidden required>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Turnos</label><b> (*)</b>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-clock"></i></span>
-                                        </div>
-                                        <select name="turno_id" id="" class="form-control" required>
-                                            <option value="">Seleccione un turno...</option>
-                                            @foreach ($turnos as $turno)
-                                                <option value="{{ $turno->id }}"
-                                                    {{ $matricula->turno_id == $turno->id ? 'selected' : '' }}>
-                                                    {{ $turno->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    <p>
+                                        {{ $matricula->turno->nombre }}
+                                    </p>
                                     @error('turno_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
@@ -211,19 +168,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Gestiones</label><b> (*)</b>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-university"></i></span>
-                                        </div>
-                                        <select name="gestion_id" id="" class="form-control" required>
-
-                                            @foreach ($gestiones as $gestione)
-                                                <option value="{{ $gestione->id }}"
-                                                    {{ $matricula->gestion_id == $gestione->id ? 'selected' : '' }}>
-                                                    {{ $gestione->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    <p>
+                                        {{ $matricula->gestion->nombre }}
+                                    </p>
                                     @error('gestion_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
@@ -234,19 +181,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Niveles</label><b> (*)</b>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
-                                        </div>
-                                        <select name="nivel_id" id="niveles" class="form-control" required>
-
-                                            @foreach ($niveles as $nivele)
-                                                <option value="{{ $nivele->id }}"
-                                                    {{ $matricula->nivel_id == $nivele->id ? 'selected' : '' }}>
-                                                    {{ $nivele->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    <p>
+                                        {{ $matricula->nivel->nombre }}
+                                    </p>
                                     @error('nivel_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
@@ -255,12 +192,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Fecha</label><b> (*)</b>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-calendar"></i></span>
-                                        </div>
-                                        <input type="date" class="form-control" value="{{ $matricula->fecha_matriculacion }}" name="fecha_matriculacion" required>
-                                    </div>
+                                    <p>
+                                        {{ $matricula->fecha_matriculacion }}
+                                    </p>
                                     @error('paralelo_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
@@ -273,18 +207,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Grados</label><b> (*)</b>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-list-alt"></i></span>
-                                        </div>
-                                        <select name="grado_id" id="grados" class="form-control" required>
-                                            @foreach ($grados as $grado)
-                                                <option value="{{ $grado->id }}"
-                                                    {{ $matricula->grado_id == $grado->id ? 'selected' : '' }}>
-                                                    {{ $grado->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    <p>
+                                        {{ $matricula->grado->nombre }}
+                                    </p>
                                     @error('grado_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
@@ -293,19 +218,9 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Paralelos</label><b> (*)</b>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i class="fas fa-clone"></i></span>
-                                        </div>
-                                        <select name="paralelo_id" id="paralelos" class="form-control" required>
-                                            @foreach ($paralelos as $paralelo)
-                                                <option value="{{ $paralelo->id }}"
-                                                    {{ $matricula->paralelo_id == $paralelo->id ? 'selected' : '' }}>
-                                                    {{ $paralelo->nombre }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    <p>
+                                        {{ $matricula->paralelo->nombre }}
+                                    </p>
                                     @error('paralelo_id')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
@@ -320,15 +235,13 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <a href="{{ url('/admin/matriculaciones') }}" class="btn btn-default">
-                                        <i class="fas fa-arrow-left"></i> Cancelar
+                                        <i class="fas fa-arrow-left"></i> Volver
                                     </a>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-save"></i> Actualizar
-                                    </button>
+                                    
                                 </div>
                             </div>
                         </div>
-                    </form>
+                 
 
 
 
@@ -426,11 +339,9 @@
                                 tabla += '</tr>';
                             });
                             $('#tabla_historial').html(tabla).show();
-                            $('#tabla_bd').css('display', 'none');
                         } else {
                             $('#tabla_historial').html(
                                 '<p>No hay historial académico registrado del estudiante.</p>');
-                            $('#tabla_bd').css('display', 'none');
                         }
                     },
                     error: function() {

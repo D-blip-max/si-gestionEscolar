@@ -136,3 +136,7 @@ Route::get('/admin/matriculaciones/buscar_estudiante/{id}',[App\Http\Controllers
 Route::get('/admin/matriculaciones/buscar_grado/{id}',[App\Http\Controllers\MatriculacionController::class,'buscar_grados'])->name('admin.matriculaciones.buscar_grados')->middleware('auth');
 Route::get('/admin/matriculaciones/buscar_paralelo/{id}',[App\Http\Controllers\MatriculacionController::class,'buscar_paralelos'])->name('admin.matriculaciones.buscar_paralelos')->middleware('auth');
 Route::get('/admin/matriculaciones/pdf/{id}',[App\Http\Controllers\MatriculacionController::class,'pdf_matricula'])->name('admin.matriculaciones.pdf_matricula')->middleware('auth');
+Route::get('/admin/matriculaciones/{id}',[App\Http\Controllers\MatriculacionController::class,'show'])->name('admin.matriculaciones.show')->middleware('auth');
+Route::get('/admin/matriculaciones/{id}/edit',[App\Http\Controllers\MatriculacionController::class,'edit'])->name('admin.matriculaciones.edit')->middleware('auth');
+Route::put('/admin/matriculaciones/{id}',[App\Http\Controllers\MatriculacionController::class,'update'])->name('admin.matriculaciones.update')->middleware('auth');
+Route::delete('/admin/matriculaciones/{id}',[App\Http\Controllers\MatriculacionController::class,'destroy'])->name('admin.matriculaciones.destroy')->middleware('auth');
