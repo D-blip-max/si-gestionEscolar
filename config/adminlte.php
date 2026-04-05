@@ -403,6 +403,12 @@ return [
             'icon'    => 'fas fa-fw fa-clipboard-list',
             'classes' => 'bg-blue text-white',
         ],
+        [
+            'text'    => 'Asignaciones',
+            'icon'    => 'fas fa-fw fa-chalkboard-teacher',
+            'classes' => 'bg-blue text-white',
+            'url'     => 'admin/asignaciones',
+        ],
 
     ],
 

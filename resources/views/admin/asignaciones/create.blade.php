@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1>Registro de una nueva Matriculacion del Estudiante</h1>
+    <h1>Registro de una nueva Asignacion</h1>
     <hr>
 @stop
 
@@ -13,7 +13,7 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Datos del Estudiante</h3>
+                            <h3 class="card-title">Datos del Docente</h3>
                         </div>
 
                         <div class="card-body">
@@ -21,16 +21,16 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="">Buscar estudiante: <b>(*)</b></label>
+                                        <label for="">Buscar docente: <b>(*)</b></label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fas fa-users"></i></span>
                                             </div>
-                                            <select name="" id="buscar_estudiante" class="form-control select2">
-                                                <option value="">Selecciona un estudiante...</option>
-                                                @foreach ($estudiantes as $estudiante)
-                                                    <option value="{{ $estudiante->id }}">
-                                                        {{ $estudiante->apellidos . ' ' . $estudiante->nombres . ' - ' . $estudiante->ci }}
+                                            <select name="" id="buscar_docente" class="form-control select2">
+                                                <option value="">Selecciona un docente...</option>
+                                                @foreach ($docentes as $docente)
+                                                    <option value="{{ $docente->id }}">
+                                                        {{ $docente->apellidos . ' ' . $docente->nombres . ' - ' . $docente->ci }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -41,7 +41,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="datos_estudiante" style="display: none">
+                            <div id="datos_docente" style="display: none">
                                 <div class="row">
 
                                     <div class="col-md-3">
@@ -103,8 +103,8 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
-                                                    <label for="">Género</label>
-                                                    <p id="genero">a</p>
+                                                    <label for="">Profesion</label>
+                                                    <p id="profesion">a</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -127,11 +127,11 @@
                 <div class="col-md-12">
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Historial Academico</h3>
+                            <h3 class="card-title">Formacion Academica</h3>
                         </div>
 
                         <div class="card-body">
-                            <div id="tabla_historial">
+                            <div id="tabla_formacion">
 
                             </div>
 
@@ -155,9 +155,9 @@
 
                 <div class="card-body">
 
-                    <form action="{{ url('/admin/matriculaciones/create') }}" method="post">
+                    <form action="{{ url('/admin/asignaciones/create') }}" method="post">
                         @csrf
-                        <input type="text" name="estudiante_id" id="estudiante_id" hidden required>
+                        <input type="text" name="personal_id" id="docente_id" hidden required>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -225,9 +225,9 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fas fa-calendar"></i></span>
                                         </div>
-                                        <input type="date" class="form-control" name="fecha_matriculacion" required>
+                                        <input type="date" class="form-control" name="fecha_asignacion" required>
                                     </div>
-                                    @error('fecha_matriculacion')
+                                    @error('fecha_asignacion')
                                         <small style="color: red">{{ $message }}</small>
                                     @enderror
                                 </div>
@@ -272,13 +272,34 @@
                             </div>
 
                         </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="class="form-group">
+                                    <label for="">Materia a impartir</label><b> (*)</b>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-book"></i></span>
+                                        </div>
+                                        <select name="materia_id" class="form-control" required>
+                                            <option value="">Seleccione una materia...</option>
+                                            @foreach ($materias as $materia)
+                                                <option value="{{ $materia->id }}">{{ $materia->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @error('materia_id')
+                                        <small style="color: red">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
 
                         <hr>
 
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <a href="{{ url('/admin/matriculaciones') }}" class="btn btn-default">
+                                    <a href="{{ url('/admin/asignaciones') }}" class="btn btn-default">
                                         <i class="fas fa-arrow-left"></i> Cancelar
                                     </a>
                                     <button type="submit" class="btn btn-primary">
@@ -351,47 +372,50 @@
             }
         });
 
-        $('#buscar_estudiante').on('change', function() {
+        $('#buscar_docente').on('change', function() {
             var id = $(this).val();
 
             if (id) {
                 $.ajax({
-                    url: "{{ url('/admin/matriculaciones/buscar_estudiante/') }}" + '/' + id,
+                    url: "{{ url('/admin/asignaciones/buscar_docente/') }}" + '/' + id,
                     type: 'GET',
-                    success: function(estudiante) {
-                        $('#apellidos').html(estudiante.apellidos);
-                        $('#nombres').html(estudiante.nombres);
-                        $('#ci').html(estudiante.ci);
-                        $('#fecha_nacimiento').html(estudiante.fecha_nacimiento);
-                        $('#telefono').html(estudiante.telefono);
-                        $('#direccion').html(estudiante.direccion);
-                        $('#email').html(estudiante.usuario.email);
-                        $('#genero').html(estudiante.genero);
-                        $('#foto').attr('src', estudiante.foto_url).show();
-                        $('#estudiante_id').val(estudiante.id);
-                        $('#datos_estudiante').css('display', 'block');
-                        if (estudiante.matriculaciones && estudiante.matriculaciones.length > 0) {
+                    success: function(docente) {
+                        $('#apellidos').html(docente.apellidos);
+                        $('#nombres').html(docente.nombres);
+                        $('#ci').html(docente.ci);
+                        $('#fecha_nacimiento').html(docente.fecha_nacimiento);
+                        $('#telefono').html(docente.telefono);
+                        $('#direccion').html(docente.direccion);
+                        $('#email').html(docente.usuario.email);
+                        $('#profesion').html(docente.profesion);
+                        $('#foto').attr('src', docente.foto_url).show();
+                        $('#docente_id').val(docente.id);
+                        $('#datos_docente').css('display', 'block');
+                        var baseUrl = "{{ url('/') }}";
+                        if (docente.formaciones && docente.formaciones.length > 0) {
                             var tabla = '<table class="table table-bordered">';
                             tabla +=
-                                '<thead><tr><th>Turno</th><th>Gestión</th><th>Nivel</th><th>Grado</th><th>Paralelo</th></tr></thead>';
+                                '<thead><tr><th>Título</th><th>Institución</th><th>Nivel</th><th>Fecha de graduación</th><th>Archivo</th></tr></thead>';
                             tabla += '<tbody>';
-                            estudiante.matriculaciones.forEach(function(matriculacion) {
+                            docente.formaciones.forEach(function(formacion) {
                                 tabla += '<tr>';
-                                tabla += '<td>' + matriculacion.turno.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.gestion.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.nivel.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.grado.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.paralelo.nombre + '</td>';
+                                tabla += '<td>' + formacion.titulo + '</td>';
+                                tabla += '<td>' + formacion.institucion + '</td>';
+                                tabla += '<td>' + formacion.nivel + '</td>';
+                                tabla += '<td>' + formacion.fecha_graduacion + '</td>';
+                                tabla += '<td><a href="' + baseUrl + '/' + formacion.archivo +
+                                    '" target="_blank">Ver archivo</a></td>';
                                 tabla += '</tr>';
                             });
-                            $('#tabla_historial').html(tabla).show();
+                            $('#tabla_formacion').html(tabla).show();
                         } else {
-                            $('#tabla_historial').html(
-                                '<p>No hay historial académico registrado del estudiante.</p>');
+                            $('#tabla_formacion').html(
+                                '<p>No hay formación académica registrado del docente.</p>');
                         }
+
                     },
                     error: function() {
-                        alert('No se puede obtener información del estudiante');
+                        alert('No se puede obtener información del docente');
                     }
                 });
             } else {

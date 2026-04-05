@@ -140,3 +140,14 @@ Route::get('/admin/matriculaciones/{id}',[App\Http\Controllers\MatriculacionCont
 Route::get('/admin/matriculaciones/{id}/edit',[App\Http\Controllers\MatriculacionController::class,'edit'])->name('admin.matriculaciones.edit')->middleware('auth');
 Route::put('/admin/matriculaciones/{id}',[App\Http\Controllers\MatriculacionController::class,'update'])->name('admin.matriculaciones.update')->middleware('auth');
 Route::delete('/admin/matriculaciones/{id}',[App\Http\Controllers\MatriculacionController::class,'destroy'])->name('admin.matriculaciones.destroy')->middleware('auth');
+
+
+//rutas para asignacion de materias de los docentes
+Route::get('/admin/asignaciones', [App\Http\Controllers\AsignacionController::class, 'index'])->name('admin.asignaciones.index')->middleware('auth');
+Route::get('/admin/asignaciones/create', [App\Http\Controllers\AsignacionController::class, 'create'])->name('admin.asignaciones.create')->middleware('auth');
+Route::post('/admin/asignaciones/create', [App\Http\Controllers\AsignacionController::class, 'store'])->name('admin.asignaciones.store')->middleware('auth');
+Route::get('/admin/asignaciones/buscar_docente/{id}',[App\Http\Controllers\AsignacionController::class,'buscar_docente'])->name('admin.matriculaciones.buscar_docente')->middleware('auth');
+
+
+
+

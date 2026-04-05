@@ -18,4 +18,9 @@ class Nivel extends Model
     {
         return $this->hasMany(Matriculacion::class);
     }
+
+    public function asignaciones()
+    {
+        return $this->hasMany(Asignacion::class);
+    }
 }
