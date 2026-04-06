@@ -17,7 +17,9 @@ use App\Models\Materia;
 use Spatie\Permission\Models\Role;
 use App\Models\Personal;
 use App\Models\Ppff;
+use App\Models\Matriculacion;
 use App\Models\Estudiante;
+use App\Models\Asignacion;
 
 
 
@@ -454,5 +456,30 @@ class DatabaseSeeder extends Seeder
 
         $u30 = User::create(['name' => 'Raúl Zeballos', 'email' => 'raul.z@estudiante.com', 'password' => Hash::make('111030')])->assignRole('ESTUDIANTE');
         Estudiante::create(['usuario_id' => $u30->id, 'ppff_id' => $p10->id, 'nombres' => 'Raúl', 'apellidos' => 'Zeballos', 'ci' => '111030', 'fecha_nacimiento' => '2013-05-18', 'telefono' => '60000030', 'direccion' => 'Av. Santos Dumont', 'foto' => 'uploads/estudiantes/est30.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+
+
+        Matriculacion::create(['estudiante_id' => 1, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 2, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 3, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 4, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 5, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 6, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 7, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 8, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 9, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 10, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 11, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 12, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 13, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 14, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 15, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 16, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 17, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 18, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 19, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+        Matriculacion::create(['estudiante_id' => 20, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
+
+        Asignacion::create(['personal_id' => 7, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'materia_id' => 9, 'turno_id' => 1, 'fecha_asignacion' => '2025-01-15']);
+        Asignacion::create(['personal_id' => 8, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'materia_id' => 11, 'turno_id' => 1, 'fecha_asignacion' => '2025-01-15']);
     }
 }

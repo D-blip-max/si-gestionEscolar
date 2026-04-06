@@ -302,6 +302,7 @@ return [
         // Navbar items:
         //configuracion 
         [
+            'can'  => 'admin.configuracion.index',
             'text' => 'Configuracion',
             'url' => 'admin/configuracion', //fijarse bien en las routes
             'icon' => 'fas fa-fw fa-cog',
@@ -309,6 +310,7 @@ return [
         ],
         //gestiones
         [
+            'can' => 'admin.gestiones.index',
             'text'    => 'Gestiones',
             'url'     => 'admin/gestiones',
             'icon'    => 'fas fa-fw fa-tasks',
@@ -316,6 +318,7 @@ return [
         ],
         //periodos
         [
+            'can' => 'admin.periodos.index',
             'text'    => 'Periodos',
             'url'     => 'admin/periodos',
             'icon'    => 'fas fa-fw fa-calendar-alt',
@@ -323,6 +326,7 @@ return [
         ],
         //niveles
         [
+            'can' => 'admin.niveles.index',
             'text'    => 'Niveles',
             'url'     => 'admin/niveles',
             'icon'    => 'fas fa-fw fa-layer-group',
@@ -330,6 +334,7 @@ return [
         ],
         //Grados
         [
+            'can' => 'admin.grados.index',
             'text'    => 'Grados',
             'url'     => 'admin/grados',
             'icon'    => 'fas fa-fw fa-list-alt',
@@ -337,6 +342,7 @@ return [
         ],
         //Paralelos
         [
+            'can' => 'admin.paralelos.index',
             'text'    => 'Paralelos',
             'url'     => 'admin/paralelos',
             'icon'    => 'fas fa-fw fa-clone',
@@ -344,6 +350,7 @@ return [
         ],
         //Turnos
         [
+            'can' => 'admin.turnos.index',
             'text'    => 'Turnos',
             'url'     => 'admin/turnos',
             'icon'    => 'fas fa-fw fa-clock',
@@ -351,6 +358,7 @@ return [
         ],
         //Materias
         [
+            'can' => 'admin.materias.index',
             'text'    => 'Materias',
             'url'     => 'admin/materias',
             'icon'    => 'fas fa-fw fa-book ',
@@ -358,6 +366,7 @@ return [
         ],
         //Roles
         [
+            'can' => 'admin.roles.index',
             'text'    => 'Roles',
             'url'     => 'admin/roles',
             'icon'    => 'fas fa-fw fa-users-cog ',
@@ -365,6 +374,7 @@ return [
         ],
         //Administrativos
         [
+            'can' => 'admin.personal.index',
             'text'    => 'Personal',
             'url'     => 'admin/personal',
             'icon'    => 'fas fa-fw fa-briefcase ',
@@ -384,6 +394,7 @@ return [
         ],
         //Padres de Fmailia
         [
+            'can' => 'admin.ppffs.index',
             'text'    => 'Padres de familia',
             'icon'    => 'fas fa-fw fa-house-user',
             'classes' => 'bg-blue text-white',
@@ -391,6 +402,7 @@ return [
         ],
         //Estudiantes
         [
+            'can' => 'admin.estudiantes.index',
             'text'    => 'Estudiantes',
             'icon'    => 'fas fa-fw fa-user-graduate',
             'classes' => 'bg-blue text-white',
@@ -398,12 +410,14 @@ return [
         ],
         // matriculaciones
         [
+            'can' => 'admin.matriculaciones.index',
             'text'    => 'Matriculaciones',
             'url'     => 'admin/matriculaciones',
             'icon'    => 'fas fa-fw fa-clipboard-list',
             'classes' => 'bg-blue text-white',
         ],
         [
+            'can' => 'admin.asignaciones.index',
             'text'    => 'Asignaciones',
             'icon'    => 'fas fa-fw fa-chalkboard-teacher',
             'classes' => 'bg-blue text-white',
