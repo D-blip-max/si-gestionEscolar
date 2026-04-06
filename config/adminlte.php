@@ -423,6 +423,13 @@ return [
             'classes' => 'bg-blue text-white',
             'url'     => 'admin/asignaciones',
         ],
+        [
+            'can'     => 'admin.pagos.index',
+            'text'    => 'Pagos',
+            'url'     => 'admin/pagos',
+            'icon'    => 'fas fa-fw fa-money-bill-wave',
+            'classes' => 'bg-blue text-white',
+        ],
 
     ],
 
