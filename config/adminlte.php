@@ -430,6 +430,13 @@ return [
             'icon'    => 'fas fa-fw fa-money-bill-wave',
             'classes' => 'bg-blue text-white',
         ],
+        [
+            'can'     => 'admin.asistencias.index',
+            'text'    => 'Asistencias',
+            'url'     => 'admin/asistencias',
+            'icon'    => 'fas fa-fw fa-user-check',
+            'classes' => 'bg-blue text-white',
+        ],
 
     ],
 

@@ -150,5 +150,14 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'admin.pagos.store'])->syncRoles($admin, $caja);
         Permission::create(['name' => 'admin.pagos.comprobante'])->syncRoles($admin, $caja);
         Permission::create(['name' => 'admin.pagos.destroy'])->syncRoles($admin, $caja);
+
+        // --- PERMISOS PARA ASISTENCIAS DEL ESTUDIANTE ---
+        Permission::create(['name' => 'admin.asistencias.index'])->syncRoles($admin,$docente,$estudiante);
+        Permission::create(['name' => 'admin.asistencias.create'])->syncRoles($docente);
+        Permission::create(['name' => 'admin.asistencias.store'])->syncRoles($docente);
+
+
+
+        
     }
 }
