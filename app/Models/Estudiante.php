@@ -20,4 +20,10 @@ class Estudiante extends Model
     {
         return $this->hasMany(Matriculacion::class);
     }
+
+
+    public function detalleAsistencias()
+    {
+        return $this->hasMany(DetalleAsistencia::class);
+    }
 }

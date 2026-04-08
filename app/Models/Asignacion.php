@@ -42,4 +42,7 @@ class Asignacion extends Model
     {
         return $this->belongsTo(Materia::class);
     }
+    public function asistencias() {
+        return $this->hasMany(Asistencia::class);
+    }
 }

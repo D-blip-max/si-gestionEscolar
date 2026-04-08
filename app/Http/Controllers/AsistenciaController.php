@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth; //este siosi para los auth
 use App\Models\Personal;
 use App\Models\Asignacion;
 use App\Models\Matriculacion;
+use App\Models\DetalleAsistencia;
+
 
 class AsistenciaController extends Controller
 {
@@ -41,7 +43,7 @@ class AsistenciaController extends Controller
     {
         $asignacion = Asignacion::findOrFail($id);
         $docente = Personal::where('user_id', Auth::user()->id)->first();
-        $asistencias = Asistencia::where('asignacion_id', $id)->get();
+        $asistencias = Asistencia::with('detalleAsistencias')->where('asignacion_id', $id)->get();
         $matriculados = Matriculacion::with('estudiante')
             ->where('turno_id', $asignacion->turno_id)
             ->where('gestion_id', $asignacion->gestion_id)
@@ -59,8 +61,33 @@ class AsistenciaController extends Controller
      */
     public function store(Request $request)
     {
-        $datos=request()->all();
-        return response()->json($datos);
+        //return response()->json($datos);
+        $request->validate([
+            'asignacion_id' => 'required',
+            'fecha' => 'required|date',
+            'observacion' => 'nullable|string|max:255',
+            'estado_asistencia' => 'required',
+        ]);
+
+        $asistencia = new Asistencia();
+        $asistencia->asignacion_id = $request->asignacion_id;
+        $asistencia->fecha = $request->fecha;
+        $asistencia->observacion = $request->observacion;
+        $asistencia->save();
+
+        $estado_asistencia = $request->estado_asistencia;
+
+        foreach ($estado_asistencia as $estudiante_id => $estado) {
+            DetalleAsistencia::create([
+                'asistencia_id' => $asistencia->id,
+                'estudiante_id' => $estudiante_id,
+                'estado_asistencia' => $estado,
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('mensaje', 'Se registro la asistencia de la manera correctamente')
+            ->with('icono', 'success');
     }
 
     /**
@@ -82,16 +109,46 @@ class AsistenciaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Asistencia $asistencia)
+    public function update(Request $request,  $id)
     {
-        //
+        //return response()->json($datos);
+        $request->validate([
+            'asignacion_id' => 'required',
+            'fecha' => 'required|date',
+            'observacion' => 'nullable|string|max:255',
+            'estado_asistencia' => 'required',
+        ]);
+
+        $asistencia = Asistencia::findOrFail($id);
+        $asistencia->asignacion_id = $request->asignacion_id;
+        $asistencia->fecha = $request->fecha;
+        $asistencia->observacion = $request->observacion;
+        $asistencia->save();
+
+        $estado_asistencia = $request->estado_asistencia;
+
+        foreach ($estado_asistencia as $estudiante_id => $estado) {
+            DetalleAsistencia::where('asistencia_id', $asistencia->id)
+                ->where('estudiante_id', $estudiante_id)
+                ->update(['estado_asistencia' => $estado]);
+        }
+
+        return redirect()->back()
+            ->with('mensaje', 'Se actualizo la asistencia de la manera correctamente')
+            ->with('icono', 'success');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Asistencia $asistencia)
+    public function destroy($id)
     {
-        //
+        $asistencia = Asistencia::findOrFail($id);
+        $asistencia->detalleAsistencias()->delete(); // Eliminar los detalles de asistencia asociados
+        $asistencia->delete(); // Eliminar la asistencia
+
+        return redirect()->back()
+            ->with('mensaje', 'Se elimino la asistencia de la manera correctamente')
+            ->with('icono', 'success');
     }
 }

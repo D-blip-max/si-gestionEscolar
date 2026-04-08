@@ -38,7 +38,7 @@
                                     <div class="modal-body">
                                         <form action="{{ url('/admin/asistencias/create') }}" method="POST">
                                             @csrf
-                                            <input type="text" name="asignacion_id" value="{{ $asignacion->id }}">
+                                            <input type="text" name="asignacion_id" value="{{ $asignacion->id }}" hidden>
                                             <div class="row">
                                                 <div class="col-md-4">
                                                     <div class="form-group">
@@ -62,7 +62,7 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th style="text-align: center">Nro</th>
-                                                                    <th style="text-align: center">Nombre</th>
+                                                                    <th style="text-align: center">Estudiante</th>
                                                                     <th style="text-align: center">CI</th>
                                                                     <th style="text-align: center">Asistencia</th>
                                                                 </tr>
@@ -137,6 +137,237 @@
                                     <td style="text-align: center">{{ $asistencia->fecha }}</td>
                                     <td>{{ $asistencia->observacion }}</td>
                                     <td>
+                                        {{-- boton de modal de asistencia --}}
+                                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                            data-target="#modalVerAsistencia{{ $asistencia->id }}">
+                                            <i class="fas fa-eye"></i> Ver asistencias
+                                        </button>
+                                        {{-- modal para ver las asistencias --}}
+                                        <div class="modal fade" id="modalVerAsistencia{{ $asistencia->id }}" tabindex="-1"
+                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header"
+                                                        style="background-color: #17a2b8; color: white;">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Detalle de
+                                                            asistencias</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label for="">Estudiantes</label>
+                                                                    <table
+                                                                        class="table table-bordered table-striped table-hover table-sm">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th style="text-align: center">Nro</th>
+                                                                                <th style="text-align: center">Estudiante
+                                                                                </th>
+                                                                                <th style="text-align: center">C.I.</th>
+                                                                                <th style="text-align: center">Asistencia
+                                                                                </th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @foreach ($asistencia->detalleAsistencias as $detalle)
+                                                                                <tr>
+                                                                                    <td style="text-align: center">
+                                                                                        {{ $loop->iteration }}</td>
+                                                                                    <td>{{ $detalle->estudiante->apellidos }}
+                                                                                        {{ $detalle->estudiante->nombres }}
+                                                                                    </td>
+                                                                                    <td>{{ $detalle->estudiante->ci }}</td>
+                                                                                    <td style="text-align: center">
+                                                                                        {{ $detalle->estado_asistencia }}
+                                                                                    </td>
+                                                                                </tr>
+                                                                            @endforeach
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">Cerrar</button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{-- modal para ver las asistencias --}}
+
+                                        {{-- otro modal --}}
+
+
+                                        {{-- boton de modal de Editar asistencia --}}
+                                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                            data-target="#modalEditarAsistencia{{ $asistencia->id }}">
+                                            <i class="fas fa-pencil-alt"></i>Editar asistencias
+                                        </button>
+                                        {{-- modal para Editar asistencias --}}
+                                        <div class="modal fade" id="modalEditarAsistencia{{ $asistencia->id }}"
+                                            tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <div class="modal-header"
+                                                        style="background-color: #17b82c; color: white;">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Editar
+                                                            asistencias</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        <form action="{{ url('/admin/asistencias/' . $asistencia->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <input type="text" name="asignacion_id"
+                                                                value="{{ $asignacion->id }}" hidden>
+
+                                                            <div class="row">
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label for="">Fecha de la
+                                                                            asistencia</label><b>
+                                                                            *</b>
+                                                                        <input type="date" class="form-control"
+                                                                            name="fecha"
+                                                                            value="{{ $asistencia->fecha }}" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <div class="form-group">
+                                                                        <label for="">Observación
+                                                                            (opcional)</label>
+                                                                        <input type="text" class="form-control"
+                                                                            name="observacion"
+                                                                            value="{{ $asistencia->observacion }}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label for="">Estudiantes</label>
+                                                                        <table
+                                                                            class="table table-bordered table-striped table-hover table-sm">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th style="text-align: center">Nro</th>
+                                                                                    <th style="text-align: center">
+                                                                                        Estudiante
+                                                                                    </th>
+                                                                                    <th style="text-align: center">C.I.
+                                                                                    </th>
+                                                                                    <th style="text-align: center">
+                                                                                        Asistencia
+                                                                                    </th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach ($asistencia->detalleAsistencias as $detalle)
+                                                                                    <tr>
+                                                                                        <td style="text-align: center">
+                                                                                            {{ $loop->iteration }}</td>
+                                                                                        <td>{{ $detalle->estudiante->apellidos }}
+                                                                                            {{ $detalle->estudiante->nombres }}
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            {{ $detalle->estudiante->ci }}
+                                                                                        </td>
+
+                                                                                        <td style="text-align: center">
+                                                                                            <input type="radio"
+                                                                                                name="estado_asistencia[{{ $detalle->estudiante->id }}]"
+                                                                                                value="PRESENTE"
+                                                                                                {{ $detalle->estado_asistencia == 'PRESENTE' ? 'checked' : '' }}
+                                                                                                required> Presente
+                                                                                            <input type="radio"
+                                                                                                name="estado_asistencia[{{ $detalle->estudiante->id }}]"
+                                                                                                value="FALTA"
+                                                                                                {{ $detalle->estado_asistencia == 'FALTA' ? 'checked' : '' }}
+                                                                                                required> Falta
+                                                                                            <input type="radio"
+                                                                                                name="estado_asistencia[{{ $detalle->estudiante->id }}]"
+                                                                                                value="ATRASO"
+                                                                                                {{ $detalle->estado_asistencia == 'ATRASO' ? 'checked' : '' }}
+                                                                                                required> Atraso
+                                                                                            <input type="radio"
+                                                                                                name="estado_asistencia[{{ $detalle->estudiante->id }}]"
+                                                                                                value="LICENCIA"
+                                                                                                {{ $detalle->estado_asistencia == 'LICENCIA' ? 'checked' : '' }}
+                                                                                                required> Licencia
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                @endforeach
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal">Cancelar</button>
+                                                                    <button type="submit"
+                                                                        class="btn btn-success">Actualizar
+                                                                        Asistencia</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{-- modal para Editar las asistencias --}}
+
+                                        {{-- otro --}}
+                                        {{-- boton para eliminar --}}
+
+                                        <form action="{{ url('/admin/asistencias/' . $asistencia->id) }}" method="post"
+                                            id="miFormulario{{ $asistencia->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="preguntar{{ $asistencia->id }}(event)">
+                                                <i class="fas fa-trash"></i> Eliminar asistencia
+                                            </button>
+                                        </form>
+                                        <script>
+                                            function preguntar{{ $asistencia->id }}(event) {
+                                                event.preventDefault();
+
+                                                Swal.fire({
+                                                    title: '¿Desea eliminar este registro?',
+                                                    text: '',
+                                                    icon: 'question',
+                                                    showDenyButton: true,
+                                                    confirmButtonText: 'Eliminar',
+                                                    confirmButtonColor: '#a5161d',
+                                                    denyButtonColor: '#270a0a',
+                                                    denyButtonText: 'Cancelar',
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        // JavaScript puro para enviar el formulario
+                                                        document.getElementById('miFormulario{{ $asistencia->id }}').submit();
+                                                    }
+                                                });
+                                            }
+                                        </script>
+
 
                                     </td>
                                 </tr>
