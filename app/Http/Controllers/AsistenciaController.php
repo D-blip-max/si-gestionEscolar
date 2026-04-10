@@ -22,7 +22,8 @@ class AsistenciaController extends Controller
         $id_usuario = Auth::user()->id;
 
         if (($rol == 'ADMINISTRADOR') || ($rol == 'DIRECTOR/A GENERAL') || ($rol == 'DIRECTOR/A ACADÉMICO') || ($rol == 'SECRETARIO/A') || ($rol == 'REGENTE')) {
-            return view('admin.asistencias.index');
+            $asignaciones = Asignacion::all();
+            return view('admin.asistencias.index', compact('asignaciones'));
         }
 
         if ($rol == 'DOCENTE') {
@@ -93,9 +94,21 @@ class AsistenciaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Asistencia $asistencia)
+    public function show($id)
     {
-        //
+        $asignacion = Asignacion::findOrFail($id);
+
+        $asistencias = Asistencia::with('detalleAsistencias.estudiante')
+            ->where('asignacion_id', $id)
+            ->orderBy('fecha','desc')->get(); // Ordenar por fecha de forma descendente
+
+        $estudiantes = $asistencias->flatMap(function ($asistencia) {
+            return $asistencia->detalleAsistencias->pluck('estudiante')->filter();
+        })->unique('id')->sortBy('apellidos');
+
+        $fechas = $asistencias->pluck('fecha')->unique()->sort();
+
+        return view('admin.asistencias.show', compact('asistencias', 'asignacion', 'estudiantes', 'fechas'));
     }
 
     /**
