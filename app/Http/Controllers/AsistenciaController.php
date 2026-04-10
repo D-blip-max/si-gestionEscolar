@@ -9,6 +9,7 @@ use App\Models\Personal;
 use App\Models\Asignacion;
 use App\Models\Matriculacion;
 use App\Models\DetalleAsistencia;
+use App\Models\Estudiante;
 
 
 class AsistenciaController extends Controller
@@ -33,7 +34,23 @@ class AsistenciaController extends Controller
         }
 
         if ($rol == 'ESTUDIANTE') {
-            return view('admin.asistencias.index_estudiante');
+            $estudiante = Estudiante::where('usuario_id', $id_usuario)->first();
+            $matriculas = Matriculacion::where('estudiante_id', $estudiante->id)->get();
+
+            $asignaciones = collect();
+
+            foreach ($matriculas as $matricula) {
+                $datos = Asignacion::with('personal', 'materia')
+                    ->where('turno_id', $matricula->turno_id)
+                    ->where('gestion_id', $matricula->gestion_id)
+                    ->where('nivel_id', $matricula->nivel_id)
+                    ->where('grado_id', $matricula->grado_id)
+                    ->where('paralelo_id', $matricula->paralelo_id)
+                    ->get();
+                $asignaciones = $asignaciones->merge($datos);
+            }
+
+            return view('admin.asistencias.index_estudiante', compact('estudiante', 'matriculas', 'asignaciones'));
         }
     }
 
@@ -94,13 +111,28 @@ class AsistenciaController extends Controller
     /**
      * Display the specified resource.
      */
+    public function show_estudiante($id_asignacion, $id_estudiante)
+    {
+        $asignacion = Asignacion::findOrFail($id_asignacion);
+        $estudiante = Estudiante::findOrFail($id_estudiante);
+
+        $asistencias = Asistencia::with(['detalleAsistencias' => function ($query) use ($id_estudiante) {
+            $query->where('estudiante_id', $id_estudiante);
+        }])
+            ->where('asignacion_id', $id_asignacion)
+            ->orderBy('fecha', 'asc') // Ordenar por fecha de forma descendente
+            ->get();
+
+        return view('admin.asistencias.show_estudiante', compact('asistencias', 'asignacion', 'estudiante'));
+    }
+
     public function show($id)
     {
         $asignacion = Asignacion::findOrFail($id);
 
         $asistencias = Asistencia::with('detalleAsistencias.estudiante')
             ->where('asignacion_id', $id)
-            ->orderBy('fecha','desc')->get(); // Ordenar por fecha de forma descendente
+            ->orderBy('fecha', 'desc')->get(); // Ordenar por fecha de forma descendente
 
         $estudiantes = $asistencias->flatMap(function ($asistencia) {
             return $asistencia->detalleAsistencias->pluck('estudiante')->filter();
