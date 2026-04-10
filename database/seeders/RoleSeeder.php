@@ -157,6 +157,9 @@ class RoleSeeder extends Seeder
         Permission::create(['name' => 'admin.asistencias.store'])->syncRoles($docente);
         Permission::create(['name' => 'admin.asistencias.destroy'])->syncRoles($docente);
         Permission::create(['name' => 'admin.asistencias.update'])->syncRoles($docente);
+        Permission::create(['name' => 'admin.asistencias.show'])->syncRoles($docente);
+
+
 
 
 
