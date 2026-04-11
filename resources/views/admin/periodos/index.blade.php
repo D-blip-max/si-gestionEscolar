@@ -120,7 +120,7 @@
                                         @foreach ($gestion->periodos as $periodo)
                                        
                                              
-                                        <span class="badge badge-info">{{ $periodo->nombre }}</span><br>
+                                       <button class="btn btn-info btn-sm btn-block">{{ $periodo->nombre }}</button>
                                         @endforeach
                                     </td>
 

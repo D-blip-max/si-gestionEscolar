@@ -423,7 +423,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm"
-                                                onclick="preguntar{{ $calificacione->id }}(event)">
+                                                onclick="preguntar{{ $calificacione->id }}(event)" style="margin: 3px">
                                                 <i class="fas fa-trash"></i> Eliminar calificaciones
                                             </button>
                                         </form>

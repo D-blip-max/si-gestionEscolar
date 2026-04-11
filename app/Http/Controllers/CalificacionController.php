@@ -24,8 +24,8 @@ class CalificacionController extends Controller
         $id_usuario = Auth::user()->id;
 
         if (($rol == 'ADMINISTRADOR') || ($rol == 'DIRECTOR/A GENERAL') || ($rol == 'DIRECTOR/A ACADÉMICO') || ($rol == 'SECRETARIO/A') || ($rol == 'REGENTE')) {
-            //   $asignaciones = Asignacion::all();
-            //   return view('admin.asistencias.index', compact('asignaciones'));
+            $asignaciones = Asignacion::all();
+            return view('admin.calificaciones.index', compact('asignaciones'));
         }
 
         if ($rol == 'DOCENTE') {
@@ -121,6 +121,44 @@ class CalificacionController extends Controller
     /**
      * Display the specified resource.
      */
+    public function show_admin($id)
+    {
+        $asignacion = Asignacion::find($id);
+        $docente = Personal::where('user_id', $asignacion->personal_id)->first();
+        $periodos = Periodo::where('gestion_id', $asignacion->gestion_id)
+            ->orderBy('id')->get();
+
+        $calificacionesPorPeriodo = [];
+        foreach ($periodos as $periodo) {
+            $calificaciones = Calificacion::with('detalleCalificaciones')
+                ->where('asignacion_id', $asignacion->id)
+                ->where('periodo_id', $periodo->id)
+                ->get();
+            $calificacionesPorPeriodo[] = [
+                'periodo' => $periodo,
+                'calificaciones' => $calificaciones
+            ];
+        }
+
+        $calificaciones = Calificacion::with('detalleCalificaciones')
+            ->where('asignacion_id', $asignacion->id)
+            ->get();
+
+        $matriculados = Matriculacion::with('estudiante')
+            ->where('turno_id', $asignacion->turno_id)
+            ->where('gestion_id', $asignacion->gestion_id)
+            ->where('nivel_id', $asignacion->nivel_id)
+            ->where('grado_id', $asignacion->grado_id)
+            ->where('paralelo_id', $asignacion->paralelo_id)
+            ->get()
+            ->sortBy('estudiante.apellidos');
+
+        return view('admin.calificaciones.show_admin', compact('asignacion', 'docente', 'periodos', 'calificacionesPorPeriodo', 'calificaciones', 'matriculados'));
+    }
+    /**
+     * Display the specified resource.
+     */
+
     public function show(Calificacion $calificacion)
     {
         //

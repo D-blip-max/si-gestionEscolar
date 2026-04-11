@@ -118,7 +118,7 @@
                                     <td>{{ $nivel->nombre }}</td>
                                     <td>
                                         @foreach ($nivel->grados as $grado)
-                                            <span class="badge badge-info">{{ $grado->nombre }}</span><br>
+                                            <button class="btn btn-info btn-sm btn-block">{{ $grado->nombre }}</button>
                                         @endforeach
                                     </td>
 
