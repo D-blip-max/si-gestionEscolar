@@ -42,6 +42,7 @@
                                 <th>Promedio Final</th>
                                 <th>Estado</th>
                             </tr>
+                            {{-- tener cuidado che --}}
                             <tr style="background-color: #b6ccf0; text-align: center;">
                                 <th></th>
                                 <th></th>
