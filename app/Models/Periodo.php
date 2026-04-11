@@ -7,13 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Periodo extends Model
 {
     //
-    protected $table="periodos";
+    protected $table = "periodos";
     protected $fillable = [
         'nombre',
-        'gestion_id'];
-    
-    public function gestion(){  //1 Periodo tiene 1 gestion
-        return $this->belongsTo(Gestion::class);
-    }   
+        'gestion_id'
+    ];
 
+    public function gestion()
+    {  //1 Periodo tiene 1 gestion
+        return $this->belongsTo(Gestion::class);
+    }
+    public function calificaciones()
+    {
+        return $this->hasMany(Calificacion::class);
+    }
 }

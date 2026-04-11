@@ -26,4 +26,9 @@ class Estudiante extends Model
     {
         return $this->hasMany(DetalleAsistencia::class);
     }
+
+    public function detalleCalificaciones()
+    {
+        return $this->hasMany(DetalleCalificacion::class);
+    }
 }

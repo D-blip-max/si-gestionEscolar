@@ -169,6 +169,14 @@ Route::post('/admin/asistencias/create', [App\Http\Controllers\AsistenciaControl
 Route::put('/admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'update'])->name('admin.asistencias.update')->middleware('auth', 'can:admin.asistencias.update');//
 Route::delete('/admin/asistencias/{id}', [App\Http\Controllers\AsistenciaController::class, 'destroy'])->name('admin.asistencias.destroy')->middleware('auth', 'can:admin.asistencias.destroy');//
 
+//rutas para las calificaciones
+Route::get('/admin/calificaciones', [App\Http\Controllers\CalificacionController::class, 'index'])->name('admin.calificaciones.index')->middleware('auth','can:admin.calificaciones.index');
+Route::get('/admin/calificaciones/create/asignacion/{id}', [App\Http\Controllers\CalificacionController::class, 'create'])->name('admin.calificaciones.create')->middleware('auth','can:admin.calificaciones.create');
+Route::post('/admin/calificaciones/create', [App\Http\Controllers\CalificacionController::class, 'store'])->name('admin.calificaciones.store')->middleware('auth','can:admin.calificaciones.store');
+Route::put('/admin/calificaciones/{id}', [App\Http\Controllers\CalificacionController::class, 'update'])->name('admin.calificaciones.update')->middleware('auth','can:admin.calificaciones.update');
+Route::get('/admin/calificaciones/detalle/asignacion/{id_asignacion}/estudiante/{id_estudiante}', [App\Http\Controllers\CalificacionController::class, 'show_estudiante'])->name('admin.calificaciones.show_estudiante')->middleware('auth','can:admin.calificaciones.show_estudiante');
+Route::get('/admin/calificaciones/asignacion/{id}', [App\Http\Controllers\CalificacionController::class, 'show_admin'])->name('admin.calificaciones.show_admin')->middleware('auth','can:admin.calificaciones.show_admin');
+Route::delete('/admin/calificaciones/{id}', [App\Http\Controllers\CalificacionController::class, 'destroy'])->name('admin.calificaciones.destroy')->middleware('auth','can:admin.calificaciones.destroy');
 
 
 

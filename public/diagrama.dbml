@@ -153,3 +153,18 @@ Table detalles_asistencias {
   estudiante_id int [ref: > estudiantes.id]
   estado_asistencia varchar
 }
+Table calificaciones {
+  id int [pk, increment] // Primary key
+  asignacion_id int [ref: > asignaciones.id]
+  periodo_id int [ref: > periodos.id]
+  tipo varchar
+  descripcion varchar
+  fecha date
+}
+
+Table detalles_calificaciones {
+  id int [pk, increment] // Primary key
+  calificacion_id int [ref: > calificaciones.id]
+  estudiante_id int [ref: > estudiantes.id]
+  nota decimal(5, 2)
+}

@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1><b>Listado de Asignaciones</b></h1>
+    <h1><b>Listado de Asignaciones para asistencias</b></h1>
     <hr>
 @stop
 
