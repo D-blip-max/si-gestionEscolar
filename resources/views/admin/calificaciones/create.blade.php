@@ -24,7 +24,7 @@
                             Calificar estudiantes
                         </button>
 
-                        <!-- Modal -->
+                        <!-- Modal  para crear calificaciones-->
                         <div class="modal fade" id="ModalCreate" tabindex="-1" role="dialog"
                             aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-lg" role="document">
@@ -105,7 +105,8 @@
                                                                         </td>
                                                                         <td>
                                                                             <center>
-                                                                                <input style="text-align: center;width:60px"
+                                                                                <input
+                                                                                    style="text-align: center;width:100px"
                                                                                     type="text" class="form-control"
                                                                                     name="nota[{{ $matriculado->estudiante->id }}]"
                                                                                     value="{{ old('nota.' . $matriculado->estudiante->id) }}"
@@ -161,7 +162,7 @@
                                     <td>{{ $calificacione->periodo->nombre }}</td>
                                     <td>{{ $calificacione->fecha }}</td>
                                     <td>
-                                        {{-- boton de modal de calificacione --}}
+                                        {{-- boton de modal de Ver calificacione --}}
                                         <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
                                             data-target="#modalVerCalificaciones{{ $calificacione->id }}">
                                             <i class="fas fa-eye"></i> Ver calificaciones
@@ -269,6 +270,185 @@
                                             </div>
                                         </div>
                                         {{-- modal para ver las asistencias --}}
+
+
+
+                                        {{-- otro modal gogo --}}
+
+                                        {{-- boton de modal de calificacione --}}
+                                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal"
+                                            data-target="#modalEditarCalificaciones{{ $calificacione->id }}">
+                                            <i class="fas fa-pencil-alt"></i> Editar calificaciones
+                                        </button>
+                                        {{-- modal para Editar las calificacione --}}
+
+                                        <div class="modal fade" id="modalEditarCalificaciones{{ $calificacione->id }}"
+                                            tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header"
+                                                        style="background-color: #039124; color: white;">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Editar
+                                                            calificacion</h5>
+                                                        <button type="button" class="close" data-dismiss="modal"
+                                                            aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form
+                                                            action="{{ url('/admin/calificaciones/' . $calificacione->id) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <input type="text" name="asignacion_id"
+                                                                value="{{ $asignacion->id }}" hidden>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="">Periodo para
+                                                                            calificación</label><b> *</b>
+                                                                        <select name="periodo_id" class="form-control"
+                                                                            id="" required>
+                                                                            <option value="">Seleccione el periodo...
+                                                                            </option>
+                                                                            @foreach ($periodos as $periodo)
+                                                                                <option value="{{ $periodo->id }}"
+                                                                                    {{ $periodo->id == $calificacione->periodo_id ? 'selected' : '' }}>
+                                                                                    {{ $periodo->nombre }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label for="">Tipo de
+                                                                            calificación</label><b> *</b>
+                                                                        <input type="text" class="form-control"
+                                                                            name="tipo"
+                                                                            value="{{ $calificacione->tipo }}" required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label for="">Fecha de la
+                                                                            calificacion</label><b> *</b>
+                                                                        <input type="date" class="form-control"
+                                                                            name="fecha"
+                                                                            value="{{ $calificacione->fecha }}" required>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-8">
+                                                                    <div class="form-group">
+                                                                        <label for="">Descripcion
+                                                                            (opcional)</label>
+                                                                        <input type="text" class="form-control"
+                                                                            name="descripcion"
+                                                                            value="{{ $calificacione->descripcion }}">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div class="form-group">
+                                                                        <label for="">Estudiantes</label>
+                                                                        <table
+                                                                            class="table table-bordered table-striped table-hover table-sm">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th style="text-align: center">Nro</th>
+                                                                                    <th style="text-align: center">
+                                                                                        Estudiante</th>
+                                                                                    <th style="text-align: center">CI</th>
+                                                                                    <th style="text-align: center">
+                                                                                        Calificacion</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @foreach ($calificacione->detalleCalificaciones as $detalle)
+                                                                                    <tr>
+                                                                                        <td style="text-align: center">
+                                                                                            {{ $loop->iteration }}
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            {{ $detalle->estudiante->apellidos }}
+                                                                                            {{ $detalle->estudiante->nombres }}
+                                                                                        </td>
+                                                                                        <td>{{ $detalle->estudiante->ci }}
+                                                                                        </td>
+                                                                                        <td style="text-align: center">
+                                                                                            <center>
+                                                                                                <input
+                                                                                                    style="text-align: center; width:100px"
+                                                                                                    type="text"
+                                                                                                    class="form-control"
+                                                                                                    name="nota[{{ $detalle->estudiante->id }}]"
+                                                                                                    value="{{ $detalle->nota ?? '' }}"
+                                                                                                    required>
+                                                                                            </center>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                @endforeach
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <button type="button" class="btn btn-secondary"
+                                                                        data-dismiss="modal">Cancelar</button>
+                                                                    <button type="submit"
+                                                                        class="btn btn-success">Actualizar
+                                                                        Calificaciones</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- modal para Editar las calificacione --}}
+
+                                        {{-- button para eliminar --}}
+                                        <form action="{{ url('/admin/calificaciones/' . $calificacione->id) }}"
+                                            method="post" id="miFormulario{{ $calificacione->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                onclick="preguntar{{ $calificacione->id }}(event)">
+                                                <i class="fas fa-trash"></i> Eliminar calificaciones
+                                            </button>
+                                        </form>
+
+                                        <script>
+                                            function preguntar{{ $calificacione->id }}(event) {
+                                                event.preventDefault();
+
+                                                Swal.fire({
+                                                    title: '¿Desea eliminar este registro?',
+                                                    text: '',
+                                                    icon: 'question',
+                                                    showDenyButton: true,
+                                                    confirmButtonText: 'Eliminar',
+                                                    confirmButtonColor: '#a5161d',
+                                                    denyButtonColor: '#270a0a',
+                                                    denyButtonText: 'Cancelar',
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        // JavaScript puro para enviar el formulario
+                                                        document.getElementById('miFormulario{{ $calificacione->id }}').submit();
+                                                    }
+                                                });
+                                            }
+                                        </script>
                                     </td>
                                 </tr>
                             @endforeach

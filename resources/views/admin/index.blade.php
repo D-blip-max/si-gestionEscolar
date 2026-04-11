@@ -9,6 +9,46 @@
 
 @section('content')
 
+
+    <div class="row">
+        @if (Auth::user()->roles->pluck('name')->implode(', ') == 'DOCENTE')
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <b>Datos del usuario</b>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped table-hover">
+                            <tr>
+                                <th>Nombre</th>
+                                <td>{{ Auth::user()->personal->nombres }}</td>
+                            </tr>
+                            <tr>
+                                <th>Apellidos</th>
+                                <td>{{ Auth::user()->personal->apellidos }}</td>
+                            </tr>
+                            <tr>
+                                <th>Carnet de identidad</th>
+                                <td>{{ Auth::user()->personal->ci }}</td>
+                            </tr>
+                            <tr>
+                                <th>Fecha de nacimiento</th>
+                                <td>{{ Auth::user()->personal->fecha_nacimiento }}</td>
+                            </tr>
+                            <tr>
+                                <th>Teléfono</th>
+                                <td>{{ Auth::user()->personal->telefono }}</td>
+                            </tr>
+                            <tr>
+                                <th>Profesión</th>
+                                <td>{{ Auth::user()->personal->profesion }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
     <div class="row">
         @can('admin.gestiones.index')
             <div class="col-md-3 col-sm-6 col-12">

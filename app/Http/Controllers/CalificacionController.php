@@ -137,16 +137,49 @@ class CalificacionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Calificacion $calificacion)
+    public function update(Request $request,  $id)
     {
-        //
+        //return response()->json($datos);
+        $request->validate([
+            'asignacion_id' => 'required',
+            'periodo_id' => 'required',
+            'tipo' => 'required',
+            'fecha' => 'required',
+            'nota' => 'required',
+        ]);
+
+        $calificacion = Calificacion::find($id);
+        $calificacion->asignacion_id = $request->asignacion_id;
+        $calificacion->periodo_id = $request->periodo_id;
+        $calificacion->tipo = $request->tipo;
+        $calificacion->fecha = $request->fecha;
+        $calificacion->descripcion = $request->descripcion;
+        $calificacion->save();
+
+        foreach ($request->nota as $estudiante_id => $nota) {
+            DetalleCalificacion::updateOrCreate([
+                'calificacion_id' => $calificacion->id,
+                'estudiante_id' => $estudiante_id
+            ], [
+                'nota' => $nota
+            ]);
+        }
+
+        return redirect()->back()
+            ->with('mensaje', 'Se actualizo las calificaciones correctamente')
+            ->with('icono', 'success');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Calificacion $calificacion)
+    public function destroy($id)
     {
-        //
+        $calificacion = Calificacion::find($id);
+        $calificacion->delete();
+
+        return redirect()->back()
+            ->with('mensaje', 'Se elimino la calificación correctamente')
+            ->with('icono', 'success');
     }
 }
