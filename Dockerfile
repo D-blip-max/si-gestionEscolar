@@ -1,40 +1,56 @@
-FROM node:20-bullseye AS frontend
+FROM php:8.2-cli
 
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run production
-
-FROM php:8.1-apache
-
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip libpng-dev libjpeg-dev libfreetype6-dev libzip-dev libpq-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libpq-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Instalar extensiones PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd pdo pdo_pgsql zip
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/html
+# Instalar Node.js 20 (La 22 es muy nueva y a veces da problemas con algunas distros, la 20 es LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
 
+WORKDIR /app
+
+# Copiar archivos de dependencias
 COPY composer.json composer.lock ./
-RUN composer install --optimize-autoloader --no-dev --no-interaction
+COPY package.json package-lock.json ./
 
+# Instalar dependencias
+RUN composer install --optimize-autoloader --no-dev --no-scripts --no-interaction
+RUN npm ci
+
+# Copiar el resto de la aplicación
 COPY . .
-COPY --from=frontend /app/public /var/www/html/public
 
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Build de assets
+RUN npm run build
 
-RUN a2enmod rewrite
+# Crear directorios y permisos
+RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
+    && chmod -R 777 storage bootstrap/cache
 
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri \
-    -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+# NOTA: No uses EXPOSE o úsalo solo como documentación, Railway ignora esto.
 
-EXPOSE 80
-CMD ["apache2-foreground"]
+# Comando de inicio CORREGIDO
+# Usamos "sh -c" para que pueda interpretar la variable $PORT de Railway
+CMD sh -c "php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan view:clear && \
+    php artisan route:cache && \
+    php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
