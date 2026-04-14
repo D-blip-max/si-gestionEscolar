@@ -4,9 +4,8 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci
-
 COPY . .
-RUN npm run production
+RUN npm run production || npm run prod || npm run build
 
 FROM php:8.2-apache
 
@@ -28,7 +27,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
-
 COPY composer.json composer.lock ./
 RUN composer install --optimize-autoloader --no-dev --no-scripts --no-interaction
 
