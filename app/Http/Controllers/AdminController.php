@@ -24,7 +24,7 @@ class AdminController extends Controller
         $total_niveles= Nivel::count();
         $total_grados= Grado::count();
         $total_turnos= Turno::count();
-        //$total_paralelos= Paralelo::count();    asd
+        $total_paralelos= Paralelo::count();    
         $total_materias= Materia::count();
         $total_roles= Role::count();
         $total_personal_administrativos= Personal::where('tipo', 'administrativo')->count();

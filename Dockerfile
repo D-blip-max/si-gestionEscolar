@@ -35,7 +35,7 @@ COPY package.json package-lock.json ./
 RUN composer install --optimize-autoloader --no-dev --no-scripts --no-interaction
 RUN npm ci
 
-# Copiar el resto de la aplicación
+# Copiar el resto de la aplicación 
 COPY . .
 
 # Build de assets
