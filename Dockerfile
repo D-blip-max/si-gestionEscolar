@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm ci
+
 COPY . .
 RUN npm run production || npm run prod || npm run build
 
@@ -27,6 +28,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
+
 COPY composer.json composer.lock ./
 RUN composer install --optimize-autoloader --no-dev --no-scripts --no-interaction
 
@@ -37,9 +39,11 @@ RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs boots
     && chown -R www-data:www-data storage bootstrap/cache public \
     && chmod -R 775 storage bootstrap/cache public
 
-RUN a2enmod rewrite
+RUN a2dismod mpm_event && a2enmod mpm_prefork rewrite
+
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 EXPOSE 80
+
 CMD ["apache2-foreground"]
