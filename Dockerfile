@@ -50,8 +50,8 @@ RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs boots
 # Comando de inicio CORREGIDO
 # Usamos "sh -c" para que pueda interpretar la variable $PORT de Railway
 CMD sh -c "php artisan config:clear && \
+    php artisan migrate --force && \
     php artisan cache:clear && \
     php artisan view:clear && \
     php artisan route:cache && \
-    php artisan migrate --force && \
     php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
