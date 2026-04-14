@@ -41,6 +41,9 @@ COPY . .
 # Build de assets Vite
 RUN npm run build
 
+# Dump autoload con la app completa
+RUN composer dump-autoload --optimize
+
 # Permisos
 RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
     && chmod -R 777 storage bootstrap/cache
@@ -64,8 +67,7 @@ RUN echo 'server { \n\
     } \n\
 }' > /etc/nginx/sites-available/default
 
-CMD sh -c "composer dump-autoload --optimize && \
-    php artisan config:cache && \
+CMD sh -c "php artisan config:clear && \
     php artisan migrate --force && \
     php artisan storage:link && \
     php artisan route:cache && \
