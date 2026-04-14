@@ -64,7 +64,8 @@ RUN echo 'server { \n\
     } \n\
 }' > /etc/nginx/sites-available/default
 
-CMD sh -c "php artisan config:cache && \
+CMD sh -c "composer dump-autoload --optimize && \
+    php artisan config:cache && \
     php artisan migrate --force && \
     php artisan storage:link && \
     php artisan route:cache && \
