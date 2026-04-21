@@ -315,7 +315,7 @@ return [
             'url'     => 'admin/gestiones',
             'icon'    => 'fas fa-fw fa-tasks',
             'classes' => 'bg-blue text-white',
-        ],
+        ],/*
         //periodos
         [
             'can' => 'admin.periodos.index',
@@ -323,7 +323,7 @@ return [
             'url'     => 'admin/periodos',
             'icon'    => 'fas fa-fw fa-calendar-alt',
             'classes' => 'bg-blue text-white',
-        ],
+        ],*/
         //niveles
         [
             'can' => 'admin.niveles.index',
@@ -331,7 +331,7 @@ return [
             'url'     => 'admin/niveles',
             'icon'    => 'fas fa-fw fa-layer-group',
             'classes' => 'bg-blue text-white',
-        ],
+        ],/*
         //Grados
         [
             'can' => 'admin.grados.index',
@@ -347,7 +347,7 @@ return [
             'url'     => 'admin/paralelos',
             'icon'    => 'fas fa-fw fa-clone',
             'classes' => 'bg-blue text-white',
-        ],
+        ],*/
         //Turnos
         [
             'can' => 'admin.turnos.index',
@@ -355,7 +355,7 @@ return [
             'url'     => 'admin/turnos',
             'icon'    => 'fas fa-fw fa-clock',
             'classes' => 'bg-blue text-white',
-        ],
+        ],/*
         //Materias
         [
             'can' => 'admin.materias.index',
@@ -363,7 +363,7 @@ return [
             'url'     => 'admin/materias',
             'icon'    => 'fas fa-fw fa-book ',
             'classes' => 'bg-blue text-white',
-        ],
+        ],*/
         //Roles
         [
             'can' => 'admin.roles.index',
@@ -392,6 +392,14 @@ return [
                 ],
             ],
         ],
+        //Gestionar Usuario
+        [
+            'can' => 'admin.usuarios.index',
+            'text' => 'Gestionar Usuario',
+            'url' => 'admin/usuarios',
+            'icon' => 'fas fa-fw fa-users',
+            'classes' => 'bg-blue text-white',
+        ],/*
         //Padres de Fmailia
         [
             'can' => 'admin.ppffs.index',
@@ -399,7 +407,7 @@ return [
             'icon'    => 'fas fa-fw fa-house-user',
             'classes' => 'bg-blue text-white',
             'url'     => 'admin/ppffs',
-        ],
+        ],*/
         //Estudiantes
         [
             'can' => 'admin.estudiantes.index',
@@ -407,7 +415,7 @@ return [
             'icon'    => 'fas fa-fw fa-user-graduate',
             'classes' => 'bg-blue text-white',
             'url'  => 'admin/estudiantes',
-        ],
+        ],/*
         // matriculaciones
         [
             'can' => 'admin.matriculaciones.index',
@@ -443,7 +451,7 @@ return [
             'url'     => 'admin/calificaciones',
             'icon'    => 'fas fa-fw fa-graduation-cap',
             'classes' => 'bg-blue text-white',
-        ],
+        ],*/
 
     ],
 
