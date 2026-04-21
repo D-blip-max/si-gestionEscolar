@@ -9,7 +9,7 @@
 
 @section('content')
 
-
+{{-- hola como estan --}}
     <div class="row">
         @if (Auth::user()->roles->pluck('name')->implode(', ') == 'DOCENTE')
             <div class="col-md-6">

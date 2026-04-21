@@ -394,7 +394,7 @@ return [
         ],
         //Gestionar Usuario
         [
-            'can' => 'admin.usuarios.index',
+           // 'can' => 'admin.usuarios.index',
             'text' => 'Gestionar Usuario',
             'url' => 'admin/usuarios',
             'icon' => 'fas fa-fw fa-users',

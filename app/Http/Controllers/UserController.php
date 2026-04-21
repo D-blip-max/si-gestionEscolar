@@ -51,23 +51,37 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        // Validar contraseña actual si se intenta cambiar la contraseña
+        if ($request->filled('current_password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->withErrors(['current_password' => 'La contraseña actual no es correcta.']);
+            }
+
+            $request->validate([
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $user->update(['password' => Hash::make($request->password)]);
+            return redirect()->route('admin.usuarios.index')->with('success', 'Contraseña actualizada exitosamente.');
+        }
+
+        // Validación para actualizar datos sin cambiar contraseña
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
             'roles' => 'array',
         ]);
 
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
-
-        if ($request->password) {
-            $user->update(['password' => Hash::make($request->password)]);
+        if ($request->filled('name') || $request->filled('email')) {
+            $user->update([
+                'name' => $request->name ?? $user->name,
+                'email' => $request->email ?? $user->email,
+            ]);
         }
 
-        $user->syncRoles($request->roles ?? []);
+        if ($request->roles) {
+            $user->syncRoles($request->roles);
+        }
 
         return redirect()->route('admin.usuarios.index')->with('success', 'Usuario actualizado exitosamente.');
     }
