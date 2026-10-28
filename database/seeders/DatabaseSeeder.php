@@ -111,8 +111,11 @@ class DatabaseSeeder extends Seeder
         // 1. Matriz de Roles y Permisos RBAC
         $this->call(RoleSeeder::class);
 
-        // Si ya están cargados los 110 estudiantes del semestre, asegurar monto 250.00 Bs, completar los 6 bimestres de 2026 y terminar de inmediato
-        if (Estudiante::count() >= 110) {
+        // Verificar si ya está cargado el catálogo exacto (solo Inglés 9 niveles y Guaraní 2 niveles, sin Francés, y 110 estudiantes)
+        $tieneCatalogoAntiguo = Idioma::where('codigo', 'FRA')->exists()
+            || Modulo::whereHas('idioma', fn ($q) => $q->where('codigo', 'GUA'))->count() !== 2;
+
+        if (Estudiante::count() >= 110 && !$tieneCatalogoAntiguo) {
             BoletaPago::where('monto', '!=', 250.00)->update(['monto' => 250.00]);
             CicloBimestral::firstOrCreate(
                 ['nombre' => 'Bimestre V - 2026 (Sep-Oct)'],
@@ -133,9 +136,12 @@ class DatabaseSeeder extends Seeder
         BoletaPago::truncate();
         Asignacion::truncate();
         Paralelo::truncate();
+        Modulo::truncate();
+        Idioma::truncate();
         CicloBimestral::truncate();
         Estudiante::truncate();
         Formacion::truncate();
+        Personal::truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         User::whereIn('email', [
@@ -144,6 +150,7 @@ class DatabaseSeeder extends Seeder
             'diego.vargas@cei.com',
             'valeria.castro@cei.com',
             'mateo.roca@cei.com',
+            'sophie.laurent@cei.com',
         ])->delete();
 
         $this->usersByEmail = User::all()->keyBy('email')->all();
@@ -168,22 +175,18 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
 
-            // 4. Catálogo de Idiomas (Inglés, Guaraní y Francés)
-            $ingles = Idioma::firstOrCreate(['codigo' => 'ENG'], [
+            // 4. Catálogo de Idiomas Oficiales CEI (Únicamente Inglés y Guaraní)
+            $ingles = Idioma::create([
+                'codigo'      => 'ENG',
                 'nombre'      => 'Inglés',
                 'descripcion' => 'Programa modular de Lengua Inglesa (Módulos 1 al 9: Básico, Intermedio y Avanzado)',
                 'estado'      => 'ACTIVO',
             ]);
 
-            $guarani = Idioma::firstOrCreate(['codigo' => 'GUA'], [
+            $guarani = Idioma::create([
+                'codigo'      => 'GUA',
                 'nombre'      => 'Guaraní',
-                'descripcion' => 'Programa modular de Lengua y Cultura Guaraní Universitaria',
-                'estado'      => 'ACTIVO',
-            ]);
-
-            $frances = Idioma::firstOrCreate(['codigo' => 'FRA'], [
-                'nombre'      => 'Francés',
-                'descripcion' => 'Programa modular de Lengua Francesa Comunicativa',
+                'descripcion' => 'Programa modular de Lengua y Cultura Guaraní Universitaria (2 Niveles)',
                 'estado'      => 'ACTIVO',
             ]);
 
@@ -238,40 +241,21 @@ class DatabaseSeeder extends Seeder
                 $prevId = $mod->id;
             }
 
-            // 6.2 Guaraní: Módulos 1 al 4
+            // 6.2 Guaraní: Consta únicamente de 2 Niveles (Módulo 1 y Módulo 2)
             $modulosGuarani = [];
             $prevGua = null;
-            for ($i = 1; $i <= 4; $i++) {
-                $mg = Modulo::updateOrCreate(
-                    ['idioma_id' => $guarani->id, 'numero_orden' => $i],
-                    [
-                        'nombre'               => "Guaraní Módulo {$i}",
-                        'nivel'                => 'BASICO',
-                        'duracion_meses'       => 2,
-                        'prerrequisito_id'     => $prevGua,
-                        'es_modulo_graduacion' => false,
-                    ]
-                );
+            for ($i = 1; $i <= 2; $i++) {
+                $mg = Modulo::create([
+                    'idioma_id'            => $guarani->id,
+                    'numero_orden'         => $i,
+                    'nombre'               => "Guaraní Nivel {$i}",
+                    'nivel'                => 'BASICO',
+                    'duracion_meses'       => 2,
+                    'prerrequisito_id'     => $prevGua,
+                    'es_modulo_graduacion' => ($i === 2),
+                ]);
                 $modulosGuarani[$i] = $mg;
                 $prevGua = $mg->id;
-            }
-
-            // 6.3 Francés: Módulos 1 al 4
-            $modulosFrances = [];
-            $prevFra = null;
-            for ($i = 1; $i <= 4; $i++) {
-                $mf = Modulo::updateOrCreate(
-                    ['idioma_id' => $frances->id, 'numero_orden' => $i],
-                    [
-                        'nombre'               => "Francés Módulo {$i}",
-                        'nivel'                => 'BASICO',
-                        'duracion_meses'       => 2,
-                        'prerrequisito_id'     => $prevFra,
-                        'es_modulo_graduacion' => false,
-                    ]
-                );
-                $modulosFrances[$i] = $mf;
-                $prevFra = $mf->id;
             }
 
             // 7. Personal Administrativo (5 cuentas con Contraseña = CI)
@@ -298,7 +282,7 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
 
-            // 8. Plantel Docente Titular (11 Docentes: 9 de Inglés, 1 de Guaraní, 1 de Francés — Contraseña = CI)
+            // 8. Plantel Docente Titular (11 Docentes: 9 de Inglés y 2 de Guaraní — Contraseña = CI)
             $docentesData = [
                 1  => ['email' => 'maria.fernandez@cei.com', 'nombres' => 'María', 'apellidos' => 'Fernández', 'ci' => '24680246', 'tel' => '79123456', 'prof' => 'Lic. en Lengua Inglesa y Fonética', 'titulo1' => 'Licenciatura en Lenguas Modernas', 'inst1' => 'UAGRM - Facultad de Humanidades', 'titulo2' => 'Diplomado en Metodología Comunicativa', 'inst2' => 'Escuela de Postgrado UAGRM'],
                 2  => ['email' => 'carlos.rios@cei.com', 'nombres' => 'Carlos', 'apellidos' => 'Ríos', 'ci' => '97531975', 'tel' => '71234567', 'prof' => 'Certificado C2 Cambridge / Docente Titular', 'titulo1' => 'Cambridge English Proficiency (CPE - C2)', 'inst1' => 'University of Cambridge Assessment', 'titulo2' => 'Licenciatura en Filología Hispano-Inglesa', 'inst2' => 'UAGRM - Facultad de Humanidades'],
@@ -309,8 +293,8 @@ class DatabaseSeeder extends Seeder
                 7  => ['email' => 'lucia.camacho@cei.com', 'nombres' => 'Lucía', 'apellidos' => 'Camacho', 'ci' => '3841205', 'tel' => '72145605', 'prof' => 'Magíster en Lingüística Inglesa', 'titulo1' => 'TOEFL iBT C2 International Certification', 'inst1' => 'ETS Educational Testing Service', 'titulo2' => 'Maestría en Educación Superior Universitaria', 'inst2' => 'Postgrado UAGRM'],
                 8  => ['email' => 'fernando.justiniano@cei.com', 'nombres' => 'Fernando', 'apellidos' => 'Justiniano', 'ci' => '3841206', 'tel' => '72145606', 'prof' => 'Docente Evaluador de Grado Intermedio', 'titulo1' => 'Especialidad en Evaluación de Competencias Lingüísticas', 'inst1' => 'Postgrado Humanidades UAGRM', 'titulo2' => 'Licenciatura en Lenguas Modernas', 'inst2' => 'UAGRM'],
                 9  => ['email' => 'claudia.banzer@cei.com', 'nombres' => 'Claudia', 'apellidos' => 'Bánzer', 'ci' => '3841207', 'tel' => '72145607', 'prof' => 'Doctora en Filología Inglesa y Suficiencia', 'titulo1' => 'Doctorado en Lingüística Aplicada y Traducción', 'inst1' => 'Universidad Complutense / Convenio UAGRM', 'titulo2' => 'Examinadora Oficial Internacional C1/C2', 'inst2' => 'Cambridge Assessment'],
-                10 => ['email' => 'arandu.karai@cei.com', 'nombres' => 'Arandú', 'apellidos' => 'Karai Guasú', 'ci' => '3841208', 'tel' => '72145608', 'prof' => 'Lic. en Lengua y Cultura Guaraní', 'titulo1' => 'Licenciatura en Educación Intercultural Bilingüe', 'inst1' => 'UAGRM - Camiri / Humanidades', 'titulo2' => 'Especialista en Gramática Guaraní Contemporánea', 'inst2' => 'ILC Nación Guaraní'],
-                11 => ['email' => 'sophie.laurent@cei.com', 'nombres' => 'Sophie', 'apellidos' => 'Laurent Ribera', 'ci' => '3841209', 'tel' => '72145609', 'prof' => 'Especialista DALF C2 en Lengua Francesa', 'titulo1' => 'Diplôme Approfondi de Langue Française (DALF C2)', 'inst1' => 'Alliance Française / Ministère de l’Éducation', 'titulo2' => 'Licenciatura en Lenguas Modernas (Mención Francés)', 'inst2' => 'UAGRM - Facultad de Humanidades'],
+                10 => ['email' => 'arandu.karai@cei.com', 'nombres' => 'Arandú', 'apellidos' => 'Karai Guasú', 'ci' => '3841208', 'tel' => '72145608', 'prof' => 'Lic. en Lengua y Cultura Guaraní (Nivel 1)', 'titulo1' => 'Licenciatura en Educación Intercultural Bilingüe', 'inst1' => 'UAGRM - Camiri / Humanidades', 'titulo2' => 'Especialista en Gramática Guaraní Contemporánea', 'inst2' => 'ILC Nación Guaraní'],
+                11 => ['email' => 'teresa.cuellar@cei.com', 'nombres' => 'Teresa', 'apellidos' => 'Cuéllar Arandú', 'ci' => '3841209', 'tel' => '72145609', 'prof' => 'Magíster en Lingüística Guaraní (Nivel 2)', 'titulo1' => 'Maestría en Lenguas Nativas y Educación Superior', 'inst1' => 'Escuela de Postgrado UAGRM', 'titulo2' => 'Certificación Oficial de Suficiencia en Lengua Guaraní', 'inst2' => 'Instituto Plurinacional de Estudio de Lenguas y Culturas'],
             ];
 
             $docentes = [];
@@ -435,44 +419,78 @@ class DatabaseSeeder extends Seeder
                 $paralelosActivosVirt[$mIdx] = $pVirt;
             }
 
-            // Paralelos de Guaraní y Francés (Histórico Bim II y Activos Bim III)
-            $parGuaHist1 = Paralelo::firstOrCreate(
-                ['nombre' => 'GUA-M1 (Bim II)', 'ciclo_id' => $ciclos[8]->id, 'modulo_id' => $modulosGuarani[1]->id],
-                ['modalidad' => 'PRESENCIAL', 'aula_o_enlace' => 'Aula 105 - Humanidades', 'turno' => 'MAÑANA', 'hora_inicio' => '07:30:00', 'hora_fin' => '09:30:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
-            );
-            Asignacion::firstOrCreate(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaHist1->id], ['fecha_asignacion' => $ciclos[8]->fecha_inicio, 'estado' => 'activo']);
+            // Paralelos de Guaraní: 1 Histórico (Bim II) + 4 Activos en Bim III (Presencial y Virtual para Nivel 1 y Nivel 2)
+            $parGuaHist1 = Paralelo::create([
+                'nombre'        => 'GUA-N1 (Bim II)',
+                'ciclo_id'      => $ciclos[8]->id,
+                'modulo_id'     => $modulosGuarani[1]->id,
+                'modalidad'     => 'PRESENCIAL',
+                'aula_o_enlace' => 'Aula 105 - Humanidades',
+                'turno'         => 'MAÑANA',
+                'hora_inicio'   => '07:30:00',
+                'hora_fin'      => '09:30:00',
+                'cupo_maximo'   => 25,
+                'cupo_ocupado'  => 0,
+            ]);
+            Asignacion::create(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaHist1->id, 'fecha_asignacion' => $ciclos[8]->fecha_inicio, 'estado' => 'activo']);
 
-            $parGuaAct1 = Paralelo::firstOrCreate(
-                ['nombre' => 'GUA-M1 Presencial', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosGuarani[1]->id],
-                ['modalidad' => 'PRESENCIAL', 'aula_o_enlace' => 'Aula 105 - Humanidades', 'turno' => 'TARDE', 'hora_inicio' => '14:30:00', 'hora_fin' => '16:30:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
-            );
-            Asignacion::firstOrCreate(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaAct1->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
+            $parGuaAct1Pres = Paralelo::create([
+                'nombre'        => 'GUA-N1 Presencial',
+                'ciclo_id'      => $cicloActivo->id,
+                'modulo_id'     => $modulosGuarani[1]->id,
+                'modalidad'     => 'PRESENCIAL',
+                'aula_o_enlace' => 'Aula 105 - Humanidades',
+                'turno'         => 'MAÑANA',
+                'hora_inicio'   => '07:30:00',
+                'hora_fin'      => '09:30:00',
+                'cupo_maximo'   => 25,
+                'cupo_ocupado'  => 0,
+            ]);
+            Asignacion::create(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaAct1Pres->id, 'fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
 
-            $parGuaAct2 = Paralelo::firstOrCreate(
-                ['nombre' => 'GUA-M2 Virtual', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosGuarani[2]->id],
-                ['modalidad' => 'VIRTUAL', 'aula_o_enlace' => 'https://meet.google.com/cei-guarani-m2', 'turno' => 'NOCHE', 'hora_inicio' => '19:00:00', 'hora_fin' => '21:00:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
-            );
-            Asignacion::firstOrCreate(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaAct2->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
+            $parGuaAct1Virt = Paralelo::create([
+                'nombre'        => 'GUA-N1 Virtual',
+                'ciclo_id'      => $cicloActivo->id,
+                'modulo_id'     => $modulosGuarani[1]->id,
+                'modalidad'     => 'VIRTUAL',
+                'aula_o_enlace' => 'https://meet.google.com/cei-guarani-n1',
+                'turno'         => 'NOCHE',
+                'hora_inicio'   => '19:00:00',
+                'hora_fin'      => '21:00:00',
+                'cupo_maximo'   => 25,
+                'cupo_ocupado'  => 0,
+            ]);
+            Asignacion::create(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaAct1Virt->id, 'fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
 
-            $parFraHist1 = Paralelo::firstOrCreate(
-                ['nombre' => 'FRA-M1 (Bim II)', 'ciclo_id' => $ciclos[8]->id, 'modulo_id' => $modulosFrances[1]->id],
-                ['modalidad' => 'VIRTUAL', 'aula_o_enlace' => 'https://meet.google.com/cei-frances-b2', 'turno' => 'NOCHE', 'hora_inicio' => '19:00:00', 'hora_fin' => '21:00:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
-            );
-            Asignacion::firstOrCreate(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parFraHist1->id], ['fecha_asignacion' => $ciclos[8]->fecha_inicio, 'estado' => 'activo']);
+            $parGuaAct2Pres = Paralelo::create([
+                'nombre'        => 'GUA-N2 Presencial',
+                'ciclo_id'      => $cicloActivo->id,
+                'modulo_id'     => $modulosGuarani[2]->id,
+                'modalidad'     => 'PRESENCIAL',
+                'aula_o_enlace' => 'Aula 108 - Humanidades',
+                'turno'         => 'TARDE',
+                'hora_inicio'   => '14:30:00',
+                'hora_fin'      => '16:30:00',
+                'cupo_maximo'   => 25,
+                'cupo_ocupado'  => 0,
+            ]);
+            Asignacion::create(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parGuaAct2Pres->id, 'fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
 
-            $parFraAct1 = Paralelo::firstOrCreate(
-                ['nombre' => 'FRA-M1 Presencial', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosFrances[1]->id],
-                ['modalidad' => 'PRESENCIAL', 'aula_o_enlace' => 'Aula 108 - Humanidades', 'turno' => 'MAÑANA', 'hora_inicio' => '07:30:00', 'hora_fin' => '09:30:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
-            );
-            Asignacion::firstOrCreate(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parFraAct1->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
+            $parGuaAct2Virt = Paralelo::create([
+                'nombre'        => 'GUA-N2 Virtual',
+                'ciclo_id'      => $cicloActivo->id,
+                'modulo_id'     => $modulosGuarani[2]->id,
+                'modalidad'     => 'VIRTUAL',
+                'aula_o_enlace' => 'https://meet.google.com/cei-guarani-n2',
+                'turno'         => 'NOCHE',
+                'hora_inicio'   => '19:00:00',
+                'hora_fin'      => '21:00:00',
+                'cupo_maximo'   => 25,
+                'cupo_ocupado'  => 0,
+            ]);
+            Asignacion::create(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parGuaAct2Virt->id, 'fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
 
-            $parFraAct2 = Paralelo::firstOrCreate(
-                ['nombre' => 'FRA-M2 Virtual', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosFrances[2]->id],
-                ['modalidad' => 'VIRTUAL', 'aula_o_enlace' => 'https://meet.google.com/cei-frances-m2', 'turno' => 'NOCHE', 'hora_inicio' => '19:00:00', 'hora_fin' => '21:00:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
-            );
-            Asignacion::firstOrCreate(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parFraAct2->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
-
-            // 10. Población Estudiantil Completa: 110 Estudiantes (90 en Inglés + 10 en Guaraní + 10 en Francés)
+            // 10. Población Estudiantil Completa: 110 Estudiantes (90 en los 9 niveles de Inglés + 20 en los 2 niveles de Guaraní)
             $nombresM = ['Daniel', 'Roberto', 'Lucas', 'Mateo', 'Sebastián', 'Alejandro', 'Gabriel', 'Nicolás', 'Samuel', 'Joaquín', 'Andrés', 'Leonardo', 'Adrián', 'Bruno', 'Martín', 'Hugo', 'Rodrigo', 'Álvaro', 'Gonzalo', 'Iván'];
             $nombresF = ['Carla', 'Valeria', 'Camila', 'Mariana', 'Luciana', 'Sofía', 'Fernanda', 'Natalia', 'Andrea', 'Gabriela', 'Daniela', 'Victoria', 'Isabella', 'Paula', 'Renata', 'Carolina', 'Elena', 'Adriana', 'Claudia', 'Mónica'];
             $apellidosCat = ['Mendoza', 'Sosa', 'Guzmán', 'Ortiz', 'Peña', 'Suárez', 'Roca', 'Justiniano', 'Vaca', 'Ribera', 'Saucedo', 'Parada', 'Chávez', 'Cuéllar', 'Cabrera', 'Aguilera', 'Bánzer', 'Toledo', 'Paz', 'Rivero', 'Zeballos', 'Salvatierra', 'Montaño', 'Arteaga', 'Cronenbold', 'Gutiérrez', 'Kempff', 'Landívar', 'Montero', 'Durán'];
@@ -644,11 +662,11 @@ class DatabaseSeeder extends Seeder
                 }
             }
 
-            // 10.2 Estudiantes de Guaraní (10 estudiantes: CEI-2026-0091 al 0100) y Francés (10 estudiantes: CEI-2026-0101 al 0110)
+            // 10.2 Los 20 Estudiantes de Guaraní: 10 en Nivel 1 (CEI-2026-0091 al 0100) y 10 en Nivel 2 (CEI-2026-0101 al 0110)
             for ($extraIdx = 1; $extraIdx <= 20; $extraIdx++) {
                 $idx = $correlativoGlobal;
-                $esGuarani = ($extraIdx <= 10);
-                $posIdioma = $esGuarani ? $extraIdx : ($extraIdx - 10); // 1..10
+                $esNivel1 = ($extraIdx <= 10);
+                $posNivel = $esNivel1 ? $extraIdx : ($extraIdx - 10); // 1..10 en cada nivel de Guaraní
                 $esMujer = ($idx % 2 === 0);
 
                 $nombre = $esMujer ? $nombresF[($idx - 1) % count($nombresF)] : $nombresM[($idx - 1) % count($nombresM)];
@@ -683,24 +701,21 @@ class DatabaseSeeder extends Seeder
                     'ppff_id'           => null,
                 ]);
 
-                if ($esGuarani) {
-                    if ($posIdioma <= 5) {
-                        // Nivel 1 de Guaraní en Ciclo Activo
-                        $this->registrarMatricula($est, $modulosGuarani[1], $parGuaAct1, sprintf('BOL-GUA-M1-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 4 ? 'APROBADO' : 'PENDIENTE'), ($posIdioma <= 4 ? 82.0 : 0.0), null, $adminUser->id);
-                    } else {
-                        // Aprobó Guaraní M1 en Bimestre II + Cursa Guaraní M2 en Bimestre III
-                        $this->registrarMatricula($est, $modulosGuarani[1], $parGuaHist1, sprintf('BOL-GUA-H1-%04d', $idx), $banco, '2026-03-01', '2026-03-02', 'APROBADO', 85.0, 'Aprobado en Bimestre II', $adminUser->id);
-                        $this->registrarMatricula($est, $modulosGuarani[2], $parGuaAct2, sprintf('BOL-GUA-M2-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 9 ? 'APROBADO' : 'REPROBADO'), ($posIdioma <= 9 ? 88.0 : 44.0), null, $adminUser->id);
-                    }
+                if ($esNivel1) {
+                    // 10 Estudiantes en Guaraní Nivel 1 (5 en Presencial y 5 en Virtual)
+                    $parGuaN1 = ($posNivel <= 5) ? $parGuaAct1Pres : $parGuaAct1Virt;
+                    $estadoGua1 = ($posNivel <= 7) ? 'APROBADO' : (($posNivel === 8) ? 'REPROBADO' : 'PENDIENTE');
+                    $notaGua1 = ($posNivel <= 7) ? (76.0 + $posNivel * 2) : (($posNivel === 8) ? 42.0 : 0.0);
+                    $this->registrarMatricula($est, $modulosGuarani[1], $parGuaN1, sprintf('BOL-GUA-N1-%04d', $idx), $banco, '2026-05-03', '2026-05-04', $estadoGua1, $notaGua1, null, $adminUser->id);
                 } else {
-                    if ($posIdioma <= 5) {
-                        // Nivel 1 de Francés en Ciclo Activo
-                        $this->registrarMatricula($est, $modulosFrances[1], $parFraAct1, sprintf('BOL-FRA-M1-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 4 ? 'APROBADO' : 'PENDIENTE'), ($posIdioma <= 4 ? 80.0 : 0.0), null, $adminUser->id);
-                    } else {
-                        // Aprobó Francés M1 en Bimestre II + Cursa Francés M2 en Bimestre III
-                        $this->registrarMatricula($est, $modulosFrances[1], $parFraHist1, sprintf('BOL-FRA-H1-%04d', $idx), $banco, '2026-03-01', '2026-03-02', 'APROBADO', 84.0, 'Aprobado en Bimestre II', $adminUser->id);
-                        $this->registrarMatricula($est, $modulosFrances[2], $parFraAct2, sprintf('BOL-FRA-M2-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 9 ? 'APROBADO' : 'REPROBADO'), ($posIdioma <= 9 ? 86.0 : 41.0), null, $adminUser->id);
-                    }
+                    // 10 Estudiantes en Guaraní Nivel 2: primero aprobaron Guaraní Nivel 1 en Bimestre II - 2026 + ahora cursan Guaraní Nivel 2 en Bimestre III - 2026
+                    $this->registrarMatricula($est, $modulosGuarani[1], $parGuaHist1, sprintf('BOL-GUA-H1-%04d', $idx), $banco, '2026-03-01', '2026-03-02', 'APROBADO', 80.0 + $posNivel, 'Guaraní Nivel 1 aprobado en Bimestre II - 2026', $adminUser->id);
+
+                    $parGuaN2 = ($posNivel <= 5) ? $parGuaAct2Pres : $parGuaAct2Virt;
+                    $estadoGua2 = ($posNivel <= 8) ? 'APROBADO' : (($posNivel === 9) ? 'REPROBADO' : 'PENDIENTE');
+                    $notaGua2 = ($posNivel <= 8) ? (78.0 + $posNivel * 2) : (($posNivel === 9) ? 44.0 : 0.0);
+                    $obsGua2 = ($estadoGua2 === 'APROBADO') ? 'Culminación del Programa de Lengua Guaraní (Nivel 2)' : null;
+                    $this->registrarMatricula($est, $modulosGuarani[2], $parGuaN2, sprintf('BOL-GUA-N2-%04d', $idx), $banco, '2026-05-03', '2026-05-04', $estadoGua2, $notaGua2, $obsGua2, $adminUser->id);
                 }
 
                 $correlativoGlobal++;
