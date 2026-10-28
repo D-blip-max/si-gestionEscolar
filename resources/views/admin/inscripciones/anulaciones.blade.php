@@ -48,7 +48,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($inscripciones as $ins)
+                        @foreach ($inscripciones as $ins)
                             <tr>
                                 <td class="text-center align-middle font-weight-bold">{{ $loop->iteration }}</td>
                                 <td class="text-center align-middle">
@@ -64,7 +64,7 @@
                                     {{ optional(optional($ins->paralelo)->ciclo)->nombre ?? 'Ciclo' }}
                                 </td>
                                 <td class="align-middle">
-                                    <strong>{{ optional($ins->modulo->idioma)->nombre }}</strong><br>
+                                    <strong>{{ optional(optional($ins->modulo)->idioma)->nombre }}</strong><br>
                                     <span class="text-muted text-sm">{{ optional($ins->modulo)->nombre }}</span>
                                 </td>
                                 <td class="text-center align-middle">
@@ -80,14 +80,7 @@
                                     <i class="fas fa-comment-alt text-secondary mr-1"></i> "{{ $ins->motivo_anulacion ?? 'Sin motivo especificado' }}"
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">
-                                    <i class="fas fa-info-circle fa-2x mb-2 text-secondary"></i><br>
-                                    No se registran inscripciones anuladas en el sistema.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>

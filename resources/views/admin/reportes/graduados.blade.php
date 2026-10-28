@@ -97,7 +97,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($estudiantes as $est)
+                        @foreach ($estudiantes as $est)
                             <tr>
                                 <td class="text-center align-middle font-weight-bold">{{ $loop->iteration }}</td>
                                 <td class="text-center align-middle font-weight-bold">
@@ -116,13 +116,7 @@
                                     </span>
                                 </td>
                             </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">
-                                    No se encontraron estudiantes que cumplan con todos los requisitos para el nivel {{ $tipoGraduacion }}.
-                                </td>
-                            </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
             </div>
