@@ -306,14 +306,13 @@ return [
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
 
-        ['header' => 'MÓDULOS DE GESTIÓN ACADÉMICA'],
-
         // =========================================================================
         // SEGURIDAD Y CONFIGURACIÓN
         // =========================================================================
         [
             'text'    => 'Seguridad y Configuración',
             'icon'    => 'fas fa-fw fa-shield-alt',
+            'can'     => ['admin.configuracion.index', 'admin.usuarios.index', 'admin.roles.index'],
             'submenu' => [
                 [
                     'text' => 'Configuración Institucional',
@@ -333,6 +332,12 @@ return [
                     'icon' => 'fas fa-fw fa-user-tag',
                     'can'  => 'admin.roles.index',
                 ],
+                [
+                    'text' => 'Auditoría de Notas',
+                    'url'  => 'admin/roles/auditoria-notas',
+                    'icon' => 'fas fa-fw fa-history',
+                    'can'  => 'admin.roles.index',
+                ],
             ],
         ],
 
@@ -342,21 +347,25 @@ return [
         [
             'text'    => 'Catálogos Académicos',
             'icon'    => 'fas fa-fw fa-book-open',
+            'can'     => ['admin.idiomas.index', 'admin.modulos.index', 'admin.paralelos.index'],
             'submenu' => [
                 [
                     'text' => 'Gestión de Idiomas',
                     'url'  => 'admin/idiomas',
                     'icon' => 'fas fa-fw fa-language',
+                    'can'  => 'admin.idiomas.index',
                 ],
                 [
                     'text' => 'Módulos y Niveles',
                     'url'  => 'admin/modulos',
                     'icon' => 'fas fa-fw fa-layer-group',
+                    'can'  => 'admin.modulos.index',
                 ],
                 [
                     'text' => 'Ciclos y Paralelos',
                     'url'  => 'admin/paralelos',
                     'icon' => 'fas fa-fw fa-chalkboard',
+                    'can'  => 'admin.paralelos.index',
                 ],
             ],
         ],
@@ -366,21 +375,25 @@ return [
         [
             'text'    => 'Personal y Docencia',
             'icon'    => 'fas fa-fw fa-chalkboard-teacher',
+            'can'     => ['admin.personal.index', 'admin.personal.formaciones.index', 'admin.asignaciones.index'],
             'submenu' => [
                 [
                     'text' => 'Padrón de Personal',
                     'url'  => 'admin/personal',
                     'icon' => 'fas fa-fw fa-id-badge',
+                    'can'  => 'admin.personal.index',
                 ],
                 [
                     'text' => 'Formación Académica',
                     'url'  => 'admin/personal/formaciones',
                     'icon' => 'fas fa-fw fa-graduation-cap',
+                    'can'  => 'admin.personal.formaciones.index',
                 ],
                 [
                     'text' => 'Asignación a Grupos',
                     'url'  => 'admin/asignaciones',
                     'icon' => 'fas fa-fw fa-tasks',
+                    'can'  => 'admin.asignaciones.index',
                 ],
             ],
         ],
@@ -391,21 +404,25 @@ return [
         [
             'text'    => 'Estudiantes y Boletas',
             'icon'    => 'fas fa-fw fa-user-graduate',
+            'can'     => ['admin.estudiantes.index', 'admin.boletas.index', 'admin.estudiantes.kardex'],
             'submenu' => [
                 [
                     'text' => 'Padrón de Estudiantes',
                     'url'  => 'admin/estudiantes',
                     'icon' => 'fas fa-fw fa-users',
+                    'can'  => 'admin.estudiantes.index',
                 ],
                 [
                     'text' => 'Registro de Boletas',
                     'url'  => 'admin/boletas',
                     'icon' => 'fas fa-fw fa-file-invoice-dollar',
+                    'can'  => 'admin.boletas.index',
                 ],
                 [
                     'text' => 'Kárdex Académico',
                     'url'  => 'admin/estudiantes/kardex',
                     'icon' => 'fas fa-fw fa-address-book',
+                    'can'  => 'admin.estudiantes.kardex',
                 ],
             ],
         ],
@@ -416,21 +433,25 @@ return [
         [
             'text'    => 'Inscripciones y Matrícula',
             'icon'    => 'fas fa-fw fa-clipboard-check',
+            'can'     => ['admin.inscripciones.create', 'admin.inscripciones.index', 'admin.inscripciones.destroy'],
             'submenu' => [
                 [
                     'text' => 'Nueva Inscripción',
                     'url'  => 'admin/inscripciones/create',
                     'icon' => 'fas fa-fw fa-user-plus',
+                    'can'  => 'admin.inscripciones.create',
                 ],
                 [
                     'text' => 'Listado de Matrículas',
                     'url'  => 'admin/inscripciones',
                     'icon' => 'fas fa-fw fa-list-alt',
+                    'can'  => 'admin.inscripciones.index',
                 ],
                 [
                     'text' => 'Historial y Anulaciones',
                     'url'  => 'admin/inscripciones/anulaciones',
                     'icon' => 'fas fa-fw fa-undo-alt',
+                    'can'  => 'admin.inscripciones.destroy',
                 ],
             ],
         ],
@@ -441,21 +462,25 @@ return [
         [
             'text'    => 'Control de Calificaciones',
             'icon'    => 'fas fa-fw fa-marker',
+            'can'     => ['docente.grupos.index', 'docente.calificaciones.create', 'docente.actas.index'],
             'submenu' => [
                 [
                     'text' => 'Mis Grupos Asignados',
                     'url'  => 'docente/grupos',
                     'icon' => 'fas fa-fw fa-users',
+                    'can'  => 'docente.grupos.index',
                 ],
                 [
                     'text' => 'Cargar Nota Final',
                     'url'  => 'docente/calificaciones',
                     'icon' => 'fas fa-fw fa-edit',
+                    'can'  => 'docente.calificaciones.create',
                 ],
                 [
                     'text' => 'Actas Oficiales (PDF)',
                     'url'  => 'docente/actas',
                     'icon' => 'fas fa-fw fa-file-pdf',
+                    'can'  => 'docente.actas.index',
                 ],
             ],
         ],
@@ -466,21 +491,25 @@ return [
         [
             'text'    => 'Portal del Estudiante',
             'icon'    => 'fas fa-fw fa-laptop-code',
+            'can'     => ['estudiante.clases.index', 'estudiante.avance.index', 'estudiante.documentos.index'],
             'submenu' => [
                 [
                     'text' => 'Mi Módulo y Clases',
                     'url'  => 'estudiante/modulo-activo',
                     'icon' => 'fas fa-fw fa-video',
+                    'can'  => 'estudiante.clases.index',
                 ],
                 [
                     'text' => 'Avance a Graduación',
                     'url'  => 'estudiante/avance-curricular',
                     'icon' => 'fas fa-fw fa-award',
+                    'can'  => 'estudiante.avance.index',
                 ],
                 [
                     'text' => 'Historial y Certificados',
                     'url'  => 'estudiante/mis-documentos',
                     'icon' => 'fas fa-fw fa-certificate',
+                    'can'  => 'estudiante.documentos.index',
                 ],
             ],
         ],
@@ -491,21 +520,25 @@ return [
         [
             'text'    => 'Reportes y Finanzas',
             'icon'    => 'fas fa-fw fa-chart-line',
+            'can'     => ['admin.reportes.conciliacion', 'admin.reportes.inscritos', 'admin.reportes.graduados'],
             'submenu' => [
                 [
                     'text' => 'Conciliación de Boletas',
                     'url'  => 'admin/reportes/conciliacion-boletas',
                     'icon' => 'fas fa-fw fa-money-check-alt',
+                    'can'  => 'admin.reportes.conciliacion',
                 ],
                 [
                     'text' => 'Inscritos por Modalidad',
                     'url'  => 'admin/reportes/inscritos-modalidad',
                     'icon' => 'fas fa-fw fa-chart-pie',
+                    'can'  => 'admin.reportes.inscritos',
                 ],
                 [
                     'text' => 'Graduados Intermedio/Avanzado',
                     'url'  => 'admin/reportes/estudiantes-graduados',
                     'icon' => 'fas fa-fw fa-user-check',
+                    'can'  => 'admin.reportes.graduados',
                 ],
             ],
         ],

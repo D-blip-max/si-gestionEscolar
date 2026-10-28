@@ -68,7 +68,13 @@
                     <p>Estudiantes {{ $gestionSeleccionada === 'TODAS' ? 'Autónomos' : 'Activos (' . $gestionSeleccionada . ')' }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-user-graduate"></i></div>
-                <a href="{{ route('admin.estudiantes.index') }}" class="small-box-footer">Padrón de Estudiantes <i class="fas fa-arrow-circle-right"></i></a>
+                @can('admin.estudiantes.index')
+                    <a href="{{ route('admin.estudiantes.index') }}" class="small-box-footer">Padrón de Estudiantes <i class="fas fa-arrow-circle-right"></i></a>
+                @elseif(auth()->user()->can('admin.estudiantes.kardex'))
+                    <a href="{{ route('admin.estudiantes.kardex.general') }}" class="small-box-footer">Kárdex Estudiantil <i class="fas fa-arrow-circle-right"></i></a>
+                @else
+                    <span class="small-box-footer">Padrón Estudiantil CEI</span>
+                @endcan
             </div>
         </div>
 
@@ -79,7 +85,13 @@
                     <p>Recaudación {{ $gestionSeleccionada === 'TODAS' ? 'Total' : 'Gestión ' . $gestionSeleccionada }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
-                <a href="{{ route('admin.boletas.index') }}" class="small-box-footer">Conciliación de Boletas <i class="fas fa-arrow-circle-right"></i></a>
+                @can('admin.boletas.index')
+                    <a href="{{ route('admin.boletas.index') }}" class="small-box-footer">Conciliación de Boletas <i class="fas fa-arrow-circle-right"></i></a>
+                @elseif(auth()->user()->can('admin.reportes.conciliacion'))
+                    <a href="{{ route('admin.reportes.conciliacion') }}" class="small-box-footer">Reporte de Recaudación <i class="fas fa-arrow-circle-right"></i></a>
+                @else
+                    <span class="small-box-footer">Tesorería Fiscalizada CEI</span>
+                @endcan
             </div>
         </div>
 
@@ -90,7 +102,11 @@
                     <p>Docentes Titulares</p>
                 </div>
                 <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                <a href="{{ route('admin.personal.index', ['tipo' => 'docente']) }}" class="small-box-footer">Padrón de Personal <i class="fas fa-arrow-circle-right"></i></a>
+                @can('admin.personal.index')
+                    <a href="{{ route('admin.personal.index', ['tipo' => 'docente']) }}" class="small-box-footer">Padrón de Personal <i class="fas fa-arrow-circle-right"></i></a>
+                @else
+                    <span class="small-box-footer">Plantel Docente CEI</span>
+                @endcan
             </div>
         </div>
 
@@ -101,72 +117,113 @@
                     <p>Matrículas {{ $gestionSeleccionada === 'TODAS' ? 'Registradas' : 'Gestión ' . $gestionSeleccionada }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-clipboard-check"></i></div>
-                <a href="{{ route('admin.inscripciones.index') }}" class="small-box-footer">Listado de Matrículas <i class="fas fa-arrow-circle-right"></i></a>
+                @can('admin.inscripciones.index')
+                    <a href="{{ route('admin.inscripciones.index') }}" class="small-box-footer">Listado de Matrículas <i class="fas fa-arrow-circle-right"></i></a>
+                @elseif(auth()->user()->can('admin.reportes.inscritos'))
+                    <a href="{{ route('admin.reportes.inscritos') }}" class="small-box-footer">Reporte de Inscritos <i class="fas fa-arrow-circle-right"></i></a>
+                @else
+                    <span class="small-box-footer">Registro Académico CEI</span>
+                @endcan
             </div>
         </div>
     </div>
 
-    <!-- Módulos de Acceso Rápido -->
+    <!-- Módulos de Acceso Rápido (Solo aparecen los módulos a los que el usuario tiene permiso) -->
     <div class="card card-outline card-secondary shadow-sm mb-4">
         <div class="card-header bg-white">
             <h5 class="card-title text-bold mb-0"><i class="fas fa-th-large text-primary mr-1"></i> Módulos Principales del Sistema</h5>
         </div>
         <div class="card-body">
             <div class="row">
+                @canany(['admin.usuarios.index', 'admin.roles.index', 'admin.configuracion.index'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
-                        <h6 class="font-weight-bold">Seguridad y Usuarios</h6>
+                        <h6 class="font-weight-bold">Seguridad y Configuración</h6>
                         <small class="text-muted d-block mb-2">Configuración, Usuarios y Roles</small>
-                        <a href="{{ route('admin.usuarios.index') }}" class="btn btn-outline-primary btn-xs">Administrar</a>
+                        @can('admin.usuarios.index')
+                            <a href="{{ route('admin.usuarios.index') }}" class="btn btn-outline-primary btn-xs">Administrar</a>
+                        @else
+                            <a href="{{ route('admin.configuracion.index') }}" class="btn btn-outline-primary btn-xs">Configuración</a>
+                        @endcan
                     </div>
                 </div>
+                @endcanany
 
+                @canany(['admin.idiomas.index', 'admin.modulos.index', 'admin.paralelos.index'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-book-open fa-2x text-success mb-2"></i>
                         <h6 class="font-weight-bold">Catálogos Académicos</h6>
-                        <small class="text-muted d-block mb-2">Idiomas, Módulos 1-9 y Paralelos</small>
+                        <small class="text-muted d-block mb-2">Idiomas, Módulos y Paralelos</small>
                         <a href="{{ route('admin.idiomas.index') }}" class="btn btn-outline-success btn-xs">Catálogos</a>
                     </div>
                 </div>
+                @endcanany
 
+                @canany(['admin.personal.index', 'admin.asignaciones.index', 'admin.personal.formaciones.index'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-chalkboard-teacher fa-2x text-info mb-2"></i>
                         <h6 class="font-weight-bold">Personal y Docentes</h6>
                         <small class="text-muted d-block mb-2">Padrón Docente y Asignaciones</small>
-                        <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-outline-info btn-xs">Asignaciones</a>
+                        @can('admin.asignaciones.index')
+                            <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-outline-info btn-xs">Asignaciones</a>
+                        @else
+                            <a href="{{ route('admin.personal.index', ['tipo' => 'docente']) }}" class="btn btn-outline-info btn-xs">Padrón Docente</a>
+                        @endcan
                     </div>
                 </div>
+                @endcanany
 
+                @canany(['admin.estudiantes.index', 'admin.boletas.index', 'admin.estudiantes.kardex'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
-                        <h6 class="font-weight-bold">Padrón de Estudiantes</h6>
+                        <h6 class="font-weight-bold">Estudiantes y Boletas</h6>
                         <small class="text-muted d-block mb-2">Padrón, Boletas y Kárdex</small>
-                        <a href="{{ route('admin.estudiantes.index') }}" class="btn btn-outline-warning btn-xs">Estudiantes</a>
+                        @can('admin.estudiantes.index')
+                            <a href="{{ route('admin.estudiantes.index') }}" class="btn btn-outline-warning btn-xs">Estudiantes</a>
+                        @elseif(auth()->user()->can('admin.boletas.index'))
+                            <a href="{{ route('admin.boletas.index') }}" class="btn btn-outline-warning btn-xs">Boletas</a>
+                        @else
+                            <a href="{{ route('admin.estudiantes.kardex.general') }}" class="btn btn-outline-warning btn-xs">Kárdex</a>
+                        @endcan
                     </div>
                 </div>
+                @endcanany
 
+                @canany(['admin.inscripciones.create', 'admin.inscripciones.index'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-clipboard-check fa-2x text-danger mb-2"></i>
                         <h6 class="font-weight-bold">Inscripciones y Matrícula</h6>
                         <small class="text-muted d-block mb-2">Inscripción Modular y Ficha PDF</small>
-                        <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-outline-danger btn-xs">Nueva Matrícula</a>
+                        @can('admin.inscripciones.create')
+                            <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-outline-danger btn-xs">Nueva Matrícula</a>
+                        @else
+                            <a href="{{ route('admin.inscripciones.index') }}" class="btn btn-outline-danger btn-xs">Matrículas</a>
+                        @endcan
                     </div>
                 </div>
+                @endcanany
 
+                @canany(['docente.grupos.index', 'docente.actas.index'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-marker fa-2x text-purple mb-2" style="color: #6f42c1;"></i>
                         <h6 class="font-weight-bold">Control de Notas</h6>
                         <small class="text-muted d-block mb-2">Planilla Docente y Actas PDF</small>
-                        <a href="{{ route('docente.grupos.index') }}" class="btn btn-outline-dark btn-xs">Calificaciones</a>
+                        @can('docente.grupos.index')
+                            <a href="{{ route('docente.grupos.index') }}" class="btn btn-outline-dark btn-xs">Calificaciones</a>
+                        @else
+                            <a href="{{ route('docente.actas.index') }}" class="btn btn-outline-dark btn-xs">Actas PDF</a>
+                        @endcan
                     </div>
                 </div>
+                @endcanany
 
+                @canany(['estudiante.clases.index', 'estudiante.avance.index', 'estudiante.documentos.index'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-laptop-code fa-2x text-indigo mb-2" style="color: #6610f2;"></i>
@@ -175,15 +232,24 @@
                         <a href="{{ route('estudiante.clases.index') }}" class="btn btn-outline-info btn-xs">Mi Aula</a>
                     </div>
                 </div>
+                @endcanany
 
+                @canany(['admin.reportes.conciliacion', 'admin.reportes.inscritos', 'admin.reportes.graduados'])
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-chart-line fa-2x text-teal mb-2" style="color: #20c997;"></i>
                         <h6 class="font-weight-bold">Reportes y Finanzas</h6>
                         <small class="text-muted d-block mb-2">Conciliación, Modalidad y Graduados</small>
-                        <a href="{{ route('admin.reportes.conciliacion') }}" class="btn btn-outline-success btn-xs">Reportes</a>
+                        @can('admin.reportes.conciliacion')
+                            <a href="{{ route('admin.reportes.conciliacion') }}" class="btn btn-outline-success btn-xs">Reportes</a>
+                        @elseif(auth()->user()->can('admin.reportes.inscritos'))
+                            <a href="{{ route('admin.reportes.inscritos') }}" class="btn btn-outline-success btn-xs">Inscritos</a>
+                        @else
+                            <a href="{{ route('admin.reportes.graduados') }}" class="btn btn-outline-success btn-xs">Graduados</a>
+                        @endcan
                     </div>
                 </div>
+                @endcanany
             </div>
         </div>
     </div>

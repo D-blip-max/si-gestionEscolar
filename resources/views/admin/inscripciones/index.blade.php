@@ -56,12 +56,16 @@
             </form>
 
             <div class="card-tools">
-                <a href="{{ route('admin.inscripciones.anulaciones') }}" class="btn btn-outline-danger btn-sm mr-2">
-                    <i class="fas fa-history mr-1"></i> Historial de Anulaciones
-                </a>
-                <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus-circle mr-1"></i> Nueva Inscripción Modular
-                </a>
+                @can('admin.inscripciones.destroy')
+                    <a href="{{ route('admin.inscripciones.anulaciones') }}" class="btn btn-outline-danger btn-sm mr-2">
+                        <i class="fas fa-history mr-1"></i> Historial de Anulaciones
+                    </a>
+                @endcan
+                @can('admin.inscripciones.create')
+                    <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus-circle mr-1"></i> Nueva Inscripción Modular
+                    </a>
+                @endcan
             </div>
         </div>
 
@@ -146,11 +150,13 @@
                                         <a href="{{ route('admin.inscripciones.pdf', $ins->id) }}" target="_blank" class="btn btn-danger" title="Imprimir Ficha Oficial (PDF)">
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
-                                        @if($ins->estado === 'ACTIVA')
-                                            <button type="button" class="btn btn-warning" onclick="abrirModalAnular({{ $ins->id }}, '{{ optional($ins->estudiante)->apellidos }} {{ optional($ins->estudiante)->nombres }}', '{{ optional($ins->modulo)->nombre }}')" title="Anular Matrícula">
-                                                <i class="fas fa-undo-alt"></i>
-                                            </button>
-                                        @endif
+                                        @can('admin.inscripciones.destroy')
+                                            @if($ins->estado === 'ACTIVA')
+                                                <button type="button" class="btn btn-warning" onclick="abrirModalAnular({{ $ins->id }}, '{{ optional($ins->estudiante)->apellidos }} {{ optional($ins->estudiante)->nombres }}', '{{ optional($ins->modulo)->nombre }}')" title="Anular Matrícula">
+                                                    <i class="fas fa-undo-alt"></i>
+                                                </button>
+                                            @endif
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

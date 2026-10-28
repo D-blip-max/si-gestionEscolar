@@ -38,9 +38,11 @@
         <div class="card-header bg-white">
             <h3 class="card-title text-bold"><i class="fas fa-users mr-1"></i> Estudiantes Matriculados</h3>
             <div class="card-tools">
-                <a href="{{ route('admin.estudiantes.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-user-plus mr-1"></i> Nuevo Estudiante
-                </a>
+                @can('admin.estudiantes.create')
+                    <a href="{{ route('admin.estudiantes.create') }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-user-plus mr-1"></i> Nuevo Estudiante
+                    </a>
+                @endcan
             </div>
         </div>
 
@@ -107,18 +109,26 @@
                                 </td>
                                 <td class="text-center align-middle">
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.estudiantes.kardex', $estudiante->id) }}" class="btn btn-outline-primary" title="Kárdex Académico">
-                                            <i class="fas fa-graduation-cap"></i>
-                                        </a>
-                                        <a href="{{ route('admin.estudiantes.show', $estudiante->id) }}" class="btn btn-info" title="Ver Perfil">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.estudiantes.edit', $estudiante->id) }}" class="btn btn-warning" title="Editar">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-danger" onclick="confirmarEliminar({{ $estudiante->id }})" title="Eliminar">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        @can('admin.estudiantes.kardex')
+                                            <a href="{{ route('admin.estudiantes.kardex', $estudiante->id) }}" class="btn btn-outline-primary" title="Kárdex Académico">
+                                                <i class="fas fa-graduation-cap"></i>
+                                            </a>
+                                        @endcan
+                                        @can('admin.estudiantes.show')
+                                            <a href="{{ route('admin.estudiantes.show', $estudiante->id) }}" class="btn btn-info" title="Ver Perfil">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        @endcan
+                                        @can('admin.estudiantes.edit')
+                                            <a href="{{ route('admin.estudiantes.edit', $estudiante->id) }}" class="btn btn-warning" title="Editar">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        @endcan
+                                        @can('admin.estudiantes.destroy')
+                                            <button type="button" class="btn btn-danger" onclick="confirmarEliminar({{ $estudiante->id }})" title="Eliminar">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        @endcan
                                     </div>
                                     <form id="delete-estudiante-{{ $estudiante->id }}" action="{{ route('admin.estudiantes.destroy', $estudiante->id) }}" method="POST" style="display: none;">
                                         @csrf

@@ -113,16 +113,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-warning btn-sm"
-                                                    onclick="cargarEdicion('{{ $p->id }}', '{{ $p->ciclo_id }}', '{{ $p->modulo_id }}', '{{ $p->nombre }}', '{{ $p->modalidad }}', '{{ addslashes($p->aula_o_enlace) }}', '{{ $p->turno }}', '{{ $p->hora_inicio }}', '{{ $p->hora_fin }}', '{{ $p->cupo_maximo }}')"
-                                                    title="Editar Grupo">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    onclick="confirmarEliminar('{{ $p->id }}', '{{ $p->nombre }}')"
-                                                    title="Eliminar Grupo">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                @can('admin.paralelos.update')
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        onclick="cargarEdicion('{{ $p->id }}', '{{ $p->ciclo_id }}', '{{ $p->modulo_id }}', '{{ $p->nombre }}', '{{ $p->modalidad }}', '{{ addslashes($p->aula_o_enlace) }}', '{{ $p->turno }}', '{{ $p->hora_inicio }}', '{{ $p->hora_fin }}', '{{ $p->cupo_maximo }}')"
+                                                        title="Editar Grupo">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                @endcan
+                                                @can('admin.paralelos.destroy')
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="confirmarEliminar('{{ $p->id }}', '{{ $p->nombre }}')"
+                                                        title="Eliminar Grupo">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
                                                 <form id="form-delete-{{ $p->id }}" action="{{ route('admin.paralelos.destroy', $p->id) }}" method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')
@@ -187,16 +191,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-warning btn-sm"
-                                                    onclick="cargarEdicion('{{ $p->id }}', '{{ $p->ciclo_id }}', '{{ $p->modulo_id }}', '{{ $p->nombre }}', '{{ $p->modalidad }}', '{{ addslashes($p->aula_o_enlace) }}', '{{ $p->turno }}', '{{ $p->hora_inicio }}', '{{ $p->hora_fin }}', '{{ $p->cupo_maximo }}')"
-                                                    title="Editar Grupo">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    onclick="confirmarEliminar('{{ $p->id }}', '{{ $p->nombre }}')"
-                                                    title="Eliminar Grupo">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                @can('admin.paralelos.update')
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        onclick="cargarEdicion('{{ $p->id }}', '{{ $p->ciclo_id }}', '{{ $p->modulo_id }}', '{{ $p->nombre }}', '{{ $p->modalidad }}', '{{ addslashes($p->aula_o_enlace) }}', '{{ $p->turno }}', '{{ $p->hora_inicio }}', '{{ $p->hora_fin }}', '{{ $p->cupo_maximo }}')"
+                                                        title="Editar Grupo">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                @endcan
+                                                @can('admin.paralelos.destroy')
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="confirmarEliminar('{{ $p->id }}', '{{ $p->nombre }}')"
+                                                        title="Eliminar Grupo">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
                                                 <form id="form-delete-{{ $p->id }}" action="{{ route('admin.paralelos.destroy', $p->id) }}" method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')

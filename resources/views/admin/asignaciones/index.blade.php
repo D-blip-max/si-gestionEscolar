@@ -129,15 +129,21 @@
                                 </td>
                                 <td class="text-center align-middle">
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.asignaciones.show', $asignacion->id) }}" class="btn btn-info" title="Ver Detalle">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('admin.asignaciones.edit', $asignacion->id) }}" class="btn btn-warning" title="Editar">
-                                            <i class="fas fa-pencil-alt"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-danger" onclick="confirmarEliminacion({{ $asignacion->id }})" title="Eliminar">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                        @can('admin.asignaciones.show')
+                                            <a href="{{ route('admin.asignaciones.show', $asignacion->id) }}" class="btn btn-info" title="Ver Detalle">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        @endcan
+                                        @can('admin.asignaciones.edit')
+                                            <a href="{{ route('admin.asignaciones.edit', $asignacion->id) }}" class="btn btn-warning" title="Editar">
+                                                <i class="fas fa-pencil-alt"></i>
+                                            </a>
+                                        @endcan
+                                        @can('admin.asignaciones.destroy')
+                                            <button type="button" class="btn btn-danger" onclick="confirmarEliminacion({{ $asignacion->id }})" title="Eliminar">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        @endcan
                                     </div>
                                     <form id="delete-form-{{ $asignacion->id }}" action="{{ route('admin.asignaciones.destroy', $asignacion->id) }}" method="POST" style="display: none;">
                                         @csrf

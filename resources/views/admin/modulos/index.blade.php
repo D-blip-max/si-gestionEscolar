@@ -117,16 +117,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-warning btn-sm"
-                                                    onclick="cargarEdicion('{{ $modulo->id }}', '{{ $modulo->idioma_id }}', '{{ addslashes($modulo->nombre) }}', '{{ $modulo->numero_orden }}', '{{ $modulo->nivel }}', '{{ $modulo->prerrequisito_id ?? '' }}', '{{ $modulo->duracion_meses }}')"
-                                                    title="Editar Módulo">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    onclick="confirmarEliminar('{{ $modulo->id }}', '{{ addslashes($modulo->nombre) }}')"
-                                                    title="Eliminar Módulo">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                @can('admin.modulos.edit')
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        onclick="cargarEdicion('{{ $modulo->id }}', '{{ $modulo->idioma_id }}', '{{ addslashes($modulo->nombre) }}', '{{ $modulo->numero_orden }}', '{{ $modulo->nivel }}', '{{ $modulo->prerrequisito_id ?? '' }}', '{{ $modulo->duracion_meses }}')"
+                                                        title="Editar Módulo">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                @endcan
+                                                @can('admin.modulos.destroy')
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="confirmarEliminar('{{ $modulo->id }}', '{{ addslashes($modulo->nombre) }}')"
+                                                        title="Eliminar Módulo">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
                                                 <form id="form-delete-{{ $modulo->id }}" action="{{ route('admin.modulos.destroy', $modulo->id) }}" method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')

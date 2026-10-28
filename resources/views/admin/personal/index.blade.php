@@ -17,9 +17,11 @@
                     <i class="fas fa-user-tie"></i> Administrativos
                 </a>
             </div>
-            <a href="{{ url('/admin/personal/create/' . $tipo) }}" class="btn btn-success shadow-sm">
-                <i class="fas fa-user-plus"></i> Registrar {{ ucfirst($tipo) }}
-            </a>
+            @can('admin.personal.create')
+                <a href="{{ url('/admin/personal/create/' . $tipo) }}" class="btn btn-success shadow-sm">
+                    <i class="fas fa-user-plus"></i> Registrar {{ ucfirst($tipo) }}
+                </a>
+            @endcan
         </div>
     </div>
     <hr>
@@ -79,23 +81,31 @@
                                         <td>{{ $personal->usuario->email ?? '-' }}</td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <a href="{{ url('/admin/personal/' . $personal->id . '/formaciones') }}"
-                                                    class="btn btn-info btn-sm" title="Títulos y Certificaciones de Idiomas">
-                                                    <i class="fas fa-graduation-cap"></i>
-                                                </a>
-                                                <a href="{{ url('/admin/personal/show/' . $personal->id) }}"
-                                                    class="btn btn-secondary btn-sm" title="Ver Ficha">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="{{ url('/admin/personal/' . $personal->id . '/edit') }}"
-                                                    class="btn btn-warning btn-sm" title="Editar">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    onclick="confirmarEliminar('{{ $personal->id }}', '{{ addslashes($personal->nombres . ' ' . $personal->apellidos) }}')"
-                                                    title="Eliminar Personal">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                @can('admin.personal.formaciones.index')
+                                                    <a href="{{ url('/admin/personal/' . $personal->id . '/formaciones') }}"
+                                                        class="btn btn-info btn-sm" title="Títulos y Certificaciones de Idiomas">
+                                                        <i class="fas fa-graduation-cap"></i>
+                                                    </a>
+                                                @endcan
+                                                @can('admin.personal.show')
+                                                    <a href="{{ url('/admin/personal/show/' . $personal->id) }}"
+                                                        class="btn btn-secondary btn-sm" title="Ver Ficha">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                @endcan
+                                                @can('admin.personal.edit')
+                                                    <a href="{{ url('/admin/personal/' . $personal->id . '/edit') }}"
+                                                        class="btn btn-warning btn-sm" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                @endcan
+                                                @can('admin.personal.destroy')
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="confirmarEliminar('{{ $personal->id }}', '{{ addslashes($personal->nombres . ' ' . $personal->apellidos) }}')"
+                                                        title="Eliminar Personal">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
                                                 <form id="form-delete-{{ $personal->id }}" action="{{ url('/admin/personal/' . $personal->id) }}" method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')

@@ -56,16 +56,20 @@
                                         </td>
                                         <td class="text-center">
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-warning btn-sm"
-                                                    onclick="cargarEdicion('{{ $idioma->id }}', '{{ addslashes($idioma->nombre) }}', '{{ $idioma->codigo }}', '{{ addslashes($idioma->descripcion ?? '') }}', '{{ $idioma->estado }}')"
-                                                    title="Editar Idioma">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-danger btn-sm"
-                                                    onclick="confirmarEliminar('{{ $idioma->id }}', '{{ addslashes($idioma->nombre) }}')"
-                                                    title="Eliminar Idioma">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
+                                                @can('admin.idiomas.edit')
+                                                    <button type="button" class="btn btn-warning btn-sm"
+                                                        onclick="cargarEdicion('{{ $idioma->id }}', '{{ addslashes($idioma->nombre) }}', '{{ $idioma->codigo }}', '{{ addslashes($idioma->descripcion ?? '') }}', '{{ $idioma->estado }}')"
+                                                        title="Editar Idioma">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                @endcan
+                                                @can('admin.idiomas.destroy')
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        onclick="confirmarEliminar('{{ $idioma->id }}', '{{ addslashes($idioma->nombre) }}')"
+                                                        title="Eliminar Idioma">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                @endcan
                                                 <form id="form-delete-{{ $idioma->id }}" action="{{ route('admin.idiomas.destroy', $idioma->id) }}" method="POST" style="display: none;">
                                                     @csrf
                                                     @method('DELETE')
