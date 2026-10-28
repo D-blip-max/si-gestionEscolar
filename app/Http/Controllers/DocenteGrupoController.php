@@ -28,7 +28,7 @@ class DocenteGrupoController extends Controller
                 },
                 'paralelo.inscripciones.estudiante',
                 'paralelo.inscripciones.calificacion'
-            ])->where('estado', 'ACTIVO')
+            ])->where('estado', 'activo')
               ->orderBy('id', 'desc')
               ->get();
 
@@ -52,7 +52,7 @@ class DocenteGrupoController extends Controller
             'paralelo.inscripciones.calificacion'
         ])
         ->where('personal_id', $docente->id)
-        ->where('estado', 'ACTIVO')
+        ->where('estado', 'activo')
         ->orderBy('id', 'desc')
         ->get();
 

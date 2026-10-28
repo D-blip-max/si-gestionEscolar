@@ -65,7 +65,7 @@ class PersonalController extends Controller
             $usuario->assignRole($request->rol);
 
             // 2. Procesar fotografía
-            $fotoPath = 'vendor/adminlte/dist/img/avatar5.png';
+            $fotoPath = 'img/default-avatar.png';
             if ($request->hasFile('foto')) {
                 $directorio = public_path('uploads/fotos');
                 if (!File::isDirectory($directorio)) {
