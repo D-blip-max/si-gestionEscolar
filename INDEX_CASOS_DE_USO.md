@@ -59,3 +59,4 @@ Este directorio contiene la especificación técnica de cada Caso de Uso (CU) im
 * 🔹 [CU-22: Conciliación de Boletas para Tesorería Universitaria](file:///c:/wamp64/www/SisLaravel6/casos_de_uso/paquete_8_reportes/CU22_conciliacion_boletas_tesoreria.md)
 * 🔹 [CU-23: Reporte Estadístico de Inscritos por Idioma y Modalidad](file:///c:/wamp64/www/SisLaravel6/casos_de_uso/paquete_8_reportes/CU23_reporte_inscritos_modalidad.md)
 * 🔹 [CU-24: Reporte de Estudiantes Graduados (Intermedio y Avanzado)](file:///c:/wamp64/www/SisLaravel6/casos_de_uso/paquete_8_reportes/CU24_reporte_graduados.md)
+ese
