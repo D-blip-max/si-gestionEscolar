@@ -20,6 +20,9 @@ use App\Models\Ppff;
 use App\Models\Matriculacion;
 use App\Models\Estudiante;
 use App\Models\Asignacion;
+use App\Models\Idioma;
+use App\Models\Modulo;
+use App\Models\CicloBimestral;
 
 
 
@@ -50,6 +53,63 @@ class DatabaseSeeder extends Seeder
             'correo_electronico' => 'cei@gmail.com',
             'web' => 'https://cei.com',
             'logo' => 'uploads\logos\1772770542_cei Logo.png'
+        ]);
+
+        // --- PAQUETE 2: IDIOMAS Y MÓDULOS DEL CEI ---
+        $ingles = Idioma::firstOrCreate(['codigo' => 'ENG'], [
+            'nombre' => 'Inglés',
+            'descripcion' => 'Programa modular de Lengua Inglesa (Básico, Intermedio y Avanzado)',
+            'estado' => 'ACTIVO'
+        ]);
+
+        $guarani = Idioma::firstOrCreate(['codigo' => 'GUA'], [
+            'nombre' => 'Guaraní',
+            'descripcion' => 'Programa modular de Lengua y Cultura Guaraní',
+            'estado' => 'ACTIVO'
+        ]);
+
+        // Ciclos Bimestrales
+        $ciclo1 = CicloBimestral::firstOrCreate(['nombre' => 'Bimestre I - 2026 (Ene-Feb)'], [
+            'gestion' => 2026,
+            'fecha_inicio' => '2026-01-15',
+            'fecha_fin' => '2026-03-15',
+            'estado' => 'ACTIVO'
+        ]);
+
+        CicloBimestral::firstOrCreate(['nombre' => 'Bimestre II - 2026 (Mar-Abr)'], [
+            'gestion' => 2026,
+            'fecha_inicio' => '2026-03-16',
+            'fecha_fin' => '2026-05-15',
+            'estado' => 'FUTURO'
+        ]);
+
+        // Módulos 1 al 9 de Inglés con correlatividades
+        $m1 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 1], [
+            'nombre' => 'Módulo 1', 'nivel' => 'BASICO', 'duracion_meses' => 2, 'prerrequisito_id' => null, 'es_modulo_graduacion' => false
+        ]);
+        $m2 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 2], [
+            'nombre' => 'Módulo 2', 'nivel' => 'BASICO', 'duracion_meses' => 2, 'prerrequisito_id' => $m1->id, 'es_modulo_graduacion' => false
+        ]);
+        $m3 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 3], [
+            'nombre' => 'Módulo 3', 'nivel' => 'BASICO', 'duracion_meses' => 2, 'prerrequisito_id' => $m2->id, 'es_modulo_graduacion' => false
+        ]);
+        $m4 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 4], [
+            'nombre' => 'Módulo 4', 'nivel' => 'BASICO', 'duracion_meses' => 2, 'prerrequisito_id' => $m3->id, 'es_modulo_graduacion' => false
+        ]);
+        $m5 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 5], [
+            'nombre' => 'Módulo 5', 'nivel' => 'INTERMEDIO', 'duracion_meses' => 2, 'prerrequisito_id' => $m4->id, 'es_modulo_graduacion' => false
+        ]);
+        $m6 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 6], [
+            'nombre' => 'Módulo 6', 'nivel' => 'INTERMEDIO', 'duracion_meses' => 2, 'prerrequisito_id' => $m5->id, 'es_modulo_graduacion' => false
+        ]);
+        $m7 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 7], [
+            'nombre' => 'Módulo 7', 'nivel' => 'INTERMEDIO', 'duracion_meses' => 2, 'prerrequisito_id' => $m6->id, 'es_modulo_graduacion' => false
+        ]);
+        $m8 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 8], [
+            'nombre' => 'Módulo 8', 'nivel' => 'INTERMEDIO', 'duracion_meses' => 2, 'prerrequisito_id' => $m7->id, 'es_modulo_graduacion' => true
+        ]);
+        $m9 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 9], [
+            'nombre' => 'Módulo 9', 'nivel' => 'AVANZADO', 'duracion_meses' => 2, 'prerrequisito_id' => $m8->id, 'es_modulo_graduacion' => true
         ]);
 
         Gestion::create(['nombre' => '2023']);

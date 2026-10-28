@@ -1,227 +1,176 @@
 @extends('adminlte::page')
 
+@section('title', 'Padrón de Estudiantes')
+
 @section('content_header')
-    <h1><b>Listado de Estudiantes</b></h1>
-    <hr>
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark"><i class="fas fa-user-graduate text-primary mr-2"></i>Padrón de Estudiantes</h1>
+                <small class="text-muted">CU-10: Registro y Gestión de Estudiantes Autónomos del Instituto</small>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Inicio</a></li>
+                    <li class="breadcrumb-item active">Estudiantes</li>
+                </ol>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('content')
+<div class="container-fluid">
+    @if (session('mensaje'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: '{{ session('icono') ?? 'info' }}',
+                    title: '{{ session('mensaje') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        </script>
+    @endif
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Estudiantes Registrados</h3>
-
-                    <div class="card-tools">
-                        <a href="{{ url('/admin/estudiantes/create') }}" class="btn btn-primary">Crear nuevo
-                            Estudiante</a>
-                    </div>
-                </div>
-                <div class="card-body">
-
-                    <table id="example1" class="table table-bordered table-striped table-hover table-sm">
-                        <thead>
-                            <tr>
-                                <th>Nro</th>
-                                <th>Estudiante</th>
-                                <th>Carnet de identidad</th>
-                                <th>Fecha de nacimiento</th>
-                                <th>Teléfono</th>
-                                <th>Género</th>
-                                <th>Correo</th>
-                                <th>Foto</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($estudiantes as $estudiante)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $estudiante->apellidos }} {{ $estudiante->nombres }}</td>
-                                    <td>{{ $estudiante->ci }}</td>
-                                    <td>{{ $estudiante->fecha_nacimiento }}</td>
-                                    <td>{{ $estudiante->telefono }}</td>
-                                    <td>{{ $estudiante->genero }}</td>
-                                    <td>{{ $estudiante->usuario->email }}</td>
-                                    <td><img src="{{ url($estudiante->foto) }}" width="100px" alt="foto"></td>
-                                    <td>
-
-                                        <div class="row d-flex justify-content-center">
-
-                                            <a href="{{ url('/admin/estudiantes/' . $estudiante->id . '/edit') }}"
-                                                class="btn btn-success btn-sm">
-                                                <i class="fas fa-pencil-alt"></i> Editar
-                                            </a>
-                                            <a href="{{ url('/admin/estudiantes/' . $estudiante->id) }}"
-                                                class="btn btn-info btn-sm">
-                                                <i class="fas fa-eye"></i> ver
-                                            </a>
-
-                                            <form action="{{ url('/admin/estudiantes/' . $estudiante->id) }}" method="post"
-                                                id="miFormulario{{ $estudiante->id }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"
-                                                    onclick="preguntar{{ $estudiante->id }}(event)">
-                                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                                </button>
-                                            </form>
-                                        </div>
-
-
-
-                                        <script>
-                                            function preguntar{{ $estudiante->id }}(event) {
-                                                event.preventDefault();
-
-                                                Swal.fire({
-                                                    title: '¿Desea eliminar este registro?',
-                                                    text: '',
-                                                    icon: 'question',
-                                                    showDenyButton: true,
-                                                    confirmButtonText: 'Eliminar',
-                                                    confirmButtonColor: '#a5161d',
-                                                    denyButtonColor: '#270a0a',
-                                                    denyButtonText: 'Cancelar',
-                                                }).then((result) => {
-                                                    if (result.isConfirmed) {
-                                                        // JavaScript puro para enviar el formulario
-                                                        document.getElementById('miFormulario{{ $estudiante->id }}').submit();
-                                                    }
-                                                });
-                                            }
-                                        </script>
-
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
-
-                </div>
+    <div class="card card-outline card-primary shadow-sm">
+        <div class="card-header bg-white">
+            <h3 class="card-title text-bold"><i class="fas fa-users mr-1"></i> Estudiantes Matriculados</h3>
+            <div class="card-tools">
+                <a href="{{ route('admin.estudiantes.create') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-user-plus mr-1"></i> Nuevo Estudiante
+                </a>
             </div>
+        </div>
 
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tabla-estudiantes" class="table table-bordered table-striped table-hover table-sm">
+                    <thead class="thead-light text-center">
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>Código CEI</th>
+                            <th>Estudiante</th>
+                            <th>Cédula (CI)</th>
+                            <th>Carrera / Origen</th>
+                            <th>Contacto / Email</th>
+                            <th>Boletas / Estado</th>
+                            <th style="width: 140px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($estudiantes as $estudiante)
+                            <tr>
+                                <td class="text-center align-middle font-weight-bold">{{ $loop->iteration }}</td>
+                                <td class="text-center align-middle">
+                                    <span class="badge badge-primary font-weight-bold px-2 py-1">
+                                        {{ $estudiante->codigo_estudiante ?? 'CEI-' . str_pad($estudiante->id, 4, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        @php
+                                            $foto = ($estudiante->foto && file_exists(public_path($estudiante->foto)))
+                                                ? asset($estudiante->foto)
+                                                : asset('vendor/adminlte/dist/img/avatar.png');
+                                        @endphp
+                                        <img src="{{ $foto }}" class="img-circle elevation-1 mr-2" style="width: 38px; height: 38px; object-fit: cover;" alt="Avatar">
+                                        <div>
+                                            <strong class="text-dark">{{ $estudiante->apellidos }} {{ $estudiante->nombres }}</strong><br>
+                                            <small class="text-muted"><i class="fas fa-venus-mars mr-1"></i> {{ ucfirst($estudiante->genero) }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center align-middle font-weight-bold">
+                                    {{ $estudiante->ci }}
+                                </td>
+                                <td class="align-middle text-sm">
+                                    <i class="fas fa-university text-secondary mr-1"></i> {{ $estudiante->carrera_facultad ?? 'Particular' }}
+                                </td>
+                                <td class="align-middle text-sm">
+                                    <div><i class="fab fa-whatsapp text-success mr-1"></i> {{ $estudiante->telefono }}</div>
+                                    <small class="text-muted"><i class="fas fa-envelope mr-1"></i> {{ optional($estudiante->usuario)->email ?? 'S/C' }}</small>
+                                </td>
+                                <td class="text-center align-middle">
+                                    @php
+                                        $boletasDisp = $estudiante->boletas->where('estado', 'DISPONIBLE')->count();
+                                    @endphp
+                                    @if($boletasDisp > 0)
+                                        <span class="badge badge-success mb-1" title="Boletas listas para matricular"><i class="fas fa-ticket-alt mr-1"></i> {{ $boletasDisp }} Boleta(s)</span><br>
+                                    @endif
+                                    @if(strtolower($estudiante->estado) === 'activo')
+                                        <span class="badge badge-light border text-success"><i class="fas fa-check-circle"></i> ACTIVO</span>
+                                    @else
+                                        <span class="badge badge-light border text-danger"><i class="fas fa-times-circle"></i> INACTIVO</span>
+                                    @endif
+                                </td>
+                                <td class="text-center align-middle">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('admin.estudiantes.kardex', $estudiante->id) }}" class="btn btn-outline-primary" title="Kárdex Académico (CU-12)">
+                                            <i class="fas fa-graduation-cap"></i>
+                                        </a>
+                                        <a href="{{ route('admin.estudiantes.show', $estudiante->id) }}" class="btn btn-info" title="Ver Perfil">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.estudiantes.edit', $estudiante->id) }}" class="btn btn-warning" title="Editar">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-danger" onclick="confirmarEliminar({{ $estudiante->id }})" title="Eliminar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                    <form id="delete-estudiante-{{ $estudiante->id }}" action="{{ route('admin.estudiantes.destroy', $estudiante->id) }}" method="POST" style="display: none;">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
+</div>
 @stop
-
-
 
 @section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
-    <style>
-        /* Fondo transparente y sin borde en el contenedor */
-        #example1_wrapper .dt-buttons {
-            background-color: transparent;
-            box-shadow: none;
-            border: none;
-            display: flex;
-            justify-content: center;
-            /* Centrar los botones */
-            gap: 10px;
-            /* Espaciado entre botones */
-            margin-bottom: 15px;
-            /* Separar botones de la tabla */
-        }
-
-        /* Estilo personalizado para los botones */
-        #example1_wrapper .btn {
-            color: #fff;
-            /* Color del texto en blanco */
-            border-radius: 4px;
-            /* Bordes redondeados */
-            padding: 5px 15px;
-            /* Espaciado interno */
-            font-size: 14px;
-            /* Tamaño de fuente */
-        }
-
-        /* Colores por tipo de botón */
-        .btn-danger {
-            background-color: #dc3545;
-            border: none;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border: none;
-        }
-
-        .btn-info {
-            background-color: #17a2b8;
-            border: none;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #212529;
-            border: none;
-        }
-
-        .btn-default {
-            background-color: #6e7176;
-            color: #212529;
-            border: none;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
 @stop
-{{--  hola --}}
+
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script>
-        $(function() {
-            $("#example1").DataTable({
-                "pageLength": 5,
-                "language": {
-                    "emptyTable": "No hay información",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Estudiantes",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 Estudiantes",
-                    "infoFiltered": "(Filtrado de _MAX_ total Estudiantes)",
-                    "lengthMenu": "Mostrar _MENU_ Estudiantes",
-                    "loadingRecords": "Cargando...",
-                    "processing": "Procesando...",
-                    "search": "Buscador:",
-                    "zeroRecords": "Sin resultados encontrados",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
-                },
-                "responsive": true,
-                "lengthChange": true,
-                "autoWidth": false,
-                buttons: [{
-                        text: '<i class="fas fa-copy"></i> COPIAR',
-                        extend: 'copy',
-                        className: 'btn btn-default'
-                    },
-                    {
-                        text: '<i class="fas fa-file-pdf"></i> PDF',
-                        extend: 'pdf',
-                        className: 'btn btn-danger'
-                    },
-                    {
-                        text: '<i class="fas fa-file-csv"></i> CSV',
-                        extend: 'csv',
-                        className: 'btn btn-info'
-                    },
-                    {
-                        text: '<i class="fas fa-file-excel"></i> EXCEL',
-                        extend: 'excel',
-                        className: 'btn btn-success'
-                    },
-                    {
-                        text: '<i class="fas fa-print"></i> IMPRIMIR',
-                        extend: 'print',
-                        className: 'btn btn-warning'
-                    }
-                ]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $(document).ready(function() {
+            $('#tabla-estudiantes').DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
+            });
         });
+
+        function confirmarEliminar(id) {
+            Swal.fire({
+                title: '¿Eliminar estudiante?',
+                text: "Se eliminará su registro y el usuario de acceso al portal.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-estudiante-' + id).submit();
+                }
+            });
+        }
     </script>
 @stop

@@ -4,14 +4,14 @@
 @inject('preloaderHelper', 'JeroenNoten\LaravelAdminLte\Helpers\PreloaderHelper')
 
 @section('adminlte_css')
-    @stack('css')   
+    @stack('css')
     @yield('css')
     <style type="text/css">
-    .zoomP {
-        /* Aumentamos la anchura y altura durante 2 segun */
-        border: 1px solid #c0c0c0;
-        box-shadow: #c0c0c0 0px 5px 5px 0px;
-    }
+        .zoomP {
+            /* Aumentamos la anchura y altura durante 2 segun */
+            border: 1px solid #c0c0c0;
+            box-shadow: #c0c0c0 0px 5px 5px 0px;
+        }
     </style>
 
 @stop
@@ -24,19 +24,19 @@
     <div class="wrapper">
 
         {{-- Preloader Animation (fullscreen mode) --}}
-        @if($preloaderHelper->isPreloaderEnabled())
+        @if ($preloaderHelper->isPreloaderEnabled())
             @include('adminlte::partials.common.preloader')
         @endif
 
         {{-- Top Navbar --}}
-        @if($layoutHelper->isLayoutTopnavEnabled())
+        @if ($layoutHelper->isLayoutTopnavEnabled())
             @include('adminlte::partials.navbar.navbar-layout-topnav')
         @else
             @include('adminlte::partials.navbar.navbar')
         @endif
 
         {{-- Left Main Sidebar --}}
-        @if(!$layoutHelper->isLayoutTopnavEnabled())
+        @if (!$layoutHelper->isLayoutTopnavEnabled())
             @include('adminlte::partials.sidebar.left-sidebar')
         @endif
 
@@ -53,7 +53,7 @@
         @endif
 
         {{-- Right Control Sidebar --}}
-        @if($layoutHelper->isRightSidebarEnabled())
+        @if ($layoutHelper->isRightSidebarEnabled())
             @include('adminlte::partials.sidebar.right-sidebar')
         @endif
 
@@ -64,14 +64,14 @@
     @stack('js')
     @yield('js')
     @if (($mensaje = Session::get('mensaje')) && ($icono = Session::get('icono')))
-    <script>
-        Swal.fire({
-            position: "top-end",
-            icon: "{{ $icono }}",
-            title: "{{ $mensaje }}",
-            showConfirmButton: false,
-            timer: 1000
-        });
-    </script>
-@endif
+        <script>
+            Swal.fire({
+                position: "top-end",
+                icon: "{{ $icono }}",
+                title: "{{ $mensaje }}",
+                showConfirmButton: false,
+                timer: 1000
+            });
+        </script>
+    @endif
 @stop

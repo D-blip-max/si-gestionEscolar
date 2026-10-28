@@ -10,6 +10,7 @@ class Formacion extends Model
 
     protected $fillable = [
         'personal_id',
+        'titulo',
         'nombre',
         'institucion',
         'nivel',

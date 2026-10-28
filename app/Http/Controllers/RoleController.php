@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditoriaCalificacion;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-
 
 class RoleController extends Controller
 {
@@ -14,7 +14,7 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::withCount('permissions')->get();
         return view('admin.roles.index', compact('roles'));
     }
 
@@ -31,82 +31,59 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        /*$datos= request()->all();
-        return response()->json($datos);
-*/
         $request->validate([
-            'name' => 'required|max:255|unique:roles',
+            'name' => 'required|string|max:100|unique:roles,name',
         ]);
+
         $rol = new Role();
-        $rol->name = $request->name;
+        $rol->name = strtoupper(trim($request->name));
         $rol->guard_name = 'web';
         $rol->save();
+
         return redirect()->route('admin.roles.index')
-            ->with('mensaje', 'El rol se ha creado correctamente')
+            ->with('mensaje', 'El rol se ha creado exitosamente.')
             ->with('icono', 'success');
     }
 
-
+    /**
+     * Matriz de permisos agrupados por los 8 paquetes de gestión
+     */
     public function permisos($id)
     {
         $rol = Role::findOrFail($id);
+
         $permisos = Permission::all()->groupBy(function ($permiso) {
-            if (stripos($permiso->name, 'configuracion') !== false) {
-                return 'Configuración del sistema';
+            $name = strtolower($permiso->name);
+
+            if (str_contains($name, 'configuracion') || str_contains($name, 'usuarios') || str_contains($name, 'roles') || str_contains($name, 'seguridad')) {
+                return 'Paquete 1: Administración y Seguridad';
             }
-            if (stripos($permiso->name, 'gestion') !== false) {
-                return 'Gestiones';
+            if (str_contains($name, 'idiomas') || str_contains($name, 'modulos') || str_contains($name, 'paralelos') || str_contains($name, 'ciclos') || str_contains($name, 'catalogos') || str_contains($name, 'gestion') || str_contains($name, 'periodos') || str_contains($name, 'niveles') || str_contains($name, 'grados') || str_contains($name, 'turnos') || str_contains($name, 'materias')) {
+                return 'Paquete 2: Catálogos Académicos';
             }
-            if (stripos($permiso->name, 'turnos') !== false) {
-                return 'Turnos';
+            if (str_contains($name, 'personal') || str_contains($name, 'asignaciones') || str_contains($name, 'formaciones')) {
+                return 'Paquete 3: Personal y Docencia';
             }
-            if (stripos($permiso->name, 'periodos') !== false) {
-                return 'Periodos';
+            if (str_contains($name, 'estudiantes') || str_contains($name, 'boletas') || str_contains($name, 'ppffs')) {
+                return 'Paquete 4: Estudiantes y Boletas';
             }
-            if (stripos($permiso->name, 'niveles') !== false) {
-                return 'Niveles';
+            if (str_contains($name, 'inscripciones') || str_contains($name, 'matriculaciones')) {
+                return 'Paquete 5: Inscripciones y Matrícula';
             }
-            if (stripos($permiso->name, 'grados') !== false) {
-                return 'Grados';
+            if (str_contains($name, 'docente') || str_contains($name, 'calificaciones') || str_contains($name, 'actas') || str_contains($name, 'asistencias')) {
+                return 'Paquete 6: Control de Notas';
             }
-            if (stripos($permiso->name, 'paralelos') !== false) {
-                return 'Paralelos';
+            if (str_contains($name, 'estudiante.portal') || str_contains($name, 'estudiante.clases') || str_contains($name, 'estudiante.avance') || str_contains($name, 'estudiante.documentos')) {
+                return 'Paquete 7: Portal del Estudiante';
             }
-            if (stripos($permiso->name, 'materias') !== false) {
-                return 'Materias';
+            if (str_contains($name, 'reportes') || str_contains($name, 'pagos')) {
+                return 'Paquete 8: Reportes y Finanzas';
             }
-            if (stripos($permiso->name, 'roles') !== false) {
-                return 'Roles';
-            }
-            if (stripos($permiso->name, 'personal') !== false) {
-                return 'Personal docente y administrativo';
-            }
-            if (stripos($permiso->name, 'formaciones') !== false) {
-                return 'Formaciones del personal';
-            }
-            if (stripos($permiso->name, 'estudiantes') !== false) {
-                return 'Estudiantes';
-            }
-            if (stripos($permiso->name, 'ppffs') !== false) {
-                return 'Padres de familia';
-            }
-            if (stripos($permiso->name, 'matriculaciones') !== false) {
-                return 'Matriculaciones';
-            }
-            if (stripos($permiso->name, 'asignaciones') !== false) {
-                return 'Asignaciones';
-            }
+
+            return 'Otros Permisos Generales';
         });
 
         return view('admin.roles.permisos', compact('rol', 'permisos'));
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
     }
 
     /**
@@ -123,37 +100,61 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-
         $request->validate([
-            'name' => 'required|max:255|unique:roles,name,' . $id,
+            'name' => 'required|string|max:100|unique:roles,name,' . $id,
         ]);
+
         $rol = Role::findOrFail($id);
-        $rol->name = $request->name;
-        $rol->guard_name = 'web';
+        $rol->name = strtoupper(trim($request->name));
         $rol->save();
+
         return redirect()->route('admin.roles.index')
-            ->with('mensaje', 'El rol se ha actualizado correctamente')
+            ->with('mensaje', 'El rol se ha actualizado correctamente.')
             ->with('icono', 'success');
     }
 
+    /**
+     * Guardar asignación de permisos
+     */
     public function update_permisos(Request $request, $id)
     {
         $rol = Role::findOrFail($id);
-        $rol->permissions()->sync($request->input('permisos'));
+        $permisos = $request->input('permisos', []);
+
+        // Sincronizar array de IDs o nombres
+        $rol->syncPermissions($permisos);
 
         return redirect()->route('admin.roles.index')
-            ->with('mensaje', 'Los permisos se han actualizado correctamente')
+            ->with('mensaje', 'Los permisos para el rol ' . $rol->name . ' se han actualizado correctamente.')
             ->with('icono', 'success');
     }
+
+    /**
+     * Auditoría inmutable de notas modificadas (Trigger / Registro)
+     */
+    public function auditoria_notas()
+    {
+        $auditorias = AuditoriaCalificacion::with(['usuario'])->orderBy('id', 'desc')->paginate(25);
+        return view('admin.roles.auditoria', compact('auditorias'));
+    }
+
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
         $rol = Role::findOrFail($id);
+
+        if (in_array($rol->name, ['ADMINISTRADOR', 'ADMINISTRATIVO', 'DOCENTE', 'ESTUDIANTE'])) {
+            return redirect()->route('admin.roles.index')
+                ->with('mensaje', 'El rol del sistema "' . $rol->name . '" es fundamental y no puede ser eliminado.')
+                ->with('icono', 'error');
+        }
+
         $rol->delete();
+
         return redirect()->route('admin.roles.index')
-            ->with('mensaje', 'El rol se ha eliminado correctamente')
+            ->with('mensaje', 'El rol se ha eliminado correctamente.')
             ->with('icono', 'success');
     }
 }

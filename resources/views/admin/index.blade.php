@@ -62,7 +62,7 @@
             </div>
         @endcan
 
-        {{--  
+        
         @can('admin.periodos.index')
             <div class="col-md-3 col-sm-6 col-12">
                 <div class="info-box zoomP">
@@ -86,7 +86,7 @@
                 </div>
             </div>
         @endcan
-            --}}
+            
         @can('admin.niveles.index')
             <div class="col-md-3 col-sm-6 col-12">
                 <div class="info-box zoomP">
@@ -117,7 +117,7 @@
                 </div>
             </div>
         @endcan
-        {{--  
+        
         @can('admin.paralelos.index')
             <div class="col-md-3 col-sm-6 col-12">
                 <div class="info-box zoomP">
@@ -141,7 +141,7 @@
                 </div>
             </div>
         @endcan
-            --}}
+            
         @can('admin.roles.index')
             <div class="col-md-3 col-sm-6 col-12">
                 <div class="info-box zoomP">
@@ -189,7 +189,7 @@
                 </div>
             </div>
         @endcan
-        {{-- 
+        
         @can('admin.ppffs.index')
             <div class="col-md-3 col-sm-6 col-12">
                 <div class="info-box zoomP">
@@ -201,7 +201,7 @@
                 </div>
             </div>
         @endcan
-            --}}
+            
 
 
 

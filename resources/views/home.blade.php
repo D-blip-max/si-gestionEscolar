@@ -1,20 +1,175 @@
 @extends('adminlte::page')
 
-@section('title', 'Dashboard')
+@section('title', 'Dashboard - Instituto CEI')
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark"><i class="fas fa-university text-primary mr-2"></i>Panel de Gestión Académica CEI</h1>
+                <small class="text-muted">Centro de Enseñanza Integral de Idiomas - Sistema Modular</small>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url('/home') }}">Inicio</a></li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('content')
-    <p>Welcome to this beautiful admin panel.</p>
+<div class="container-fluid">
+    <!-- Banner de Ciclo Activo -->
+    <div class="alert alert-primary shadow-sm mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0 font-weight-bold"><i class="fas fa-calendar-check mr-2"></i>Ciclo Bimestral Vigente: {{ optional($cicloActivo)->nombre ?? 'Bimestre I - 2026' }}</h5>
+                <small class="text-white-50">Período Académico activo para inscripciones y calificaciones modulares.</small>
+            </div>
+            <span class="badge badge-light text-primary font-weight-bold px-3 py-2">ESTADO ACTIVO</span>
+        </div>
+    </div>
+
+    <!-- Info-Boxes Superiores -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info shadow-sm">
+                <div class="inner">
+                    <h3>{{ $totalEstudiantes }}</h3>
+                    <p>Estudiantes Autónomos</p>
+                </div>
+                <div class="icon"><i class="fas fa-user-graduate"></i></div>
+                <a href="{{ route('admin.estudiantes.index') }}" class="small-box-footer">Padrón de Estudiantes <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success shadow-sm">
+                <div class="inner">
+                    <h3>Bs. {{ number_format($totalRecaudado, 2) }}</h3>
+                    <p>Recaudación Fiscalizada</p>
+                </div>
+                <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                <a href="{{ route('admin.boletas.index') }}" class="small-box-footer">Conciliación de Boletas <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning shadow-sm">
+                <div class="inner">
+                    <h3>{{ $totalDocentes }}</h3>
+                    <p>Docentes Titulares</p>
+                </div>
+                <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                <a href="{{ route('admin.personal.index') }}" class="small-box-footer">Padrón de Personal <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger shadow-sm">
+                <div class="inner">
+                    <h3>{{ $totalInscripciones }}</h3>
+                    <p>Matrículas Registradas</p>
+                </div>
+                <div class="icon"><i class="fas fa-clipboard-check"></i></div>
+                <a href="{{ route('admin.inscripciones.index') }}" class="small-box-footer">Listado de Matrículas <i class="fas fa-arrow-circle-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulos de Acceso Rápido por los 8 Paquetes -->
+    <div class="card card-outline card-secondary shadow-sm mb-4">
+        <div class="card-header bg-white">
+            <h5 class="card-title text-bold mb-0"><i class="fas fa-th-large text-primary mr-1"></i> Mapa de Operaciones por Paquetes Temáticos</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
+                        <h6 class="font-weight-bold">Paquete 1: Seguridad</h6>
+                        <small class="text-muted d-block mb-2">Configuración, Usuarios y Roles</small>
+                        <a href="{{ route('admin.usuarios.index') }}" class="btn btn-outline-primary btn-xs">Administrar</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-book-open fa-2x text-success mb-2"></i>
+                        <h6 class="font-weight-bold">Paquete 2: Catálogos</h6>
+                        <small class="text-muted d-block mb-2">Idiomas, Módulos 1-9 y Paralelos</small>
+                        <a href="{{ route('admin.idiomas.index') }}" class="btn btn-outline-success btn-xs">Catálogos</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-chalkboard-teacher fa-2x text-info mb-2"></i>
+                        <h6 class="font-weight-bold">Paquete 3: Personal</h6>
+                        <small class="text-muted d-block mb-2">Padrón Docente y Asignaciones</small>
+                        <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-outline-info btn-xs">Asignaciones</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
+                        <h6 class="font-weight-bold">Paquete 4: Estudiantes</h6>
+                        <small class="text-muted d-block mb-2">Padrón, Boletas y Kárdex</small>
+                        <a href="{{ route('admin.estudiantes.index') }}" class="btn btn-outline-warning btn-xs">Estudiantes</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-clipboard-check fa-2x text-danger mb-2"></i>
+                        <h6 class="font-weight-bold">Paquete 5: Matrícula</h6>
+                        <small class="text-muted d-block mb-2">Inscripción ACID y Ficha PDF</small>
+                        <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-outline-danger btn-xs">Nueva Matrícula</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-marker fa-2x text-purple mb-2" style="color: #6f42c1;"></i>
+                        <h6 class="font-weight-bold">Paquete 6: Notas</h6>
+                        <small class="text-muted d-block mb-2">Planilla Docente y Actas PDF</small>
+                        <a href="{{ route('docente.grupos.index') }}" class="btn btn-outline-dark btn-xs">Calificaciones</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-laptop-code fa-2x text-indigo mb-2" style="color: #6610f2;"></i>
+                        <h6 class="font-weight-bold">Paquete 7: Portal Alumno</h6>
+                        <small class="text-muted d-block mb-2">Mi Aula, Avance y Certificados</small>
+                        <a href="{{ route('estudiante.clases.index') }}" class="btn btn-outline-info btn-xs">Mi Aula</a>
+                    </div>
+                </div>
+
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="border rounded p-3 text-center h-100 hover-card bg-light">
+                        <i class="fas fa-chart-line fa-2x text-teal mb-2" style="color: #20c997;"></i>
+                        <h6 class="font-weight-bold">Paquete 8: Reportes</h6>
+                        <small class="text-muted d-block mb-2">Conciliación, Modalidad y Graduados</small>
+                        <a href="{{ route('admin.reportes.conciliacion') }}" class="btn btn-outline-success btn-xs">Reportes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @stop
 
 @section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
-@stop
-
-@section('js')
-    <script> console.log("Hi, I'm using the Laravel-AdminLTE package!"); </script>
+<style>
+    .hover-card:hover {
+        background-color: #ffffff !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        border-color: #007bff !important;
+        transition: all 0.2s ease-in-out;
+    }
+</style>
 @stop

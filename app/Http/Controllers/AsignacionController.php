@@ -3,15 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asignacion;
-use Illuminate\Http\Request;
-use App\Models\Personal;
-use App\Models\Gestion;
-use App\Models\Turno;
-use App\Models\Nivel;
-use App\Models\Materia;
-use App\Models\Grado;
+use App\Models\CicloBimestral;
 use App\Models\Paralelo;
-
+use App\Models\Personal;
+use Illuminate\Http\Request;
 
 class AsignacionController extends Controller
 {
@@ -20,8 +15,17 @@ class AsignacionController extends Controller
      */
     public function index()
     {
+        $asignaciones = Asignacion::with([
+            'personal',
+            'paralelo.modulo.idioma',
+            'paralelo.ciclo',
+            'turno',
+            'gestion',
+            'nivel',
+            'grado',
+            'materia'
+        ])->orderBy('id', 'desc')->get();
 
-        $asignaciones = Asignacion::all();
         return view('admin.asignaciones.index', compact('asignaciones'));
     }
 
@@ -30,75 +34,92 @@ class AsignacionController extends Controller
      */
     public function create()
     {
-        $gestiones = Gestion::all();
-        $turnos = Turno::all();
-        $niveles = Nivel::all();
         $docentes = Personal::where('tipo', 'docente')->get();
-        $materias = Materia::all();
-        return view('admin.asignaciones.create', compact('docentes', 'turnos', 'gestiones', 'niveles', 'materias'));
-    }
+        $ciclos = CicloBimestral::where('estado', '!=', 'CERRADO')->get();
+        $paralelos = Paralelo::with(['modulo.idioma', 'ciclo'])
+            ->orderBy('ciclo_id', 'desc')
+            ->orderBy('modulo_id')
+            ->get();
 
+        return view('admin.asignaciones.create', compact('docentes', 'ciclos', 'paralelos'));
+    }
 
     public function buscar_docente($id)
     {
-
-        $docente = Personal::with('usuario', 'formaciones')->find($id);
+        $docente = Personal::with(['usuario', 'formaciones'])->find($id);
 
         if (!$docente) {
-            return response()->json(['error', 'Docente no encontrado']);
+            return response()->json(['error' => 'Docente no encontrado'], 404);
         }
 
-        $docente->foto_url = url($docente->foto);
+        $docente->foto_url = ($docente->foto && file_exists(public_path($docente->foto)))
+            ? asset($docente->foto)
+            : asset('vendor/adminlte/dist/img/avatar5.png');
 
         return response()->json($docente);
     }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'personal_id' => 'required',
-            'turno_id' => 'required',
-            'gestion_id' => 'required',
-            'nivel_id' => 'required',
-            'grado_id' => 'required',
-            'paralelo_id' => 'required',
-            'fecha_asignacion' => 'required',
-            'materia_id' => 'required',
+            'personal_id'      => 'required|exists:personals,id',
+            'paralelo_id'      => 'required|exists:paralelos,id',
+            'fecha_asignacion' => 'required|date',
         ]);
 
-        //validacion para estudiantes ya matriculados
-        $asignacion_duplicado = Asignacion::where('personal_id', $request->personal_id)
-            ->where('turno_id', $request->turno_id)
-            ->where('gestion_id', $request->gestion_id)
-            ->where('nivel_id', $request->nivel_id)
-            ->where('grado_id', $request->grado_id)
-            ->where('paralelo_id', $request->paralelo_id)
-            ->where('materia_id', $request->materia_id)
+        $paralelo = Paralelo::with('ciclo')->findOrFail($request->paralelo_id);
+
+        // Regla 1: Un grupo solo puede tener un docente titular asignado
+        $grupoYaAsignado = Asignacion::where('paralelo_id', $paralelo->id)
+            ->where('estado', 'activo')
             ->exists();
-        if ($asignacion_duplicado) {
-            return redirect()->back()->with([
-                'mensaje' => 'El docente ya tiene la asignacion en el turno, gestion, nivel, grado y paralelo seleccionados',
-                'icono' => 'error',
-            ]);
+
+        if ($grupoYaAsignado) {
+            return redirect()->back()
+                ->withInput()
+                ->with('mensaje', 'El grupo seleccionado ya tiene un docente titular asignado.')
+                ->with('icono', 'error');
         }
 
-        $asignacion = new Asignacion();
-        $asignacion->personal_id = $request->personal_id;
-        $asignacion->turno_id = $request->turno_id;
-        $asignacion->gestion_id = $request->gestion_id;
-        $asignacion->nivel_id = $request->nivel_id;
-        $asignacion->grado_id = $request->grado_id;
-        $asignacion->paralelo_id = $request->paralelo_id;
-        $asignacion->fecha_asignacion = $request->fecha_asignacion;
-        $asignacion->materia_id = $request->materia_id;
-        $asignacion->save();
+        // Regla 2: Prevención de choque de horario para el mismo docente
+        if ($paralelo->ciclo_id && $paralelo->hora_inicio && $paralelo->hora_fin) {
+            $choqueHorario = Asignacion::where('personal_id', $request->personal_id)
+                ->where('estado', 'activo')
+                ->whereHas('paralelo', function ($query) use ($paralelo) {
+                    $query->where('ciclo_id', $paralelo->ciclo_id)
+                        ->where('turno', $paralelo->turno)
+                        ->where(function ($q) use ($paralelo) {
+                            $q->whereBetween('hora_inicio', [$paralelo->hora_inicio, $paralelo->hora_fin])
+                              ->orWhereBetween('hora_fin', [$paralelo->hora_inicio, $paralelo->hora_fin]);
+                        });
+                })->exists();
 
-        return redirect()->route('admin.asignaciones.index')->with([
-            'mensaje' => 'Asignacion creada correctamente',
-            'icono' => 'success',
+            if ($choqueHorario) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('mensaje', 'Conflicto de Horario: El docente seleccionado ya tiene otro grupo asignado en ese mismo ciclo, turno y rango de horas.')
+                    ->with('icono', 'error');
+            }
+        }
+
+        Asignacion::create([
+            'personal_id'      => $request->personal_id,
+            'paralelo_id'      => $request->paralelo_id,
+            'fecha_asignacion' => $request->fecha_asignacion,
+            'estado'           => 'activo',
+            'gestion_id'       => $request->gestion_id ?? null,
+            'nivel_id'         => $request->nivel_id ?? null,
+            'grado_id'         => $request->grado_id ?? null,
+            'materia_id'       => $request->materia_id ?? null,
+            'turno_id'         => $request->turno_id ?? null,
         ]);
+
+        return redirect()->route('admin.asignaciones.index')
+            ->with('mensaje', 'Asignación académica registrada exitosamente.')
+            ->with('icono', 'success');
     }
 
     /**
@@ -106,7 +127,12 @@ class AsignacionController extends Controller
      */
     public function show($id)
     {
-        $asignacion = Asignacion::with('personal', 'personal.formaciones', 'turno', 'gestion', 'nivel', 'grado', 'paralelo', 'materia')->find($id);
+        $asignacion = Asignacion::with([
+            'personal.usuario',
+            'personal.formaciones',
+            'paralelo.modulo.idioma',
+            'paralelo.ciclo'
+        ])->findOrFail($id);
 
         return view('admin.asignaciones.show', compact('asignacion'));
     }
@@ -116,68 +142,52 @@ class AsignacionController extends Controller
      */
     public function edit($id)
     {
-        $asignacion = Asignacion::with('personal', 'personal.formaciones', 'turno', 'gestion', 'nivel', 'grado', 'paralelo', 'materia')->find($id);
-        $gestiones = Gestion::all();
-        $niveles = Nivel::all();
-        $turnos = Turno::all();
+        $asignacion = Asignacion::with(['personal', 'paralelo'])->findOrFail($id);
         $docentes = Personal::where('tipo', 'docente')->get();
-        $materias = Materia::all();
+        $paralelos = Paralelo::with(['modulo.idioma', 'ciclo'])->get();
 
-        $grados = Grado::where('nivel_id', $asignacion->nivel_id)->get();
-        $paralelos = Paralelo::where('grado_id', $asignacion->grado_id)->get();
-        return view('admin.asignaciones.edit', compact('asignacion', 'docentes', 'turnos', 'gestiones', 'niveles', 'materias', 'grados', 'paralelos'));
+        return view('admin.asignaciones.edit', compact('asignacion', 'docentes', 'paralelos'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,  $id)
+    public function update(Request $request, $id)
     {
-
-        $asignacion = Asignacion::find($id);
+        $asignacion = Asignacion::findOrFail($id);
 
         $request->validate([
-            'personal_id' => 'required',
-            'turno_id' => 'required',
-            'gestion_id' => 'required',
-            'nivel_id' => 'required',
-            'grado_id' => 'required',
-            'paralelo_id' => 'required',
-            'fecha_asignacion' => 'required',
-            'materia_id' => 'required',
+            'personal_id'      => 'required|exists:personals,id',
+            'paralelo_id'      => 'required|exists:paralelos,id',
+            'fecha_asignacion' => 'required|date',
+            'estado'           => 'required|in:activo,inactivo',
         ]);
 
-        //validacion para estudiantes ya matriculados
-        $asignacion_duplicado = Asignacion::where('personal_id', $request->personal_id)
-            ->where('turno_id', $request->turno_id)
-            ->where('gestion_id', $request->gestion_id)
-            ->where('nivel_id', $request->nivel_id)
-            ->where('grado_id', $request->grado_id)
-            ->where('paralelo_id', $request->paralelo_id)
-            ->where('materia_id', $request->materia_id)
-            ->where('id', '!=', $id)
+        $paralelo = Paralelo::findOrFail($request->paralelo_id);
+
+        // Verificar choque de grupo con otro registro
+        $grupoYaAsignado = Asignacion::where('paralelo_id', $paralelo->id)
+            ->where('id', '!=', $asignacion->id)
+            ->where('estado', 'activo')
             ->exists();
 
-        if ($asignacion_duplicado) {
-            return redirect()->back()->with([
-                'mensaje' => 'El docente ya tiene la asignacion en el turno, gestion, nivel, grado y paralelo seleccionados',
-                'icono' => 'error',
-            ]);
+        if ($grupoYaAsignado) {
+            return redirect()->back()
+                ->withInput()
+                ->with('mensaje', 'El grupo seleccionado ya está asignado a otro docente.')
+                ->with('icono', 'error');
         }
-        $asignacion->personal_id = $request->personal_id;
-        $asignacion->turno_id = $request->turno_id;
-        $asignacion->gestion_id = $request->gestion_id;
-        $asignacion->nivel_id = $request->nivel_id;
-        $asignacion->grado_id = $request->grado_id;
-        $asignacion->paralelo_id = $request->paralelo_id;
-        $asignacion->fecha_asignacion = $request->fecha_asignacion;
-        $asignacion->materia_id = $request->materia_id;
-        $asignacion->save();
 
-        return redirect()->route('admin.asignaciones.index')->with([
-            'mensaje' => 'Asignacion actualizado correctamente',
-            'icono' => 'success',
+        $asignacion->update([
+            'personal_id'      => $request->personal_id,
+            'paralelo_id'      => $request->paralelo_id,
+            'fecha_asignacion' => $request->fecha_asignacion,
+            'estado'           => $request->estado,
         ]);
+
+        return redirect()->route('admin.asignaciones.index')
+            ->with('mensaje', 'Asignación académica actualizada correctamente.')
+            ->with('icono', 'success');
     }
 
     /**
@@ -185,13 +195,11 @@ class AsignacionController extends Controller
      */
     public function destroy($id)
     {
-        $asignacion = Asignacion::find($id);
+        $asignacion = Asignacion::findOrFail($id);
         $asignacion->delete();
 
-        return redirect()->route('admin.asignaciones.index')->with([
-            'mensaje' => 'Asignacion eliminada correctamente',
-            'icono' => 'success',
-        ]);
-        
+        return redirect()->route('admin.asignaciones.index')
+            ->with('mensaje', 'Asignación académica eliminada exitosamente.')
+            ->with('icono', 'success');
     }
 }

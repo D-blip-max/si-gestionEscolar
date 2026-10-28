@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::with('roles')->get();
         return view('admin.usuarios.index', compact('users'));
     }
 
@@ -24,71 +24,72 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'roles' => 'array',
+            'roles'    => 'required|array|min:1',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        if ($request->roles) {
-            $user->assignRole($request->roles);
-        }
+        $user->syncRoles($request->roles);
 
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuario creado exitosamente.');
+        return redirect()->route('admin.usuarios.index')
+            ->with('mensaje', 'Usuario registrado exitosamente.')
+            ->with('icono', 'success');
     }
 
-    public function edit(User $user)
+    public function edit(string $id)
     {
+        $user = User::with('roles')->findOrFail($id);
         $roles = Role::all();
         return view('admin.usuarios.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, string $id)
     {
-        // Validar contraseña actual si se intenta cambiar la contraseña
-        if ($request->filled('current_password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'La contraseña actual no es correcta.']);
-            }
+        $user = User::findOrFail($id);
 
-            $request->validate([
-                'password' => 'required|string|min:8|confirmed',
-            ]);
-
-            $user->update(['password' => Hash::make($request->password)]);
-            return redirect()->route('admin.usuarios.index')->with('success', 'Contraseña actualizada exitosamente.');
-        }
-
-        // Validación para actualizar datos sin cambiar contraseña
         $request->validate([
-            'name' => 'nullable|string|max:255',
-            'email' => 'nullable|string|email|max:255|unique:users,email,' . $user->id,
-            'roles' => 'array',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'roles'    => 'required|array|min:1',
         ]);
 
-        if ($request->filled('name') || $request->filled('email')) {
-            $user->update([
-                'name' => $request->name ?? $user->name,
-                'email' => $request->email ?? $user->email,
-            ]);
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
         }
 
-        if ($request->roles) {
-            $user->syncRoles($request->roles);
-        }
+        $user->save();
+        $user->syncRoles($request->roles);
 
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuario actualizado exitosamente.');
+        return redirect()->route('admin.usuarios.index')
+            ->with('mensaje', 'Usuario actualizado correctamente.')
+            ->with('icono', 'success');
     }
 
-    public function destroy(User $user)
+    public function destroy(string $id)
     {
+        $user = User::findOrFail($id);
+
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.usuarios.index')
+                ->with('mensaje', 'No puedes eliminar tu propia cuenta en sesión activa.')
+                ->with('icono', 'error');
+        }
+
         $user->delete();
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuario eliminado exitosamente.');
+
+        return redirect()->route('admin.usuarios.index')
+            ->with('mensaje', 'Usuario eliminado exitosamente.')
+            ->with('icono', 'success');
     }
 }

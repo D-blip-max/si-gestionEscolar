@@ -3,28 +3,34 @@
 namespace App\Http\Controllers;
 
 use App\Models\Personal;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class PersonalController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index($tipo)
+    public function index($tipo = null)
     {
-        //echo $id;
-        $personals = Personal::where('tipo', $tipo)->get();
+        $tipo = $tipo ? strtolower($tipo) : 'docente';
+        $personals = Personal::with(['usuario.roles', 'formaciones'])
+            ->where('tipo', $tipo)
+            ->get();
+
         return view('admin.personal.index', compact('personals', 'tipo'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create($tipo)
+    public function create($tipo = 'docente')
     {
+        $tipo = strtolower($tipo);
         $roles = Role::all();
         return view('admin.personal.create', compact('tipo', 'roles'));
     }
@@ -34,52 +40,61 @@ class PersonalController extends Controller
      */
     public function store(Request $request)
     {
-        // $datos= request()->all();
-        // return response()->json($datos);
         $request->validate([
-            'foto' => 'required',
-            'rol' => 'required',
-            'nombres' => 'required',
-            'apellidos' => 'required',
-            'ci' => 'required|unique:personals',
-            'fecha_nacimiento' => 'required',
-            'telefono' => 'required',
-            'profesion' => 'required',
-            'email' => 'required|unique:users',
-            'direccion' => 'required',
-            'tipo' => 'required',
+            'foto'             => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
+            'rol'              => 'required|string',
+            'nombres'          => 'required|string|max:100',
+            'apellidos'        => 'required|string|max:100',
+            'ci'               => 'required|string|max:20|unique:personals,ci',
+            'fecha_nacimiento' => 'required|date',
+            'telefono'         => 'required|string|max:30',
+            'profesion'        => 'required|string|max:150',
+            'email'            => 'required|email|max:255|unique:users,email',
+            'direccion'        => 'required|string|max:255',
+            'tipo'             => 'required|in:docente,administrativo',
         ]);
 
-        $usuario = new User();
-        $usuario->name = $request->apellidos . ' ' . $request->nombres;
-        $usuario->email = $request->email;
-        $usuario->password = Hash::make($request->ci);
-        $usuario->save();
+        DB::transaction(function () use ($request) {
+            // 1. Crear usuario asociado
+            $usuario = User::create([
+                'name'     => trim($request->nombres) . ' ' . trim($request->apellidos),
+                'email'    => trim($request->email),
+                'password' => Hash::make($request->ci), // Contraseña inicial: CI
+            ]);
 
-        $usuario->assignRole($request->rol);
+            $usuario->assignRole($request->rol);
 
-        $personal = new Personal();
-        $personal->user_id = $usuario->id;
-        $personal->tipo = $request->tipo;
-        $personal->nombres = $request->nombres;
-        $personal->apellidos = $request->apellidos;
-        $personal->ci = $request->ci;
-        $personal->fecha_nacimiento = $request->fecha_nacimiento;
-        $personal->direccion = $request->direccion;
-        $personal->telefono = $request->telefono;
-        $personal->profesion = $request->profesion;
-        $personal->foto = $request->foto;
+            // 2. Procesar fotografía
+            $fotoPath = 'vendor/adminlte/dist/img/avatar5.png';
+            if ($request->hasFile('foto')) {
+                $directorio = public_path('uploads/fotos');
+                if (!File::isDirectory($directorio)) {
+                    File::makeDirectory($directorio, 0755, true, true);
+                }
 
-        $fotoPath = $request->file('foto');
-        $nombreArchivo = time() . '_' . $fotoPath->getClientOriginalName();
-        $rutaDestinio = public_path('uploads/fotos');
-        $fotoPath->move($rutaDestinio, $nombreArchivo);
-        $personal->foto = 'uploads/fotos/' . $nombreArchivo;
+                $file = $request->file('foto');
+                $nombreArchivo = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+                $file->move($directorio, $nombreArchivo);
+                $fotoPath = 'uploads/fotos/' . $nombreArchivo;
+            }
 
-        $personal->save();
+            // 3. Crear ficha de personal
+            Personal::create([
+                'user_id'          => $usuario->id,
+                'tipo'             => $request->tipo,
+                'nombres'          => trim($request->nombres),
+                'apellidos'        => trim($request->apellidos),
+                'ci'               => trim($request->ci),
+                'fecha_nacimiento' => $request->fecha_nacimiento,
+                'direccion'        => trim($request->direccion),
+                'telefono'         => trim($request->telefono),
+                'profesion'        => trim($request->profesion),
+                'foto'             => $fotoPath,
+            ]);
+        });
 
         return redirect()->route('admin.personal.index', $request->tipo)
-            ->with('mensaje', 'El personal se ha creado correctamente')
+            ->with('mensaje', 'Personal ' . ucfirst($request->tipo) . ' registrado exitosamente con su cuenta de usuario.')
             ->with('icono', 'success');
     }
 
@@ -88,7 +103,7 @@ class PersonalController extends Controller
      */
     public function show($id)
     {
-        $personal = Personal::findOrFail($id);
+        $personal = Personal::with(['usuario.roles', 'formaciones', 'asignaciones.paralelo.modulo.idioma'])->findOrFail($id);
         return view('admin.personal.show', compact('personal'));
     }
 
@@ -97,8 +112,7 @@ class PersonalController extends Controller
      */
     public function edit($id)
     {
-        //echo $id;
-        $personal = Personal::findOrFail($id);
+        $personal = Personal::with('usuario.roles')->findOrFail($id);
         $roles = Role::all();
         return view('admin.personal.edit', compact('personal', 'roles'));
     }
@@ -112,71 +126,82 @@ class PersonalController extends Controller
         $usuario = User::findOrFail($personal->user_id);
 
         $request->validate([
-            'rol'             => 'required',
-            'nombres'         => 'required',
-            'apellidos'       => 'required',
-            'ci'              => 'required|unique:personals,ci,' . $id,
-            'fecha_nacimiento' => 'required',
-            'telefono'        => 'required',
-            'profesion'       => 'required',
-            'email'           => 'required|unique:users,email,' . $personal->user_id,
-            'direccion'       => 'required',
+            'rol'              => 'required|string',
+            'nombres'          => 'required|string|max:100',
+            'apellidos'        => 'required|string|max:100',
+            'ci'               => 'required|string|max:20|unique:personals,ci,' . $id,
+            'fecha_nacimiento' => 'required|date',
+            'telefono'         => 'required|string|max:30',
+            'profesion'        => 'required|string|max:150',
+            'email'            => 'required|email|max:255|unique:users,email,' . $personal->user_id,
+            'direccion'        => 'required|string|max:255',
+            'foto'             => 'nullable|image|mimes:jpeg,png,jpg,webp|max:3072',
         ]);
-        $usuario->name = $request->apellidos . ' ' . $request->nombres;
-        $usuario->email = $request->email;
-        $usuario->password = Hash::make($request->ci);
-        $usuario->save();
 
-        $usuario->syncRoles($request->rol);
+        DB::transaction(function () use ($request, $personal, $usuario) {
+            $usuario->name = trim($request->nombres) . ' ' . trim($request->apellidos);
+            $usuario->email = trim($request->email);
+            if ($request->filled('password')) {
+                $usuario->password = Hash::make($request->password);
+            }
+            $usuario->save();
+            $usuario->syncRoles($request->rol);
 
-        $personal->nombres = $request->nombres;
-        $personal->apellidos = $request->apellidos;
-        $personal->ci = $request->ci;
-        $personal->fecha_nacimiento = $request->fecha_nacimiento;
-        $personal->direccion = $request->direccion;
-        $personal->telefono = $request->telefono;
-        $personal->profesion = $request->profesion;
+            if ($request->hasFile('foto')) {
+                if ($personal->foto && !str_contains($personal->foto, 'avatar') && File::exists(public_path($personal->foto))) {
+                    File::delete(public_path($personal->foto));
+                }
 
-        if ($request->hasFile('foto')) {
-            // Eliminar foto anterior
-            if ($personal->foto && file_exists(public_path($personal->foto))) {
-                unlink(public_path($personal->foto));
+                $directorio = public_path('uploads/fotos');
+                if (!File::isDirectory($directorio)) {
+                    File::makeDirectory($directorio, 0755, true, true);
+                }
+
+                $file = $request->file('foto');
+                $nombreArchivo = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '', $file->getClientOriginalName());
+                $file->move($directorio, $nombreArchivo);
+                $personal->foto = 'uploads/fotos/' . $nombreArchivo;
             }
 
-            $fotoPath = $request->file('foto');
-            $nombreArchivo = time() . '_' . $fotoPath->getClientOriginalName();
-            $rutaDestino = public_path('uploads/fotos');
-            $fotoPath->move($rutaDestino, $nombreArchivo);
-            $personal->foto = 'uploads/fotos/' . $nombreArchivo;
-        }
-
-        $personal->save();
+            $personal->update([
+                'nombres'          => trim($request->nombres),
+                'apellidos'        => trim($request->apellidos),
+                'ci'               => trim($request->ci),
+                'fecha_nacimiento' => $request->fecha_nacimiento,
+                'direccion'        => trim($request->direccion),
+                'telefono'         => trim($request->telefono),
+                'profesion'        => trim($request->profesion),
+            ]);
+        });
 
         return redirect()->route('admin.personal.index', $personal->tipo)
-            ->with('mensaje', 'El personal ' . $personal->tipo . ' se ha actualizado correctamente')
+            ->with('mensaje', 'Datos del personal actualizados correctamente.')
             ->with('icono', 'success');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy( $id)
+    public function destroy($id)
     {
-        echo $id;
         $personal = Personal::findOrFail($id);
-    $usuario = User::findOrFail($personal->user_id);
+        $tipo = $personal->tipo;
 
-    // Eliminamos el archivo físico de la foto antes de borrar el registro
-    if ($personal->foto && file_exists(public_path($personal->foto))) {
-        unlink(public_path($personal->foto));
-    }
+        DB::transaction(function () use ($personal) {
+            if ($personal->foto && !str_contains($personal->foto, 'avatar') && File::exists(public_path($personal->foto))) {
+                File::delete(public_path($personal->foto));
+            }
 
-    // Borramos ambos registros de la base de datos
-    $usuario->delete();
-    $personal->delete();
+            $user = $personal->usuario;
+            $personal->delete();
 
-    return redirect()->route('admin.personal.index', $personal->tipo)
-        ->with('mensaje', 'El personal ' . $personal->tipo . ' se ha eliminado correctamente')
-        ->with('icono', 'success');
+            if ($user && $user->id !== auth()->id()) {
+                $user->delete();
+            }
+        });
+
+        return redirect()->route('admin.personal.index', $tipo)
+            ->with('mensaje', 'El personal y su usuario asociado se han eliminado correctamente.')
+            ->with('icono', 'success');
     }
 }

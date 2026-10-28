@@ -1,228 +1,195 @@
 @extends('adminlte::page')
 
+@section('title', 'Asignación Académica a Grupos')
+
 @section('content_header')
-    <h1><b>Listado de Asignaciones de Materias a los docentes</b></h1>
-    <hr>
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark"><i class="fas fa-chalkboard-teacher text-primary mr-2"></i>Asignación de Docentes a Grupos</h1>
+                <small class="text-muted">CU-09: Gestión de Docentes Titulares por Paralelo Presencial / Virtual</small>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Inicio</a></li>
+                    <li class="breadcrumb-item active">Asignaciones</li>
+                </ol>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('content')
+<div class="container-fluid">
+    @if (session('mensaje'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: '{{ session('icono') ?? 'info' }}',
+                    title: '{{ session('mensaje') }}',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            });
+        </script>
+    @endif
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Estudiantes Registrados</h3>
-
-                    <div class="card-tools">
-                        <a href="{{ url('/admin/asignaciones/create') }}" class="btn btn-primary">Crear nuevo
-                            Asignacion</a>
-                    </div>
-                </div>
-                <div class="card-body">
-
-                    <table id="example1" class="table table-bordered table-striped table-hover table-sm">
-                        <thead>
-                            <tr>
-                                <th>Nro</th>
-                                <th>Docente</th>
-                                <th>Turno</th>
-                                <th>Gestión</th>
-                                <th>Nivel</th>
-                                <th>Grado</th>
-                                <th>Paralelo</th>
-                                <th>Materia</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($asignaciones as $asignacion)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $asignacion->personal->apellidos . ' ' . $asignacion->personal->nombres }}</td>
-                                    <td>{{ $asignacion->turno->nombre }}</td>
-                                    <td>{{ $asignacion->gestion->nombre }}</td>
-                                    <td>{{ $asignacion->nivel->nombre }}</td>
-                                    <td>{{ $asignacion->grado->nombre }}</td>
-                                    <td>{{ $asignacion->paralelo->nombre }}</td>
-                                    <td>{{ $asignacion->materia->nombre }}</td>
-
-                                    <td>
-
-                                        <div class="row d-flex justify-content-center">
-
-                                            <a href="{{ url('/admin/asignaciones/' . $asignacion->id . '/edit') }}"
-                                                class="btn btn-success btn-sm">
-                                                <i class="fas fa-pencil-alt"></i> Editar
-                                            </a>
-                                            <a href="{{ url('/admin/asignaciones/' . $asignacion->id) }}"
-                                                class="btn btn-info btn-sm">
-                                                <i class="fas fa-eye"></i> ver
-                                            </a>
-
-                                            <form action="{{ url('/admin/asignaciones/' . $asignacion->id) }}"
-                                                method="post" id="miFormulario{{ $asignacion->id }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"
-                                                    onclick="preguntar{{ $asignacion->id }}(event)">
-                                                    <i class="fas fa-trash-alt"></i> Eliminar
-                                                </button>
-                                            </form>
-                                        </div>
-
-
-
-                                        <script>
-                                            function preguntar{{ $asignacion->id }}(event) {
-                                                event.preventDefault();
-
-                                                Swal.fire({
-                                                    title: '¿Desea eliminar este registro?',
-                                                    text: '',
-                                                    icon: 'question',
-                                                    showDenyButton: true,
-                                                    confirmButtonText: 'Eliminar',
-                                                    confirmButtonColor: '#a5161d',
-                                                    denyButtonColor: '#270a0a',
-                                                    denyButtonText: 'Cancelar',
-                                                }).then((result) => {
-                                                    if (result.isConfirmed) {
-                                                        // JavaScript puro para enviar el formulario
-                                                        document.getElementById('miFormulario{{ $asignacion->id }}').submit();
-                                                    }
-                                                });
-                                            }
-                                        </script>
-
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-
-
-                </div>
+    <div class="card card-outline card-primary shadow-sm">
+        <div class="card-header bg-white">
+            <h3 class="card-title text-bold"><i class="fas fa-list mr-1"></i> Padrón de Asignaciones Académicas</h3>
+            <div class="card-tools">
+                <a href="{{ route('admin.asignaciones.create') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus-circle mr-1"></i> Nueva Asignación Docente
+                </a>
             </div>
+        </div>
 
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tabla-asignaciones" class="table table-bordered table-striped table-hover table-sm">
+                    <thead class="thead-light text-center">
+                        <tr>
+                            <th style="width: 40px;">#</th>
+                            <th>Docente Titular</th>
+                            <th>Ciclo Bimestral</th>
+                            <th>Idioma / Módulo</th>
+                            <th>Grupo / Modalidad</th>
+                            <th>Turno y Horario</th>
+                            <th>Aula / Enlace</th>
+                            <th>Estado</th>
+                            <th style="width: 120px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($asignaciones as $asignacion)
+                            <tr>
+                                <td class="text-center align-middle font-weight-bold">{{ $loop->iteration }}</td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        @php
+                                            $foto = ($asignacion->personal && $asignacion->personal->foto && file_exists(public_path($asignacion->personal->foto)))
+                                                ? asset($asignacion->personal->foto)
+                                                : asset('vendor/adminlte/dist/img/avatar5.png');
+                                        @endphp
+                                        <img src="{{ $foto }}" class="img-circle elevation-1 mr-2" style="width: 38px; height: 38px; object-fit: cover;" alt="Docente">
+                                        <div>
+                                            <strong class="text-primary">{{ optional($asignacion->personal)->apellidos }} {{ optional($asignacion->personal)->nombres }}</strong><br>
+                                            <small class="text-muted"><i class="fas fa-id-card"></i> CI: {{ optional($asignacion->personal)->ci ?? 'S/N' }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <span class="badge badge-light border px-2 py-1">
+                                        <i class="far fa-calendar-alt text-primary"></i> {{ optional($asignacion->paralelo->ciclo)->nombre ?? ($asignacion->gestion->nombre ?? 'N/A') }}
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+                                    <strong>{{ optional(optional($asignacion->paralelo)->modulo)->idioma->nombre ?? 'Idioma General' }}</strong><br>
+                                    <span class="text-muted">{{ optional(optional($asignacion->paralelo)->modulo)->nombre ?? ($asignacion->materia->nombre ?? 'N/A') }}</span>
+                                </td>
+                                <td class="text-center align-middle">
+                                    <div class="font-weight-bold">{{ optional($asignacion->paralelo)->nombre ?? 'Paralelo' }}</div>
+                                    @php
+                                        $modalidad = optional($asignacion->paralelo)->modalidad ?? 'PRESENCIAL';
+                                    @endphp
+                                    @if(strtoupper($modalidad) === 'VIRTUAL')
+                                        <span class="badge badge-info"><i class="fas fa-laptop mr-1"></i> Virtual</span>
+                                    @else
+                                        <span class="badge badge-secondary"><i class="fas fa-building mr-1"></i> Presencial</span>
+                                    @endif
+                                </td>
+                                <td class="text-center align-middle">
+                                    <span class="badge badge-warning text-dark font-weight-bold">
+                                        {{ optional($asignacion->paralelo)->turno ?? (optional($asignacion->turno)->nombre ?? 'Regular') }}
+                                    </span><br>
+                                    <small class="text-muted">
+                                        {{ optional($asignacion->paralelo)->hora_inicio ? substr($asignacion->paralelo->hora_inicio, 0, 5) : '00:00' }} - 
+                                        {{ optional($asignacion->paralelo)->hora_fin ? substr($asignacion->paralelo->hora_fin, 0, 5) : '00:00' }}
+                                    </small>
+                                </td>
+                                <td class="text-center align-middle">
+                                    @if(strtoupper(optional($asignacion->paralelo)->modalidad) === 'VIRTUAL')
+                                        @if(optional($asignacion->paralelo)->aula_o_enlace)
+                                            <a href="{{ optional($asignacion->paralelo)->aula_o_enlace }}" target="_blank" class="btn btn-outline-info btn-xs text-truncate" style="max-width: 140px;" title="{{ optional($asignacion->paralelo)->aula_o_enlace }}">
+                                                <i class="fas fa-video mr-1"></i> Enlace Reunión
+                                            </a>
+                                        @else
+                                            <span class="text-muted small">Sin enlace</span>
+                                        @endif
+                                    @else
+                                        <span class="badge badge-light border"><i class="fas fa-door-open text-primary mr-1"></i> {{ optional($asignacion->paralelo)->aula_o_enlace ?? 'Aula General' }}</span>
+                                    @endif
+                                </td>
+                                <td class="text-center align-middle">
+                                    @if(strtolower($asignacion->estado) === 'activo')
+                                        <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle"></i> ACTIVO</span>
+                                    @else
+                                        <span class="badge badge-danger px-2 py-1"><i class="fas fa-times-circle"></i> INACTIVO</span>
+                                    @endif
+                                </td>
+                                <td class="text-center align-middle">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{{ route('admin.asignaciones.show', $asignacion->id) }}" class="btn btn-info" title="Ver Detalle">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.asignaciones.edit', $asignacion->id) }}" class="btn btn-warning" title="Editar">
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-danger" onclick="confirmarEliminacion({{ $asignacion->id }})" title="Eliminar">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                    <form id="delete-form-{{ $asignacion->id }}" action="{{ route('admin.asignaciones.destroy', $asignacion->id) }}" method="POST" style="display: none;">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
+</div>
 @stop
-
-
 
 @section('css')
-    {{-- Add here extra stylesheets --}}
-    {{-- <link rel="stylesheet" href="/css/admin_custom.css"> --}}
-    <style>
-        /* Fondo transparente y sin borde en el contenedor */
-        #example1_wrapper .dt-buttons {
-            background-color: transparent;
-            box-shadow: none;
-            border: none;
-            display: flex;
-            justify-content: center;
-            /* Centrar los botones */
-            gap: 10px;
-            /* Espaciado entre botones */
-            margin-bottom: 15px;
-            /* Separar botones de la tabla */
-        }
-
-        /* Estilo personalizado para los botones */
-        #example1_wrapper .btn {
-            color: #fff;
-            /* Color del texto en blanco */
-            border-radius: 4px;
-            /* Bordes redondeados */
-            padding: 5px 15px;
-            /* Espaciado interno */
-            font-size: 14px;
-            /* Tamaño de fuente */
-        }
-
-        /* Colores por tipo de botón */
-        .btn-danger {
-            background-color: #dc3545;
-            border: none;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            border: none;
-        }
-
-        .btn-info {
-            background-color: #17a2b8;
-            border: none;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #212529;
-            border: none;
-        }
-
-        .btn-default {
-            background-color: #6e7176;
-            color: #212529;
-            border: none;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
 @stop
-{{--  hola --}}
+
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
     <script>
-        $(function() {
-            $("#example1").DataTable({
-                "pageLength": 5,
-                "language": {
-                    "emptyTable": "No hay información",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Asignaciones",
-                    "infoEmpty": "Mostrando 0 a 0 de 0 Asignaciones",
-                    "infoFiltered": "(Filtrado de _MAX_ total Asignaciones)",
-                    "lengthMenu": "Mostrar _MENU_ Asignaciones",
-                    "loadingRecords": "Cargando...",
-                    "processing": "Procesando...",
-                    "search": "Buscador:",
-                    "zeroRecords": "Sin resultados encontrados",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Último",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
-                },
-                "responsive": true,
-                "lengthChange": true,
-                "autoWidth": false,
-                buttons: [{
-                        text: '<i class="fas fa-copy"></i> COPIAR',
-                        extend: 'copy',
-                        className: 'btn btn-default'
-                    },
-                    {
-                        text: '<i class="fas fa-file-pdf"></i> PDF',
-                        extend: 'pdf',
-                        className: 'btn btn-danger'
-                    },
-                    {
-                        text: '<i class="fas fa-file-csv"></i> CSV',
-                        extend: 'csv',
-                        className: 'btn btn-info'
-                    },
-                    {
-                        text: '<i class="fas fa-file-excel"></i> EXCEL',
-                        extend: 'excel',
-                        className: 'btn btn-success'
-                    },
-                    {
-                        text: '<i class="fas fa-print"></i> IMPRIMIR',
-                        extend: 'print',
-                        className: 'btn btn-warning'
-                    }
-                ]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        $(document).ready(function() {
+            $('#tabla-asignaciones').DataTable({
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
+            });
         });
+
+        function confirmarEliminacion(id) {
+            Swal.fire({
+                title: '¿Está seguro de eliminar esta asignación?',
+                text: "El docente titular será desvinculado de este grupo modular.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
     </script>
 @stop

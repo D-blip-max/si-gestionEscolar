@@ -8,8 +8,8 @@ Route::get('/', function () {
 
 Auth::routes(['register'=>true]);
 
-Route::get('/home', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index.home')->middleware('auth');
-Route::get('/admin', [App\Http\Controllers\AdminController::class, 'index'])->name('admin.index')->middleware('auth');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home')->middleware('auth');
+Route::get('/admin', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.index')->middleware('auth');
 
 //rutas que van a ser de configuracion del sistema
 Route::get('/admin/configuracion', [App\Http\Controllers\ConfiguracionController::class, 'index'])->name('admin.configuracion.index')->middleware('auth','can:admin.configuracion.index');
@@ -26,13 +26,6 @@ Route::put('/admin/gestiones/{id}', [App\Http\Controllers\GestionController::cla
 Route::delete('/admin/gestiones/{id}', [App\Http\Controllers\GestionController::class, 'destroy'])->name('admin.gestiones.destroy')->middleware('auth','can:admin.gestiones.destroy');//Delete
 
 
-//rutas que van a ser de Periodos del sitema CreateReadUpdateDelete
-//Trabajando con Modals
-Route::get('/admin/periodos', [App\Http\Controllers\PeriodoController::class, 'index'])->name('admin.periodos.index')->middleware('auth','can:admin.periodos.index');
-Route::post('/admin/periodos/create', [App\Http\Controllers\PeriodoController::class, 'store'])->name('admin.periodos.create')->middleware('auth','can:admin.periodos.create');//Create
-Route::put('/admin/periodos/{id}', [App\Http\Controllers\PeriodoController::class, 'update'])->name('admin.periodos.update')->middleware('auth','can:admin.periodos.update');//Update
-Route::delete('/admin/periodos/{id}', [App\Http\Controllers\PeriodoController::class, 'destroy'])->name('admin.periodos.destroy')->middleware('auth','can:admin.periodos.destroy');//Delete
-
 
 //rutas que van a ser de niveles del sitema CreateReadUpdateDelete
 //Trabajando con Modals
@@ -40,22 +33,6 @@ Route::get('/admin/niveles', [App\Http\Controllers\NivelController::class, 'inde
 Route::post('/admin/niveles/create', [App\Http\Controllers\NivelController::class, 'store'])->name('admin.niveles.create')->middleware('auth','can:admin.niveles.create');//Create
 Route::put('/admin/niveles/{id}', [App\Http\Controllers\NivelController::class, 'update'])->name('admin.niveles.update')->middleware('auth','can:admin.niveles.update');//Update
 Route::delete('/admin/niveles/{id}', [App\Http\Controllers\NivelController::class, 'destroy'])->name('admin.niveles.destroy')->middleware('auth','can:admin.niveles.destroy');//Delete
-
-
-//rutas que van a ser de grados del sitema CreateReadUpdateDelete
-//Trabajando con Modals
-Route::get('/admin/grados', [App\Http\Controllers\GradoController::class, 'index'])->name('admin.grados.index')->middleware('auth','can:admin.grados.index');
-Route::post('/admin/grados/create', [App\Http\Controllers\GradoController::class, 'store'])->name('admin.grados.create')->middleware('auth','can:admin.grados.create');//Create
-Route::put('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, 'update'])->name('admin.grados.update')->middleware('auth','can:admin.grados.update');//Update
-Route::delete('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, 'destroy'])->name('admin.grados.destroy')->middleware('auth','can:admin.grados.destroy');//Delete
-
-
-//rutas que van a ser de Paralelos del sitema CreateReadUpdateDelete
-//Trabajando con Modals
-Route::get('/admin/paralelos', [App\Http\Controllers\ParaleloController::class, 'index'])->name('admin.paralelos.index')->middleware('auth','can:admin.paralelos.index');
-Route::post('/admin/paralelos/create', [App\Http\Controllers\ParaleloController::class, 'store'])->name('admin.paralelos.create')->middleware('auth','can:admin.paralelos.create');//Create
-Route::put('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController::class, 'update'])->name('admin.paralelos.update')->middleware('auth','can:admin.paralelos.update');//Update
-Route::delete('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController::class, 'destroy'])->name('admin.paralelos.destroy')->middleware('auth','can:admin.paralelos.destroy');//Delete
 
 
 //rutas que van a ser de Turnos del sitema CreateReadUpdateDelete
@@ -68,12 +45,6 @@ Route::put('/admin/turnos/{id}', [App\Http\Controllers\TurnoController::class, '
 Route::delete('/admin/turnos/{id}', [App\Http\Controllers\TurnoController::class, 'destroy'])->name('admin.turnos.destroy')->middleware('auth','can:admin.turnos.destroy');//Delete
 
 
-//rutas que van a ser de materias del sitema CreateReadUpdateDelete
-//Trabajando con Modals
-Route::get('/admin/materias', [App\Http\Controllers\MateriaController::class, 'index'])->name('admin.materias.index')->middleware('auth','can:admin.materias.index');
-Route::post('/admin/materias/create', [App\Http\Controllers\MateriaController::class, 'store'])->name('admin.materias.create')->middleware('auth','can:admin.materias.create');//Create
-Route::put('/admin/materias/{id}', [App\Http\Controllers\MateriaController::class, 'update'])->name('admin.materias.update')->middleware('auth','can:admin.materias.update');//Update
-Route::delete('/admin/materias/{id}', [App\Http\Controllers\MateriaController::class, 'destroy'])->name('admin.materias.destroy')->middleware('auth','can:admin.materias.destroy');//Delete
 
 
 //rutas que van a ser de Roles del sitema CreateReadUpdateDelete
@@ -85,18 +56,106 @@ Route::get('/admin/roles/{id}/edit', [App\Http\Controllers\RoleController::class
 Route::put('/admin/roles/{id}', [App\Http\Controllers\RoleController::class, 'update'])->name('admin.roles.update')->middleware('auth','can:admin.roles.update');//Update
 Route::delete('/admin/roles/{id}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('admin.roles.destroy')->middleware('auth','can:admin.roles.destroy');//Delete
 //el metodo que da permisos
-Route::get('/admin/roles/{id}/permisos', [App\Http\Controllers\RoleController::class, 'permisos'])->name('admin.roles.permisos')->middleware('auth','can:admin.roles.permisos');//el que da permisos che
-Route::post('/admin/roles/{id}', [App\Http\Controllers\RoleController::class, 'update_permisos'])->name('admin.roles.update_permisos')->middleware('auth','can:admin.roles.update_permisos');//el que da permisos che
+Route::get('/admin/roles/auditoria-notas', [App\Http\Controllers\RoleController::class, 'auditoria_notas'])->name('admin.roles.auditoria')->middleware('auth', 'can:admin.roles.index');
+Route::get('/admin/roles/{id}/permisos', [App\Http\Controllers\RoleController::class, 'permisos'])->name('admin.roles.permisos')->middleware('auth','can:admin.roles.permisos');
+Route::post('/admin/roles/{id}/permisos', [App\Http\Controllers\RoleController::class, 'update_permisos'])->name('admin.roles.update_permisos')->middleware('auth','can:admin.roles.update_permisos');
+Route::post('/admin/roles/{id}', [App\Http\Controllers\RoleController::class, 'update_permisos'])->middleware('auth','can:admin.roles.update_permisos');
 
 
 //rutas que van a ser de Usuarios del sistema CreateReadUpdateDelete
 //trabajando con vistas
-Route::get('/admin/usuarios', [App\Http\Controllers\UserController::class, 'index'])->name('admin.usuarios.index')->middleware('auth');
-Route::get('/admin/usuarios/create', [App\Http\Controllers\UserController::class, 'create'])->name('admin.usuarios.create')->middleware('auth');
-Route::post('/admin/usuarios/create', [App\Http\Controllers\UserController::class, 'store'])->name('admin.usuarios.store')->middleware('auth');
-Route::get('/admin/usuarios/{id}/edit', [App\Http\Controllers\UserController::class, 'edit'])->name('admin.usuarios.edit')->middleware('auth');
-Route::put('/admin/usuarios/{id}', [App\Http\Controllers\UserController::class, 'update'])->name('admin.usuarios.update')->middleware('auth');
-Route::delete('/admin/usuarios/{id}', [App\Http\Controllers\UserController::class, 'destroy'])->name('admin.usuarios.destroy')->middleware('auth');
+Route::get('/admin/usuarios', [App\Http\Controllers\UserController::class, 'index'])->name('admin.usuarios.index')->middleware('auth', 'can:admin.usuarios.index');
+Route::get('/admin/usuarios/create', [App\Http\Controllers\UserController::class, 'create'])->name('admin.usuarios.create')->middleware('auth', 'can:admin.usuarios.create');
+Route::post('/admin/usuarios/create', [App\Http\Controllers\UserController::class, 'store'])->name('admin.usuarios.store')->middleware('auth', 'can:admin.usuarios.create');
+Route::get('/admin/usuarios/{id}/edit', [App\Http\Controllers\UserController::class, 'edit'])->name('admin.usuarios.edit')->middleware('auth', 'can:admin.usuarios.edit');
+Route::put('/admin/usuarios/{id}', [App\Http\Controllers\UserController::class, 'update'])->name('admin.usuarios.update')->middleware('auth', 'can:admin.usuarios.edit');
+Route::delete('/admin/usuarios/{id}', [App\Http\Controllers\UserController::class, 'destroy'])->name('admin.usuarios.destroy')->middleware('auth', 'can:admin.usuarios.destroy');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//rutas que van a ser de Periodos del sitema CreateReadUpdateDelete
+//Trabajando con Modals
+Route::get('/admin/periodos', [App\Http\Controllers\PeriodoController::class, 'index'])->name('admin.periodos.index')->middleware('auth','can:admin.periodos.index');
+Route::post('/admin/periodos/create', [App\Http\Controllers\PeriodoController::class, 'store'])->name('admin.periodos.create')->middleware('auth','can:admin.periodos.create');//Create
+Route::put('/admin/periodos/{id}', [App\Http\Controllers\PeriodoController::class, 'update'])->name('admin.periodos.update')->middleware('auth','can:admin.periodos.update');//Update
+Route::delete('/admin/periodos/{id}', [App\Http\Controllers\PeriodoController::class, 'destroy'])->name('admin.periodos.destroy')->middleware('auth','can:admin.periodos.destroy');//Delete
+
+
+//rutas que van a ser de materias del sitema CreateReadUpdateDelete
+//Trabajando con Modals
+Route::get('/admin/materias', [App\Http\Controllers\MateriaController::class, 'index'])->name('admin.materias.index')->middleware('auth','can:admin.materias.index');
+Route::post('/admin/materias/create', [App\Http\Controllers\MateriaController::class, 'store'])->name('admin.materias.create')->middleware('auth','can:admin.materias.create');//Create
+Route::put('/admin/materias/{id}', [App\Http\Controllers\MateriaController::class, 'update'])->name('admin.materias.update')->middleware('auth','can:admin.materias.update');//Update
+Route::delete('/admin/materias/{id}', [App\Http\Controllers\MateriaController::class, 'destroy'])->name('admin.materias.destroy')->middleware('auth','can:admin.materias.destroy');//Delete
+
+
+
+//rutas que van a ser de grados del sitema CreateReadUpdateDelete
+//Trabajando con Modals
+Route::get('/admin/grados', [App\Http\Controllers\GradoController::class, 'index'])->name('admin.grados.index')->middleware('auth','can:admin.grados.index');
+Route::post('/admin/grados/create', [App\Http\Controllers\GradoController::class, 'store'])->name('admin.grados.create')->middleware('auth','can:admin.grados.create');//Create
+Route::put('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, 'update'])->name('admin.grados.update')->middleware('auth','can:admin.grados.update');//Update
+Route::delete('/admin/grados/{id}', [App\Http\Controllers\GradoController::class, 'destroy'])->name('admin.grados.destroy')->middleware('auth','can:admin.grados.destroy');//Delete
+
+
+// =========================================================================
+// PAQUETE 2: CATÁLOGOS ACADÉMICOS (IDIOMAS, MÓDULOS, CICLOS, PARALELOS)
+// =========================================================================
+Route::get('/admin/idiomas', [App\Http\Controllers\IdiomaController::class, 'index'])->name('admin.idiomas.index')->middleware('auth');
+Route::post('/admin/idiomas', [App\Http\Controllers\IdiomaController::class, 'store'])->name('admin.idiomas.store')->middleware('auth');
+Route::put('/admin/idiomas/{id}', [App\Http\Controllers\IdiomaController::class, 'update'])->name('admin.idiomas.update')->middleware('auth');
+Route::delete('/admin/idiomas/{id}', [App\Http\Controllers\IdiomaController::class, 'destroy'])->name('admin.idiomas.destroy')->middleware('auth');
+
+Route::resource('/admin/modulos', App\Http\Controllers\ModuloController::class)->names('admin.modulos')->middleware('auth');
+
+Route::post('/admin/ciclos', [App\Http\Controllers\CicloBimestralController::class, 'store'])->name('admin.ciclos.store')->middleware('auth');
+Route::put('/admin/ciclos/{id}', [App\Http\Controllers\CicloBimestralController::class, 'update'])->name('admin.ciclos.update')->middleware('auth');
+Route::post('/admin/ciclos/{id}/activar', [App\Http\Controllers\CicloBimestralController::class, 'activar'])->name('admin.ciclos.activar')->middleware('auth');
+Route::delete('/admin/ciclos/{id}', [App\Http\Controllers\CicloBimestralController::class, 'destroy'])->name('admin.ciclos.destroy')->middleware('auth');
+
+//rutas que van a ser de Paralelos del sitema CreateReadUpdateDelete
+//Trabajando con Modals
+Route::get('/admin/paralelos', [App\Http\Controllers\ParaleloController::class, 'index'])->name('admin.paralelos.index')->middleware('auth','can:admin.paralelos.index');
+Route::post('/admin/paralelos', [App\Http\Controllers\ParaleloController::class, 'store'])->name('admin.paralelos.store')->middleware('auth','can:admin.paralelos.create');
+Route::post('/admin/paralelos/create', [App\Http\Controllers\ParaleloController::class, 'store'])->name('admin.paralelos.create')->middleware('auth','can:admin.paralelos.create');//Create
+Route::put('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController::class, 'update'])->name('admin.paralelos.update')->middleware('auth','can:admin.paralelos.update');//Update
+Route::delete('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController::class, 'destroy'])->name('admin.paralelos.destroy')->middleware('auth','can:admin.paralelos.destroy');//Delete
+
+
+
+
 
 
 //rutas que van a ser de Personal del sitema CreateReadUpdateDelete
@@ -119,15 +178,40 @@ Route::put('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionCo
 Route::delete('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'destroy'])->name('admin.personal.formaciones.destroy')->middleware('auth','can:admin.personal.formaciones.destroy');//Edit vista
 
 
-//rutas que van a ser de Estudiantes del sitema CreateReadUpdateDelete
-//trabajando con vistas
-Route::get('/admin/estudiantes/', [App\Http\Controllers\EstudianteController::class,'index'])->name('admin.estudiantes.index')->middleware('auth','can:admin.estudiantes.index');
-Route::get('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class,'create'])->name('admin.estudiantes.create')->middleware('auth','can:admin.estudiantes.create');
-Route::post('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class,'store'])->name('admin.estudiantes.store')->middleware('auth','can:admin.estudiantes.store');
-Route::get('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class,'show'])->name('admin.estudiantes.show')->middleware('auth','can:admin.estudiantes.show');
-Route::get('/admin/estudiantes/{id}/edit', [App\Http\Controllers\EstudianteController::class,'edit'])->name('admin.estudiantes.edit')->middleware('auth','can:admin.estudiantes.edit');
-Route::put('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class,'update'])->name('admin.estudiantes.update')->middleware('auth','can:admin.estudiantes.update');
-Route::delete('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class,'destroy'])->name('admin.estudiantes.destroy')->middleware('auth','can:admin.estudiantes.destroy');
+// =========================================================================
+// PAQUETE 4: PADRÓN DE ESTUDIANTES Y BOLETAS BANCARIAS
+// =========================================================================
+// CU-10: Padrón de Estudiantes
+Route::get('/admin/estudiantes/buscar/ajax', [App\Http\Controllers\EstudianteController::class, 'buscar_estudiante_ajax'])->name('admin.estudiantes.buscar_ajax')->middleware('auth');
+Route::get('/admin/estudiantes', [App\Http\Controllers\EstudianteController::class, 'index'])->name('admin.estudiantes.index')->middleware('auth', 'can:admin.estudiantes.index');
+Route::get('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class, 'create'])->name('admin.estudiantes.create')->middleware('auth', 'can:admin.estudiantes.create');
+Route::post('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class, 'store'])->name('admin.estudiantes.store')->middleware('auth', 'can:admin.estudiantes.store');
+Route::get('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class, 'show'])->name('admin.estudiantes.show')->middleware('auth', 'can:admin.estudiantes.show');
+Route::get('/admin/estudiantes/{id}/edit', [App\Http\Controllers\EstudianteController::class, 'edit'])->name('admin.estudiantes.edit')->middleware('auth', 'can:admin.estudiantes.edit');
+Route::put('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class, 'update'])->name('admin.estudiantes.update')->middleware('auth', 'can:admin.estudiantes.update');
+Route::delete('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class, 'destroy'])->name('admin.estudiantes.destroy')->middleware('auth', 'can:admin.estudiantes.destroy');
+
+// CU-12: Kárdex Académico del Estudiante
+Route::get('/admin/estudiantes/{id}/kardex', [App\Http\Controllers\EstudianteController::class, 'kardex'])->name('admin.estudiantes.kardex')->middleware('auth');
+Route::get('/admin/estudiantes/{id}/kardex-pdf', [App\Http\Controllers\EstudianteController::class, 'kardex_pdf'])->name('admin.estudiantes.kardex_pdf')->middleware('auth');
+
+// CU-11: Registro y Fiscalización de Boletas Bancarias
+Route::get('/admin/boletas', [App\Http\Controllers\BoletaPagoController::class, 'index'])->name('admin.boletas.index')->middleware('auth');
+Route::post('/admin/boletas', [App\Http\Controllers\BoletaPagoController::class, 'store'])->name('admin.boletas.store')->middleware('auth');
+Route::post('/admin/boletas/{id}/anular', [App\Http\Controllers\BoletaPagoController::class, 'anular'])->name('admin.boletas.anular')->middleware('auth');
+Route::delete('/admin/boletas/{id}', [App\Http\Controllers\BoletaPagoController::class, 'destroy'])->name('admin.boletas.destroy')->middleware('auth');
+Route::get('/admin/boletas/disponibles/{estudiante_id}', [App\Http\Controllers\BoletaPagoController::class, 'boletas_disponibles'])->name('admin.boletas.disponibles')->middleware('auth');
+
+// =========================================================================
+// PAQUETE 5: INSCRIPCIONES Y MATRÍCULA MODULAR
+// =========================================================================
+Route::get('/admin/inscripciones', [App\Http\Controllers\InscripcionController::class, 'index'])->name('admin.inscripciones.index')->middleware('auth');
+Route::get('/admin/inscripciones/create', [App\Http\Controllers\InscripcionController::class, 'create'])->name('admin.inscripciones.create')->middleware('auth');
+Route::post('/admin/inscripciones/create', [App\Http\Controllers\InscripcionController::class, 'store'])->name('admin.inscripciones.store')->middleware('auth');
+Route::get('/admin/inscripciones/anulaciones', [App\Http\Controllers\InscripcionController::class, 'anulaciones'])->name('admin.inscripciones.anulaciones')->middleware('auth');
+Route::post('/admin/inscripciones/{id}/anular', [App\Http\Controllers\InscripcionController::class, 'anular'])->name('admin.inscripciones.anular')->middleware('auth');
+Route::get('/admin/inscripciones/{id}/pdf', [App\Http\Controllers\InscripcionController::class, 'pdf_matricula'])->name('admin.inscripciones.pdf')->middleware('auth');
+Route::get('/admin/inscripciones/verificar-prerrequisito', [App\Http\Controllers\InscripcionController::class, 'verificar_prerrequisito'])->name('admin.inscripciones.verificar_prerrequisito')->middleware('auth');
 
 //ruta para registrar a padre de familia
 Route::get('/admin/ppffs',[App\Http\Controllers\PpffController::class,'index'])->name('admin.ppffs.index')->middleware('auth','can:admin.ppffs.index');
@@ -187,6 +271,35 @@ Route::put('/admin/calificaciones/{id}', [App\Http\Controllers\CalificacionContr
 Route::get('/admin/calificaciones/detalle/asignacion/{id_asignacion}/estudiante/{id_estudiante}', [App\Http\Controllers\CalificacionController::class, 'show_estudiante'])->name('admin.calificaciones.show_estudiante')->middleware('auth','can:admin.calificaciones.show_estudiante');
 Route::get('/admin/calificaciones/asignacion/{id}', [App\Http\Controllers\CalificacionController::class, 'show_admin'])->name('admin.calificaciones.show_admin')->middleware('auth','can:admin.calificaciones.show_admin');
 Route::delete('/admin/calificaciones/{id}', [App\Http\Controllers\CalificacionController::class, 'destroy'])->name('admin.calificaciones.destroy')->middleware('auth','can:admin.calificaciones.destroy');
+
+// =========================================================================
+// PAQUETE 6: EVALUACIÓN Y CALIFICACIONES (DOCENTE)
+// =========================================================================
+Route::get('/docente/grupos', [App\Http\Controllers\DocenteGrupoController::class, 'index'])->name('docente.grupos.index')->middleware('auth');
+Route::get('/docente/grupos/{id}', [App\Http\Controllers\DocenteGrupoController::class, 'show'])->name('docente.grupos.show')->middleware('auth');
+Route::get('/docente/calificaciones', [App\Http\Controllers\DocenteCalificacionController::class, 'index'])->name('docente.calificaciones.index')->middleware('auth');
+Route::get('/docente/calificaciones/grupo/{paralelo_id}', [App\Http\Controllers\DocenteCalificacionController::class, 'cargar_notas'])->name('docente.calificaciones.cargar')->middleware('auth');
+Route::post('/docente/calificaciones/guardar-lote', [App\Http\Controllers\DocenteCalificacionController::class, 'guardar_lote'])->name('docente.calificaciones.guardar_lote')->middleware('auth');
+Route::get('/docente/actas', [App\Http\Controllers\DocenteCalificacionController::class, 'actas_index'])->name('docente.actas.index')->middleware('auth');
+Route::get('/docente/actas/grupo/{paralelo_id}/pdf', [App\Http\Controllers\DocenteCalificacionController::class, 'acta_pdf'])->name('docente.actas.pdf')->middleware('auth');
+
+// =========================================================================
+// PAQUETE 7: PORTAL DEL ESTUDIANTE (AUTOGESTIÓN)
+// =========================================================================
+Route::get('/estudiante/modulo-activo', [App\Http\Controllers\EstudiantePortalController::class, 'modulo_activo'])->name('estudiante.clases.index')->middleware('auth');
+Route::get('/estudiante/avance-curricular', [App\Http\Controllers\EstudiantePortalController::class, 'avance_curricular'])->name('estudiante.avance.index')->middleware('auth');
+Route::get('/estudiante/mis-documentos', [App\Http\Controllers\EstudiantePortalController::class, 'mis_documentos'])->name('estudiante.documentos.index')->middleware('auth');
+Route::get('/estudiante/mis-documentos/certificado/{tipo}', [App\Http\Controllers\EstudiantePortalController::class, 'certificado_pdf'])->name('estudiante.documentos.certificado')->middleware('auth');
+
+// =========================================================================
+// PAQUETE 8: REPORTES Y CONCILIACIÓN GERENCIAL
+// =========================================================================
+Route::get('/admin/reportes/conciliacion-boletas', [App\Http\Controllers\ReporteController::class, 'conciliacion_boletas'])->name('admin.reportes.conciliacion')->middleware('auth');
+Route::get('/admin/reportes/conciliacion-boletas/pdf', [App\Http\Controllers\ReporteController::class, 'conciliacion_boletas_pdf'])->name('admin.reportes.conciliacion_pdf')->middleware('auth');
+Route::get('/admin/reportes/inscritos-modalidad', [App\Http\Controllers\ReporteController::class, 'inscritos_modalidad'])->name('admin.reportes.inscritos')->middleware('auth');
+Route::get('/admin/reportes/inscritos-modalidad/pdf', [App\Http\Controllers\ReporteController::class, 'inscritos_modalidad_pdf'])->name('admin.reportes.inscritos_pdf')->middleware('auth');
+Route::get('/admin/reportes/estudiantes-graduados', [App\Http\Controllers\ReporteController::class, 'estudiantes_graduados'])->name('admin.reportes.graduados')->middleware('auth');
+Route::get('/admin/reportes/estudiantes-graduados/pdf', [App\Http\Controllers\ReporteController::class, 'estudiantes_graduados_pdf'])->name('admin.reportes.graduados_pdf')->middleware('auth');
 
 
 

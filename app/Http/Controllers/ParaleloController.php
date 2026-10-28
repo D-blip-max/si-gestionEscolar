@@ -2,113 +2,115 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CicloBimestral;
+use App\Models\Modulo;
 use App\Models\Paralelo;
 use Illuminate\Http\Request;
-use App\Models\Grado;
-use Illuminate\Support\Facades\Validator;
-
-
-
 
 class ParaleloController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $grados = Grado::with('paralelos')
-            ->orderBy('nombre', 'asc')
-            ->get();
+        $ciclos = CicloBimestral::orderBy('gestion', 'desc')->orderBy('id', 'desc')->get();
 
-        return view('admin.paralelos.index', compact('grados'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        ///$datos= request()->all();
-        //return response()->json($datos);
-        $request->validate([
-            'nombre_create' => 'required|string|max:255',
-            'grado_id_create' => 'required|exists:grados,id',
-        ]);
-
-        $paralelo = new Paralelo();
-        $paralelo->nombre = $request->nombre_create;
-        $paralelo->grado_id = $request->grado_id_create;
-        $paralelo->save();
-
-        return redirect()->route('admin.paralelos.index')
-            ->with('mensaje', 'El paralelo se ha creado correctamente')
-            ->with('icono', 'success');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(paralelo $paralelo)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(paralelo $paralelo)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request,$id)
-    {
-        
-        $validate = Validator::make($request->all(), [
-            'grado_id' => 'required|exists:grados,id',
-            'nombre'=> 'required|String|max:255'
-        ]);
-
-        // 2. Si la validación falla, redirige con errores e ID del modal
-        if ($validate->fails()) {
-            return redirect()
-                ->back()
-                ->withErrors($validate)
-                ->withInput()
-                ->with('modal_id', $id);
+        // Determinar ciclo activo o seleccionado
+        $cicloSeleccionadoId = $request->input('ciclo_id');
+        if (!$cicloSeleccionadoId) {
+            $cicloActivo = $ciclos->firstWhere('estado', 'ACTIVO') ?? $ciclos->first();
+            $cicloSeleccionadoId = $cicloActivo ? $cicloActivo->id : null;
         }
 
-        $paralelo = Paralelo::find($id);
-        $paralelo->nombre = $request->nombre;
-        $paralelo->grado_id = $request->grado_id;
-        $paralelo->save();
-        return redirect()->route('admin.paralelos.index')
-            ->with('mensaje', 'El paralelo se ha actualizado correctamente')
+        $query = Paralelo::with(['modulo.idioma', 'ciclo', 'asignacion']);
+        if ($cicloSeleccionadoId) {
+            $query->where('ciclo_id', $cicloSeleccionadoId);
+        }
+        $paralelos = $query->get();
+
+        $modulos = Modulo::with('idioma')->orderBy('idioma_id')->orderBy('numero_orden')->get();
+
+        return view('admin.paralelos.index', compact('paralelos', 'ciclos', 'cicloSeleccionadoId', 'modulos'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nombre'        => 'required|string|max:10',
+            'ciclo_id'      => 'required|exists:ciclos_bimestrales,id',
+            'modulo_id'     => 'required|exists:modulos,id',
+            'modalidad'     => 'required|in:PRESENCIAL,VIRTUAL',
+            'aula_o_enlace' => 'required|string|max:255',
+            'turno'         => 'required|in:MAÑANA,TARDE,NOCHE',
+            'hora_inicio'   => 'nullable',
+            'hora_fin'      => 'nullable',
+            'cupo_maximo'   => 'required|integer|min:1|max:150',
+        ]);
+
+        Paralelo::create([
+            'nombre'        => strtoupper(trim($request->nombre)),
+            'ciclo_id'      => $request->ciclo_id,
+            'modulo_id'     => $request->modulo_id,
+            'modalidad'     => $request->modalidad,
+            'aula_o_enlace' => trim($request->aula_o_enlace),
+            'turno'         => $request->turno,
+            'hora_inicio'   => $request->hora_inicio,
+            'hora_fin'      => $request->hora_fin,
+            'cupo_maximo'   => (int)$request->cupo_maximo,
+            'cupo_ocupado'  => 0,
+        ]);
+
+        return redirect()->route('admin.paralelos.index', ['ciclo_id' => $request->ciclo_id])
+            ->with('mensaje', 'Grupo/Paralelo creado exitosamente.')
             ->with('icono', 'success');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy( $id)
+    public function update(Request $request, string $id)
     {
-        $paralelo = Paralelo::find($id);
+        $paralelo = Paralelo::findOrFail($id);
+
+        $request->validate([
+            'nombre'        => 'required|string|max:10',
+            'ciclo_id'      => 'required|exists:ciclos_bimestrales,id',
+            'modulo_id'     => 'required|exists:modulos,id',
+            'modalidad'     => 'required|in:PRESENCIAL,VIRTUAL',
+            'aula_o_enlace' => 'required|string|max:255',
+            'turno'         => 'required|in:MAÑANA,TARDE,NOCHE',
+            'hora_inicio'   => 'nullable',
+            'hora_fin'      => 'nullable',
+            'cupo_maximo'   => 'required|integer|min:1|max:150',
+        ]);
+
+        $paralelo->update([
+            'nombre'        => strtoupper(trim($request->nombre)),
+            'ciclo_id'      => $request->ciclo_id,
+            'modulo_id'     => $request->modulo_id,
+            'modalidad'     => $request->modalidad,
+            'aula_o_enlace' => trim($request->aula_o_enlace),
+            'turno'         => $request->turno,
+            'hora_inicio'   => $request->hora_inicio,
+            'hora_fin'      => $request->hora_fin,
+            'cupo_maximo'   => (int)$request->cupo_maximo,
+        ]);
+
+        return redirect()->route('admin.paralelos.index', ['ciclo_id' => $request->ciclo_id])
+            ->with('mensaje', 'Grupo/Paralelo actualizado correctamente.')
+            ->with('icono', 'success');
+    }
+
+    public function destroy(string $id)
+    {
+        $paralelo = Paralelo::findOrFail($id);
+
+        if ($paralelo->cupo_ocupado > 0) {
+            return redirect()->back()
+                ->with('mensaje', 'No se puede eliminar el grupo porque ya tiene alumnos inscritos.')
+                ->with('icono', 'error');
+        }
+
+        $cicloId = $paralelo->ciclo_id;
         $paralelo->delete();
-        return redirect()->route('admin.paralelos.index')
-            ->with('mensaje', 'El paralelo se ha eliminado correctamente')
+
+        return redirect()->route('admin.paralelos.index', ['ciclo_id' => $cicloId])
+            ->with('mensaje', 'Grupo/Paralelo eliminado correctamente.')
             ->with('icono', 'success');
     }
 }

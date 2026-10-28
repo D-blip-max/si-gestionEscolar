@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -14,160 +13,129 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        $admin = Role::create(['name' => 'ADMINISTRADOR']);
-        $director_general = Role::create(['name' => 'DIRECTOR/A GENERAL']);
-        $director_academico = Role::create(['name' => 'DIRECTOR/A ACADÉMICO']);
-        $director_administrativo = Role::create(['name' => 'DIRECTOR/A ADMINISTRATIVO']);
-        $docente = Role::create(['name' => 'DOCENTE']);
-        $estudiante = Role::create(['name' => 'ESTUDIANTE']);
-        $caja = Role::create(['name' => 'CAJERO/A']);
-        $secretaria = Role::create(['name' => 'SECRETARIO/A']);
-        $regente = Role::create(['name' => 'REGENTE']);
+        $admin = Role::firstOrCreate(['name' => 'ADMINISTRADOR']);
+        $director_general = Role::firstOrCreate(['name' => 'DIRECTOR/A GENERAL']);
+        $director_academico = Role::firstOrCreate(['name' => 'DIRECTOR/A ACADÉMICO']);
+        $director_administrativo = Role::firstOrCreate(['name' => 'DIRECTOR/A ADMINISTRATIVO']);
+        $docente = Role::firstOrCreate(['name' => 'DOCENTE']);
+        $estudiante = Role::firstOrCreate(['name' => 'ESTUDIANTE']);
+        $caja = Role::firstOrCreate(['name' => 'CAJERO/A']);
+        $secretaria = Role::firstOrCreate(['name' => 'SECRETARIO/A']);
+        $regente = Role::firstOrCreate(['name' => 'REGENTE']);
 
-        // --- PERMISOS PARA LA CONFIGURACIÓN DEL SISTEMA ---
-        Permission::create(['name' => 'admin.configuracion.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.configuracion.crear'])->syncRoles($admin);
+        // =========================================================================
+        // PAQUETE 1: ADMINISTRACIÓN Y SEGURIDAD
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'admin.seguridad.menu'])->syncRoles([$admin, $director_general]);
+        Permission::firstOrCreate(['name' => 'admin.configuracion.index'])->syncRoles([$admin, $director_general]);
+        Permission::firstOrCreate(['name' => 'admin.configuracion.crear'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.index'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.create'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.store'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.edit'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.update'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.usuarios.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.index'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.create'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.store'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.edit'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.update'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.permisos'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.roles.update_permisos'])->syncRoles([$admin]);
 
-        // --- PERMISOS PARA LAS GESTIONES DEL SISTEMA ---
-        Permission::create(['name' => 'admin.gestiones.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.gestiones.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.gestiones.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.gestiones.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.gestiones.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.gestiones.destroy'])->syncRoles($admin);
+        // =========================================================================
+        // PAQUETE 2: CATÁLOGOS ACADÉMICOS
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'admin.catalogos.menu'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.idiomas.index'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.idiomas.create'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.idiomas.edit'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.idiomas.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.modulos.index'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.modulos.create'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.modulos.edit'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.modulos.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.ciclos.index'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.ciclos.create'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.ciclos.edit'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.ciclos.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.paralelos.index'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.paralelos.create'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.paralelos.update'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.paralelos.destroy'])->syncRoles([$admin]);
 
-        // --- PERMISOS PARA PERIODOS ---
-        Permission::create(['name' => 'admin.periodos.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.periodos.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.periodos.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.periodos.destroy'])->syncRoles($admin);
+        // =========================================================================
+        // PAQUETE 3: PERSONAL Y ASIGNACIONES
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'admin.personal.menu'])->syncRoles([$admin, $director_general, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.index'])->syncRoles([$admin, $director_general, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.create'])->syncRoles([$admin, $director_general]);
+        Permission::firstOrCreate(['name' => 'admin.personal.store'])->syncRoles([$admin, $director_general]);
+        Permission::firstOrCreate(['name' => 'admin.personal.show'])->syncRoles([$admin, $director_general, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.edit'])->syncRoles([$admin, $director_general]);
+        Permission::firstOrCreate(['name' => 'admin.personal.update'])->syncRoles([$admin, $director_general]);
+        Permission::firstOrCreate(['name' => 'admin.personal.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.personal.formaciones.index'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.formaciones.create'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.formaciones.store'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.formaciones.edit'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.formaciones.update'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.personal.formaciones.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.asignaciones.index'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.asignaciones.create'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.asignaciones.store'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.asignaciones.show'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.asignaciones.edit'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.asignaciones.update'])->syncRoles([$admin, $director_academico]);
+        Permission::firstOrCreate(['name' => 'admin.asignaciones.destroy'])->syncRoles([$admin]);
 
-        // --- PERMISOS PARA NIVELES ---
-        Permission::create(['name' => 'admin.niveles.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.niveles.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.niveles.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.niveles.destroy'])->syncRoles($admin);
+        // =========================================================================
+        // PAQUETE 4: PADRÓN DE ESTUDIANTES Y BOLETAS BANCARIAS
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'administrativo.estudiantes.menu'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.index'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.create'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.store'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.show'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.edit'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.update'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.destroy'])->syncRoles([$admin]);
+        Permission::firstOrCreate(['name' => 'admin.estudiantes.kardex'])->syncRoles([$admin, $director_administrativo, $director_academico, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.boletas.index'])->syncRoles([$admin, $director_administrativo, $caja, $secretaria]);
 
-        // --- PERMISOS PARA GRADOS ---
-        Permission::create(['name' => 'admin.grados.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.grados.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.grados.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.grados.destroy'])->syncRoles($admin);
+        // =========================================================================
+        // PAQUETE 5: INSCRIPCIONES Y MATRÍCULA MODULAR
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'administrativo.inscripciones.menu'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.inscripciones.index'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.inscripciones.create'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.inscripciones.store'])->syncRoles([$admin, $director_administrativo, $secretaria]);
+        Permission::firstOrCreate(['name' => 'admin.inscripciones.destroy'])->syncRoles([$admin, $director_administrativo]);
 
-        // --- PERMISOS PARA PARALELOS ---
-        Permission::create(['name' => 'admin.paralelos.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.paralelos.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.paralelos.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.paralelos.destroy'])->syncRoles($admin);
+        // =========================================================================
+        // PAQUETE 6: EVALUACIÓN Y CALIFICACIONES (DOCENTE)
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'docente.calificaciones.menu'])->syncRoles([$admin, $docente]);
+        Permission::firstOrCreate(['name' => 'docente.grupos.index'])->syncRoles([$admin, $docente]);
+        Permission::firstOrCreate(['name' => 'docente.calificaciones.create'])->syncRoles([$admin, $docente]);
+        Permission::firstOrCreate(['name' => 'docente.actas.index'])->syncRoles([$admin, $docente, $director_academico]);
 
-        // --- PERMISOS PARA TURNOS ---
-        Permission::create(['name' => 'admin.turnos.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.turnos.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.turnos.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.turnos.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.turnos.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.turnos.destroy'])->syncRoles($admin);
+        // =========================================================================
+        // PAQUETE 7: PORTAL DEL ESTUDIANTE (AUTOGESTIÓN)
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'estudiante.portal.menu'])->syncRoles([$admin, $estudiante]);
+        Permission::firstOrCreate(['name' => 'estudiante.clases.index'])->syncRoles([$admin, $estudiante]);
+        Permission::firstOrCreate(['name' => 'estudiante.avance.index'])->syncRoles([$admin, $estudiante]);
+        Permission::firstOrCreate(['name' => 'estudiante.documentos.index'])->syncRoles([$admin, $estudiante]);
 
-        // --- PERMISOS PARA MATERIAS ---
-        Permission::create(['name' => 'admin.materias.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.materias.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.materias.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.materias.destroy'])->syncRoles($admin);
-
-        // --- PERMISOS PARA ROLES ---
-        Permission::create(['name' => 'admin.roles.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.roles.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.roles.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.roles.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.roles.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.roles.destroy'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.roles.permisos'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.roles.update_permisos'])->syncRoles($admin);
-
-        // --- PERMISOS PARA PERSONAL ---
-        Permission::create(['name' => 'admin.personal.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.show'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.destroy'])->syncRoles($admin);
-
-        // --- PERMISOS PARA FORMACIONES DEL PERSONAL ---
-        Permission::create(['name' => 'admin.personal.formaciones.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.formaciones.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.formaciones.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.formaciones.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.formaciones.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.personal.formaciones.destroy'])->syncRoles($admin);
-
-        // --- PERMISOS PARA ESTUDIANTES ---
-        Permission::create(['name' => 'admin.estudiantes.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.estudiantes.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.estudiantes.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.estudiantes.show'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.estudiantes.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.estudiantes.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.estudiantes.destroy'])->syncRoles($admin);
-
-        // --- PERMISOS PARA PADRES DE FAMILIA (PPFF) ---
-        Permission::create(['name' => 'admin.ppffs.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.estudiantes.ppffs.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.ppffs.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.ppffs.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.ppffs.show'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.ppffs.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.ppffs.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.ppffs.destroy'])->syncRoles($admin);
-
-        // --- PERMISOS PARA MATRICULACIONES ---
-        Permission::create(['name' => 'admin.matriculaciones.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.buscar_estudiante'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.buscar_grados'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.buscar_paralelos'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.pdf_matricula'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.show'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.destroy'])->syncRoles($admin);
-
-        // --- PERMISOS PARA ASIGNACIONES ---
-        Permission::create(['name' => 'admin.asignaciones.index'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.asignaciones.create'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.asignaciones.store'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.matriculaciones.buscar_docente'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.asignaciones.show'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.asignaciones.edit'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.asignaciones.update'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.asignaciones.destroy'])->syncRoles($admin);
-
-        // --- PERMISOS PARA ASIGNACIONES ---
-        Permission::create(['name' => 'admin.pagos.index'])->syncRoles($admin, $caja);
-        Permission::create(['name' => 'admin.pagos.ver_pagos'])->syncRoles($admin, $caja);
-        Permission::create(['name' => 'admin.pagos.store'])->syncRoles($admin, $caja);
-        Permission::create(['name' => 'admin.pagos.comprobante'])->syncRoles($admin, $caja);
-        Permission::create(['name' => 'admin.pagos.destroy'])->syncRoles($admin, $caja);
-
-        // --- PERMISOS PARA ASISTENCIAS DEL ESTUDIANTE ---
-        Permission::create(['name' => 'admin.asistencias.index'])->syncRoles($admin, $docente, $estudiante, $director_academico, $director_administrativo, $director_general, $regente, $secretaria);
-        Permission::create(['name' => 'admin.asistencias.create'])->syncRoles($docente);
-        Permission::create(['name' => 'admin.asistencias.store'])->syncRoles($docente);
-        Permission::create(['name' => 'admin.asistencias.destroy'])->syncRoles($docente);
-        Permission::create(['name' => 'admin.asistencias.update'])->syncRoles($docente);
-        Permission::create(['name' => 'admin.asistencias.show'])->syncRoles($admin, $director_academico, $director_administrativo, $director_general, $regente, $secretaria);
-        Permission::create(['name' => 'admin.asistencias.show_estudiante'])->syncRoles($estudiante);
-
-        // --- PERMISOS PARA CALIFICACIONES DEL ESTUDIANTE ---
-        
-        Permission::create(['name' => 'admin.calificaciones.index'])->syncRoles($admin, $docente, $estudiante);
-        Permission::create(['name' => 'admin.calificaciones.create'])->syncRoles($docente);
-        Permission::create(['name' => 'admin.calificaciones.store'])->syncRoles($docente);
-        Permission::create(['name' => 'admin.calificaciones.update'])->syncRoles($docente);
-        Permission::create(['name' => 'admin.calificaciones.show_estudiante'])->syncRoles($estudiante);
-        Permission::create(['name' => 'admin.calificaciones.show_admin'])->syncRoles($admin);
-        Permission::create(['name' => 'admin.calificaciones.destroy'])->syncRoles($docente);
+        // =========================================================================
+        // PAQUETE 8: REPORTES Y CONCILIACIÓN GERENCIAL
+        // =========================================================================
+        Permission::firstOrCreate(['name' => 'admin.reportes.menu'])->syncRoles([$admin, $director_general, $director_academico, $director_administrativo]);
+        Permission::firstOrCreate(['name' => 'admin.reportes.index'])->syncRoles([$admin, $director_general, $director_academico, $director_administrativo]);
+        Permission::firstOrCreate(['name' => 'admin.reportes.conciliacion'])->syncRoles([$admin, $director_general, $director_administrativo, $caja]);
+        Permission::firstOrCreate(['name' => 'admin.reportes.inscritos'])->syncRoles([$admin, $director_general, $director_academico, $director_administrativo]);
+        Permission::firstOrCreate(['name' => 'admin.reportes.graduados'])->syncRoles([$admin, $director_general, $director_academico]);
     }
 }

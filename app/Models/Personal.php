@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Personal extends Model
 {
-    //
+    protected $table = 'personals';
+
     protected $fillable = [
-        'usuario_id',
+        'user_id',
         'tipo',
         'nombres',
         'apellidos',
@@ -17,6 +18,7 @@ class Personal extends Model
         'direccion',
         'telefono',
         'profesion',
+        'foto',
     ];
 
     public function usuario()
@@ -26,11 +28,11 @@ class Personal extends Model
 
     public function formaciones()
     {
-        return $this->hasMany(Formacion::class);
+        return $this->hasMany(Formacion::class, 'personal_id');
     }
 
     public function asignaciones()
     {
-        return $this->hasMany(Asignacion::class);
+        return $this->hasMany(Asignacion::class, 'personal_id');
     }
 }

@@ -1,368 +1,188 @@
 @extends('adminlte::page')
 
+@section('title', 'Detalle de Asignación Docente')
+
 @section('content_header')
-    <h1>Datos de la Asignacion de Materia del Docente</h1>
-    <hr>
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark"><i class="fas fa-id-badge text-info mr-2"></i>Detalle de Asignación Académica</h1>
+                <small class="text-muted">CU-09: Ficha Informativa de Docente y Grupo Modular</small>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.asignaciones.index') }}">Asignaciones</a></li>
+                    <li class="breadcrumb-item active">Detalle</li>
+                </ol>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('content')
+<div class="container-fluid">
     <div class="row">
-        <div class="col-md-8">
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card card-info">
-                        <div class="card-header">
-                            <h3 class="card-title">Datos del Docente</h3>
-                        </div>
-
-                        <div class="card-body">
-
-                            <div id="datos_estudiante">
-                                <div class="row">
-
-                                    <div class="col-md-3">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="form-group">
-                                                    <label for="">Fotografía</label>
-                                                    <center>
-
-                                                        <img src="{{ url($asignacion->personal->foto) }}" width="70%"
-                                                            id="foto" alt="">
-                                                    </center>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-9">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Apellidos</label>
-                                                    <p id="apellidos">{{ $asignacion->personal->apellidos }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Nombres</label>
-                                                    <p id="nombres">{{ $asignacion->personal->nombres }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Carnet de identidad</label>
-                                                    <p id="ci">{{ $asignacion->personal->ci }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Fecha de nacimiento</label>
-                                                    <p id="fecha_nacimiento">{{ $asignacion->personal->fecha_nacimiento }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Teléfono</label>
-                                                    <p id="telefono">{{ $asignacion->personal->telefono }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Dirección</label>
-                                                    <p id="direccion">{{ $asignacion->personal->direccion }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Correo electrónico</label>
-                                                    <p id="email">{{ $asignacion->personal->usuario->email }}</p>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="">Profesion</label>
-                                                    <p id="profesion">{{ $asignacion->personal->profesion }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-
-
-
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
+        <!-- Perfil del Docente -->
+        <div class="col-md-5">
+            <div class="card card-outline card-info shadow-sm">
+                <div class="card-header bg-white">
+                    <h3 class="card-title text-bold"><i class="fas fa-user mr-1"></i> Docente Titular</h3>
                 </div>
+                <div class="card-body box-profile text-center">
+                    @php
+                        $foto = ($asignacion->personal && $asignacion->personal->foto && file_exists(public_path($asignacion->personal->foto)))
+                            ? asset($asignacion->personal->foto)
+                            : asset('vendor/adminlte/dist/img/avatar5.png');
+                    @endphp
+                    <img class="profile-user-img img-fluid img-circle shadow-sm mb-3" style="width: 130px; height: 130px; object-fit: cover;" src="{{ $foto }}" alt="Docente">
 
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card card-info">
-                        <div class="card-header">
-                            <h3 class="card-title">Formacion Academica</h3>
-                        </div>
+                    <h4 class="profile-username font-weight-bold mb-0">{{ optional($asignacion->personal)->apellidos }} {{ optional($asignacion->personal)->nombres }}</h4>
+                    <p class="text-muted">{{ optional($asignacion->personal)->profesion ?? 'Docente de Idiomas' }}</p>
 
-                        <div class="card-body">
-                            <table class="table table-bordered">
+                    <ul class="list-group list-group-unbordered text-left mb-3">
+                        <li class="list-group-item">
+                            <b><i class="fas fa-id-card text-muted mr-1"></i> CI:</b> <span class="float-right text-dark font-weight-bold">{{ optional($asignacion->personal)->ci }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b><i class="fas fa-phone text-muted mr-1"></i> Contacto:</b> <span class="float-right text-dark">{{ optional($asignacion->personal)->celular ?? optional($asignacion->personal)->telefono ?? 'S/N' }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b><i class="fas fa-envelope text-muted mr-1"></i> Correo:</b> <span class="float-right text-dark">{{ optional($asignacion->personal->usuario)->email ?? 'S/N' }}</span>
+                        </li>
+                        <li class="list-group-item">
+                            <b><i class="fas fa-map-marker-alt text-muted mr-1"></i> Dirección:</b> <span class="float-right text-dark">{{ optional($asignacion->personal)->direccion ?? 'S/N' }}</span>
+                        </li>
+                    </ul>
+
+                    <h6 class="text-bold text-secondary text-left mt-3"><i class="fas fa-graduation-cap mr-1"></i> Formación Académica:</h6>
+                    <div class="table-responsive text-left">
+                        @if($asignacion->personal && $asignacion->personal->formaciones && count($asignacion->personal->formaciones) > 0)
+                            <table class="table table-sm table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Titulo</th>
-                                        <th>Institucion</th>
+                                        <th>Título</th>
                                         <th>Nivel</th>
-                                        <th>Fecha Graduacion</th>
-                                        <th>Archivo</th>
+                                        <th>Institución</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($asignacion->personal->formaciones as $datos)
+                                    @foreach($asignacion->personal->formaciones as $f)
                                         <tr>
-                                            <td>{{ $datos->titulo }}</td>
-                                            <td>{{ $datos->institucion }}</td>
-                                            <td>{{ $datos->nivel }}</td>
-                                            <td>{{ $datos->fecha_graduacion }}</td>
-                                            <td>
-                                                <a href="{{ url($datos->archivo) }}" target="_blank">Ver archivo</a>
-                                            </td>
+                                            <td>{{ $f->titulo ?? $f->nombre }}</td>
+                                            <td><span class="badge badge-info">{{ $f->nivel }}</span></td>
+                                            <td>{{ $f->institucion }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
-
-                        </div>
-
+                        @else
+                            <p class="text-muted small">No registra formaciones añadidas.</p>
+                        @endif
                     </div>
                 </div>
             </div>
-
-
         </div>
 
-
-        <div class="col-md-4">
-
-            <div class="card card-info">
-                <div class="card-header">
-                    <h3 class="card-title">Datos del formulario</h3>
+        <!-- Información del Grupo y Estado -->
+        <div class="col-md-7">
+            <div class="card card-outline card-primary shadow-sm">
+                <div class="card-header bg-white">
+                    <h3 class="card-title text-bold"><i class="fas fa-layer-group mr-1"></i> Datos del Grupo Modular Asignado</h3>
+                    <div class="card-tools">
+                        @if(strtolower($asignacion->estado) === 'activo')
+                            <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle"></i> ACTIVO</span>
+                        @else
+                            <span class="badge badge-secondary px-2 py-1"><i class="fas fa-clock"></i> INACTIVO</span>
+                        @endif
+                    </div>
                 </div>
-
                 <div class="card-body">
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="">Turnos</label><b> (*)</b>
-                                <p>
-                                    {{ $asignacion->turno->nombre }}
-                                </p>
-                                @error('turno_id')
-                                    <small style="color: red">{{ $message }}</small>
-                                @enderror
-                            </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <label class="text-muted mb-0">Ciclo Bimestral</label>
+                            <h5 class="font-weight-bold text-primary">{{ optional($asignacion->paralelo->ciclo)->nombre ?? ($asignacion->gestion->nombre ?? 'N/A') }}</h5>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="">Gestiones</label><b> (*)</b>
-                                <p>
-                                    {{ $asignacion->gestion->nombre }}
-                                </p>
-                                @error('gestion_id')
-                                    <small style="color: red">{{ $message }}</small>
-                                @enderror
-                            </div>
+                        <div class="col-sm-6">
+                            <label class="text-muted mb-0">Idioma y Módulo</label>
+                            <h5 class="font-weight-bold">{{ optional(optional($asignacion->paralelo)->modulo)->idioma->nombre ?? 'Idioma' }} - {{ optional(optional($asignacion->paralelo)->modulo)->nombre ?? ($asignacion->materia->nombre ?? 'N/A') }}</h5>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="">Niveles</label><b> (*)</b>
-                                <p>
-                                    {{ $asignacion->nivel->nombre }}
-                                </p>
-                                @error('nivel_id')
-                                    <small style="color: red">{{ $message }}</small>
-                                @enderror
+
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <label class="text-muted mb-0">Modalidad</label>
+                            <div>
+                                @php
+                                    $esVirtual = strtoupper(optional($asignacion->paralelo)->modalidad) === 'VIRTUAL';
+                                @endphp
+                                @if($esVirtual)
+                                    <span class="badge badge-info px-2 py-1"><i class="fas fa-laptop mr-1"></i> Virtual</span>
+                                @else
+                                    <span class="badge badge-secondary px-2 py-1"><i class="fas fa-building mr-1"></i> Presencial</span>
+                                @endif
+                                <strong class="ml-2 font-weight-bold">Grupo {{ optional($asignacion->paralelo)->nombre }}</strong>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="">Fecha</label><b> (*)</b>
-                                <p>
-                                    {{ $asignacion->fecha_asignacion }}
-                                </p>
-                                @error('paralelo_id')
-                                    <small style="color: red">{{ $message }}</small>
-                                @enderror
+                        <div class="col-sm-6">
+                            <label class="text-muted mb-0">Turno y Horario</label>
+                            <div>
+                                <span class="badge badge-warning text-dark font-weight-bold">{{ optional($asignacion->paralelo)->turno }}</span>
+                                <span class="ml-2">{{ optional($asignacion->paralelo)->hora_inicio ? substr($asignacion->paralelo->hora_inicio,0,5) : '00:00' }} a {{ optional($asignacion->paralelo)->hora_fin ? substr($asignacion->paralelo->hora_fin,0,5) : '00:00' }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row">
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="">Grados</label><b> (*)</b>
-                                <p>
-                                    {{ $asignacion->grado->nombre }}
-                                </p>
-                                @error('grado_id')
-                                    <small style="color: red">{{ $message }}</small>
-                                @enderror
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <label class="text-muted mb-0">Aula Física o Enlace Virtual</label>
+                            <div>
+                                @if($esVirtual)
+                                    @if(optional($asignacion->paralelo)->aula_o_enlace)
+                                        <a href="{{ optional($asignacion->paralelo)->aula_o_enlace }}" target="_blank" class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-video mr-1"></i> Ir a la Clase Virtual
+                                        </a>
+                                    @else
+                                        <span class="text-muted">Sin enlace configurado</span>
+                                    @endif
+                                @else
+                                    <span class="badge badge-light border p-2"><i class="fas fa-door-open text-primary mr-1"></i> {{ optional($asignacion->paralelo)->aula_o_enlace ?? 'Aula General' }}</span>
+                                @endif
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="">Paralelos</label><b> (*)</b>
-                                <p>
-                                    {{ $asignacion->paralelo->nombre }}
-                                </p>
-                                @error('paralelo_id')
-                                    <small style="color: red">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="">Materia a impartir</label><b> (*)</b>
-                                <p>{{ $asignacion->materia->nombre }}</p>
-                                @error('materia_id')
-                                    <small style="color: red">{{ $message }}</small>
-                                @enderror
+                        <div class="col-sm-6">
+                            <label class="text-muted mb-0">Fecha de Asignación</label>
+                            <div class="font-weight-bold">
+                                <i class="far fa-calendar-alt text-muted mr-1"></i> {{ $asignacion->fecha_asignacion }}
                             </div>
                         </div>
                     </div>
 
-                    <hr>
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <a href="{{ url('/admin/asignaciones') }}" class="btn btn-default">
-                                    <i class="fas fa-arrow-left"></i> Volver
-                                </a>
-
+                    <div class="row mb-3">
+                        <div class="col-sm-6">
+                            <label class="text-muted mb-0">Cupo del Grupo</label>
+                            <div class="progress progress-sm mt-1">
+                                @php
+                                    $cupoMax = optional($asignacion->paralelo)->cupo_maximo ?? 30;
+                                    $cupoOcup = optional($asignacion->paralelo)->cupo_ocupado ?? 0;
+                                    $porcentaje = $cupoMax > 0 ? round(($cupoOcup / $cupoMax) * 100) : 0;
+                                @endphp
+                                <div class="progress-bar bg-success" style="width: {{ $porcentaje }}%"></div>
                             </div>
+                            <small class="text-muted">{{ $cupoOcup }} de {{ $cupoMax }} plazas ocupadas ({{ $porcentaje }}%)</small>
                         </div>
                     </div>
-
-
-
-
+                </div>
+                <div class="card-footer bg-white text-right">
+                    <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver al Listado
+                    </a>
+                    <a href="{{ route('admin.asignaciones.edit', $asignacion->id) }}" class="btn btn-warning font-weight-bold">
+                        <i class="fas fa-pencil-alt mr-1"></i> Editar Asignación
+                    </a>
                 </div>
             </div>
         </div>
-</div> @stop
-@section('css')
-    <style>
-        .select2-container .select2-selection--single {
-            height: 40px !important;
-        }
-    </style>
-@stop
-
-@section('js')
-    <script>
-        $('.select2').select2({});
-
-        $('#niveles').on('change', function() {
-            var id = $(this).val();
-            if (id) {
-                $.ajax({
-                    url: "{{ url('/admin/matriculaciones/buscar_grado/') }}" + '/' + id,
-                    type: 'GET',
-                    success: function(grados) {
-                        var options = '<option value="">Seleccione un grado...</option>';
-                        $.each(grados, function(key, value) {
-                            options += '<option value="' + key + '">' + value + '</option>';
-                        });
-                        $('#grados').html(options);
-                    },
-                    error: function() {
-                        alert('No se puede obtener información del nivel');
-                    }
-                });
-            } else {
-                alert('Seleccione un nivel...');
-            }
-        });
-
-        $('#grados').on('change', function() {
-            var id = $(this).val();
-            if (id) {
-                $.ajax({
-                    url: "{{ url('/admin/matriculaciones/buscar_paralelo/') }}" + '/' + id,
-                    type: 'GET',
-                    success: function(paralelos) {
-                        var options = '<option value="">Seleccione un paralelo...</option>';
-                        $.each(paralelos, function(key, value) {
-                            options += '<option value="' + key + '">' + value + '</option>';
-                        });
-                        $('#paralelos').html(options);
-                    },
-                    error: function() {
-                        alert('No se puede obtener información del grado');
-                    }
-                });
-            } else {
-                alert('Seleccione un nivel...');
-            }
-        });
-
-        $('#buscar_estudiante').on('change', function() {
-            var id = $(this).val();
-
-            if (id) {
-                $.ajax({
-                    url: "{{ url('/admin/matriculaciones/buscar_estudiante/') }}" + '/' + id,
-                    type: 'GET',
-                    success: function(estudiante) {
-                        $('#apellidos').html(estudiante.apellidos);
-                        $('#nombres').html(estudiante.nombres);
-                        $('#ci').html(estudiante.ci);
-                        $('#fecha_nacimiento').html(estudiante.fecha_nacimiento);
-                        $('#telefono').html(estudiante.telefono);
-                        $('#direccion').html(estudiante.direccion);
-                        $('#email').html(estudiante.usuario.email);
-                        $('#genero').html(estudiante.genero);
-                        $('#foto').attr('src', estudiante.foto_url).show();
-                        $('#estudiante_id').val(estudiante.id);
-                        $('#datos_estudiante').css('display', 'block');
-                        if (estudiante.matriculaciones && estudiante.matriculaciones.length > 0) {
-                            var tabla = '<table class="table table-bordered">';
-                            tabla +=
-                                '<thead><tr><th>Turno</th><th>Gestión</th><th>Nivel</th><th>Grado</th><th>Paralelo</th></tr></thead>';
-                            tabla += '<tbody>';
-                            estudiante.matriculaciones.forEach(function(matriculacion) {
-                                tabla += '<tr>';
-                                tabla += '<td>' + matriculacion.turno.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.gestion.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.nivel.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.grado.nombre + '</td>';
-                                tabla += '<td>' + matriculacion.paralelo.nombre + '</td>';
-                                tabla += '</tr>';
-                            });
-                            $('#tabla_historial').html(tabla).show();
-                        } else {
-                            $('#tabla_historial').html(
-                                '<p>No hay historial académico registrado del estudiante.</p>');
-                        }
-                    },
-                    error: function() {
-                        alert('No se puede obtener información del estudiante');
-                    }
-                });
-            } else {
-
-            }
-        });
-    </script>
+    </div>
+</div>
 @stop

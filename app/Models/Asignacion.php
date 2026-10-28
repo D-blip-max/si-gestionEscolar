@@ -6,11 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class Asignacion extends Model
 {
-    //
+    protected $table = 'asignacions';
+
+    protected $fillable = [
+        'personal_id',
+        'paralelo_id',
+        'fecha_asignacion',
+        'estado',
+        'gestion_id',
+        'nivel_id',
+        'grado_id',
+        'materia_id',
+        'turno_id',
+    ];
 
     public function personal()
     {
-        return $this->belongsTo(Personal::class);
+        return $this->belongsTo(Personal::class, 'personal_id');
+    }
+
+    public function docente()
+    {
+        return $this->belongsTo(Personal::class, 'personal_id');
+    }
+
+    public function paralelo()
+    {
+        return $this->belongsTo(Paralelo::class, 'paralelo_id');
     }
 
     public function turno()
@@ -33,15 +55,11 @@ class Asignacion extends Model
         return $this->belongsTo(Grado::class);
     }
 
-    public function paralelo()
-    {
-        return $this->belongsTo(Paralelo::class);
-    }
-
     public function materia()
     {
         return $this->belongsTo(Materia::class);
     }
+
     public function asistencias()
     {
         return $this->hasMany(Asistencia::class);
