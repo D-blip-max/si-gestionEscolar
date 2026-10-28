@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Helper para crear u obtener un usuario sin recalcular bcrypt si ya existe
+     * Crear u obtener usuario sin recalcular bcrypt si ya existe
      */
     private function getOrCreateUser(string $email, string $name, string $rawPassword, string $roleName): User
     {
@@ -45,9 +45,9 @@ class DatabaseSeeder extends Seeder
     }
 
     /**
-     * Helper para matricular y asentar calificación en el seeder
+     * Registrar boleta, inscripción y calificación manteniendo integridad referencial y cupo
      */
-    private function registrarMatriculaSemestral(
+    private function registrarMatricula(
         Estudiante $est,
         Modulo $modulo,
         Paralelo $paralelo,
@@ -67,7 +67,7 @@ class DatabaseSeeder extends Seeder
                 'banco_entidad'  => $banco,
                 'fecha_deposito' => $fechaDeposito,
                 'monto'          => 350.00,
-                'concepto'       => 'Matrícula ' . $modulo->nombre . ' - Inglés CEI',
+                'concepto'       => 'Matrícula ' . $modulo->nombre,
                 'estado'         => 'UTILIZADA',
                 'registrado_por' => $adminId,
             ]
@@ -105,12 +105,26 @@ class DatabaseSeeder extends Seeder
     }
 
     /**
-     * Seed the application's database — Simulación Completa 1er Semestre 2026 (CEI - UAGRM).
+     * Seed the application's database — Integridad Completa 2025 y 1er Semestre 2026 (CEI - UAGRM).
      */
     public function run(): void
     {
         // 1. Matriz de Roles y Permisos RBAC
         $this->call(RoleSeeder::class);
+
+        // Si la base de datos aún tiene solo los 5 alumnos de prueba iniciales (< 110),
+        // limpiar paralelos, boletas e inscripciones previas para poblar el semestre completo sin duplicados
+        if (Estudiante::count() < 110) {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+            AuditoriaCalificacion::truncate();
+            Calificacion::truncate();
+            Inscripcion::truncate();
+            BoletaPago::truncate();
+            Asignacion::truncate();
+            Paralelo::truncate();
+            CicloBimestral::truncate();
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
 
         DB::transaction(function () {
             // 2. Superadministrador Principal
@@ -130,7 +144,7 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
 
-            // 4. Catálogo de Idiomas
+            // 4. Catálogo de Idiomas (Inglés, Guaraní y Francés)
             $ingles = Idioma::firstOrCreate(['codigo' => 'ENG'], [
                 'nombre'      => 'Inglés',
                 'descripcion' => 'Programa modular de Lengua Inglesa (Módulos 1 al 9: Básico, Intermedio y Avanzado)',
@@ -149,36 +163,36 @@ class DatabaseSeeder extends Seeder
                 'estado'      => 'ACTIVO',
             ]);
 
-            // 5. Cronología de Ciclos Bimestrales — 1er Semestre 2026
-            $ciclo1 = CicloBimestral::updateOrCreate(['nombre' => 'Bimestre I - 2026 (Ene-Feb)'], [
-                'gestion'      => 2026,
-                'fecha_inicio' => '2026-01-05',
-                'fecha_fin'    => '2026-02-28',
-                'estado'       => 'CERRADO',
-            ]);
+            // 5. Los 10 Ciclos Bimestrales (6 de 2025 + 3 del 1er Semestre 2026 + 1 Futuro)
+            // Permiten que un alumno de Módulo 9 tenga sus 9 bimestres históricos completos sin huecos
+            $ciclosDef = [
+                1  => ['nombre' => 'Bimestre I - 2025 (Ene-Feb)',   'gestion' => 2025, 'inicio' => '2025-01-06', 'fin' => '2025-02-28', 'estado' => 'CERRADO'],
+                2  => ['nombre' => 'Bimestre II - 2025 (Mar-Abr)',  'gestion' => 2025, 'inicio' => '2025-03-03', 'fin' => '2025-04-30', 'estado' => 'CERRADO'],
+                3  => ['nombre' => 'Bimestre III - 2025 (May-Jun)', 'gestion' => 2025, 'inicio' => '2025-05-05', 'fin' => '2025-06-30', 'estado' => 'CERRADO'],
+                4  => ['nombre' => 'Bimestre IV - 2025 (Jul-Ago)',  'gestion' => 2025, 'inicio' => '2025-07-07', 'fin' => '2025-08-30', 'estado' => 'CERRADO'],
+                5  => ['nombre' => 'Bimestre V - 2025 (Sep-Oct)',   'gestion' => 2025, 'inicio' => '2025-09-01', 'fin' => '2025-10-31', 'estado' => 'CERRADO'],
+                6  => ['nombre' => 'Bimestre VI - 2025 (Nov-Dic)',  'gestion' => 2025, 'inicio' => '2025-11-03', 'fin' => '2025-12-20', 'estado' => 'CERRADO'],
+                7  => ['nombre' => 'Bimestre I - 2026 (Ene-Feb)',   'gestion' => 2026, 'inicio' => '2026-01-05', 'fin' => '2026-02-28', 'estado' => 'CERRADO'],
+                8  => ['nombre' => 'Bimestre II - 2026 (Mar-Abr)',  'gestion' => 2026, 'inicio' => '2026-03-02', 'fin' => '2026-04-30', 'estado' => 'CERRADO'],
+                9  => ['nombre' => 'Bimestre III - 2026 (May-Jun)', 'gestion' => 2026, 'inicio' => '2026-05-04', 'fin' => '2026-06-30', 'estado' => 'ACTIVO'],
+                10 => ['nombre' => 'Bimestre IV - 2026 (Jul-Ago)',  'gestion' => 2026, 'inicio' => '2026-07-06', 'fin' => '2026-08-31', 'estado' => 'FUTURO'],
+            ];
 
-            $ciclo2 = CicloBimestral::updateOrCreate(['nombre' => 'Bimestre II - 2026 (Mar-Abr)'], [
-                'gestion'      => 2026,
-                'fecha_inicio' => '2026-03-02',
-                'fecha_fin'    => '2026-04-30',
-                'estado'       => 'CERRADO',
-            ]);
+            $ciclos = [];
+            foreach ($ciclosDef as $orden => $cData) {
+                $ciclos[$orden] = CicloBimestral::updateOrCreate(
+                    ['nombre' => $cData['nombre']],
+                    [
+                        'gestion'      => $cData['gestion'],
+                        'fecha_inicio' => $cData['inicio'],
+                        'fecha_fin'    => $cData['fin'],
+                        'estado'       => $cData['estado'],
+                    ]
+                );
+            }
 
-            $ciclo3 = CicloBimestral::updateOrCreate(['nombre' => 'Bimestre III - 2026 (May-Jun)'], [
-                'gestion'      => 2026,
-                'fecha_inicio' => '2026-05-04',
-                'fecha_fin'    => '2026-06-30',
-                'estado'       => 'ACTIVO',
-            ]);
-
-            CicloBimestral::updateOrCreate(['nombre' => 'Bimestre IV - 2026 (Jul-Ago)'], [
-                'gestion'      => 2026,
-                'fecha_inicio' => '2026-07-06',
-                'fecha_fin'    => '2026-08-31',
-                'estado'       => 'FUTURO',
-            ]);
-
-            // 6. Módulos 1 al 9 de Inglés (con correlatividades y reglas de graduación en Mód. 8 y 9)
+            // 6. Módulos Curriculares por Idioma
+            // 6.1 Inglés: Módulos 1 al 9
             $modulosIngles = [];
             $prevId = null;
             for ($i = 1; $i <= 9; $i++) {
@@ -198,26 +212,43 @@ class DatabaseSeeder extends Seeder
                 $prevId = $mod->id;
             }
 
-            // Módulos básicos de Guaraní y Francés para enriquecer el catálogo
+            // 6.2 Guaraní: Módulos 1 al 4
+            $modulosGuarani = [];
             $prevGua = null;
             for ($i = 1; $i <= 4; $i++) {
-                $mg = Modulo::firstOrCreate(
+                $mg = Modulo::updateOrCreate(
                     ['idioma_id' => $guarani->id, 'numero_orden' => $i],
-                    ['nombre' => "Guaraní Módulo {$i}", 'nivel' => 'BASICO', 'duracion_meses' => 2, 'prerrequisito_id' => $prevGua, 'es_modulo_graduacion' => false]
+                    [
+                        'nombre'               => "Guaraní Módulo {$i}",
+                        'nivel'                => 'BASICO',
+                        'duracion_meses'       => 2,
+                        'prerrequisito_id'     => $prevGua,
+                        'es_modulo_graduacion' => false,
+                    ]
                 );
+                $modulosGuarani[$i] = $mg;
                 $prevGua = $mg->id;
             }
 
+            // 6.3 Francés: Módulos 1 al 4
+            $modulosFrances = [];
             $prevFra = null;
             for ($i = 1; $i <= 4; $i++) {
-                $mf = Modulo::firstOrCreate(
+                $mf = Modulo::updateOrCreate(
                     ['idioma_id' => $frances->id, 'numero_orden' => $i],
-                    ['nombre' => "Francés Módulo {$i}", 'nivel' => 'BASICO', 'duracion_meses' => 2, 'prerrequisito_id' => $prevFra, 'es_modulo_graduacion' => false]
+                    [
+                        'nombre'               => "Francés Módulo {$i}",
+                        'nivel'                => 'BASICO',
+                        'duracion_meses'       => 2,
+                        'prerrequisito_id'     => $prevFra,
+                        'es_modulo_graduacion' => false,
+                    ]
                 );
+                $modulosFrances[$i] = $mf;
                 $prevFra = $mf->id;
             }
 
-            // 7. Personal Administrativo Institucional (Contraseña = CI)
+            // 7. Personal Administrativo (5 cuentas con Contraseña = CI)
             $adminStaff = [
                 ['email' => 'juan.mendoza@cei.com', 'nombres' => 'Juan', 'apellidos' => 'Mendoza', 'ci' => '87654321', 'rol' => 'DIRECTOR/A GENERAL', 'fnac' => '1985-05-15', 'dir' => 'Av. Libertad 123', 'tel' => '76543210', 'prof' => 'Lic. en Lingüística y Gestión Educativa'],
                 ['email' => 'carlos.rojas@cei.com', 'nombres' => 'Carlos', 'apellidos' => 'Rojas', 'ci' => '76543210', 'rol' => 'DIRECTOR/A ACADÉMICO', 'fnac' => '1978-11-22', 'dir' => 'Calle Junín 456', 'tel' => '65432109', 'prof' => 'Magíster en Educación Superior'],
@@ -241,52 +272,58 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
 
-            // 8. Plantel Docente Titular (9 Docentes — 1 por cada Nivel 1 al 9, Contraseña = CI)
+            // 8. Plantel Docente Titular (11 Docentes: 9 de Inglés, 1 de Guaraní, 1 de Francés — Contraseña = CI)
             $docentesData = [
-                1 => ['email' => 'maria.fernandez@cei.com', 'nombres' => 'María', 'apellidos' => 'Fernández', 'ci' => '24680246', 'tel' => '79123456', 'prof' => 'Lic. en Lengua Inglesa y Fonética', 'titulo' => 'Licenciatura en Lenguas Modernas', 'inst' => 'UAGRM - Facultad de Humanidades'],
-                2 => ['email' => 'carlos.rios@cei.com', 'nombres' => 'Carlos', 'apellidos' => 'Ríos', 'ci' => '97531975', 'tel' => '71234567', 'prof' => 'Certificado C2 Cambridge / Docente Titular', 'titulo' => 'Cambridge English Proficiency (CPE - C2)', 'inst' => 'University of Cambridge Assessment'],
-                3 => ['email' => 'elena.vargas@cei.com', 'nombres' => 'Elena', 'apellidos' => 'Vargas', 'ci' => '3841201', 'tel' => '72145601', 'prof' => 'Magíster en Enseñanza del Inglés (TESOL)', 'titulo' => 'Master of Arts in TESOL', 'inst' => 'Universidad Autónoma Gabriel René Moreno'],
-                4 => ['email' => 'roberto.salazar@cei.com', 'nombres' => 'Roberto', 'apellidos' => 'Salazar', 'ci' => '3841202', 'tel' => '72145602', 'prof' => 'Lic. en Filología y Traducción', 'titulo' => 'Diplomado en Educación Superior Basada en Competencias', 'inst' => 'Escuela de Postgrado UAGRM'],
-                5 => ['email' => 'patricia.montero@cei.com', 'nombres' => 'Patricia', 'apellidos' => 'Montero', 'ci' => '3841203', 'tel' => '72145603', 'prof' => 'Especialista en Inglés Académico (IELTS C1)', 'titulo' => 'Certificación Internacional IELTS Band 8.5', 'inst' => 'British Council Internacional'],
-                6 => ['email' => 'diego.arnez@cei.com', 'nombres' => 'Diego', 'apellidos' => 'Arnez', 'ci' => '3841204', 'tel' => '72145604', 'prof' => 'Lic. en Lingüística Aplicada', 'titulo' => 'Licenciatura en Ciencias del Lenguaje', 'inst' => 'UAGRM - Facultad de Humanidades'],
-                7 => ['email' => 'lucia.camacho@cei.com', 'nombres' => 'Lucía', 'apellidos' => 'Camacho', 'ci' => '3841205', 'tel' => '72145605', 'prof' => 'Magíster en Lingüística Inglesa', 'titulo' => 'TOEFL iBT C2 International Certification', 'inst' => 'ETS Educational Testing Service'],
-                8 => ['email' => 'fernando.justiniano@cei.com', 'nombres' => 'Fernando', 'apellidos' => 'Justiniano', 'ci' => '3841206', 'tel' => '72145606', 'prof' => 'Docente Evaluador de Grado Intermedio', 'titulo' => 'Especialidad en Evaluación de Competencias Lingüísticas', 'inst' => 'Postgrado Humanidades UAGRM'],
-                9 => ['email' => 'claudia.banzer@cei.com', 'nombres' => 'Claudia', 'apellidos' => 'Bánzer', 'ci' => '3841207', 'tel' => '72145607', 'prof' => 'Doctora en Filología Inglesa y Suficiencia', 'titulo' => 'Doctorado en Lingüística Aplicada y Traducción', 'inst' => 'Universidad Complutense / Convenio UAGRM'],
+                1  => ['email' => 'maria.fernandez@cei.com', 'nombres' => 'María', 'apellidos' => 'Fernández', 'ci' => '24680246', 'tel' => '79123456', 'prof' => 'Lic. en Lengua Inglesa y Fonética', 'titulo1' => 'Licenciatura en Lenguas Modernas', 'inst1' => 'UAGRM - Facultad de Humanidades', 'titulo2' => 'Diplomado en Metodología Comunicativa', 'inst2' => 'Escuela de Postgrado UAGRM'],
+                2  => ['email' => 'carlos.rios@cei.com', 'nombres' => 'Carlos', 'apellidos' => 'Ríos', 'ci' => '97531975', 'tel' => '71234567', 'prof' => 'Certificado C2 Cambridge / Docente Titular', 'titulo1' => 'Cambridge English Proficiency (CPE - C2)', 'inst1' => 'University of Cambridge Assessment', 'titulo2' => 'Licenciatura en Filología Hispano-Inglesa', 'inst2' => 'UAGRM - Facultad de Humanidades'],
+                3  => ['email' => 'elena.vargas@cei.com', 'nombres' => 'Elena', 'apellidos' => 'Vargas', 'ci' => '3841201', 'tel' => '72145601', 'prof' => 'Magíster en Enseñanza del Inglés (TESOL)', 'titulo1' => 'Master of Arts in TESOL', 'inst1' => 'Universidad Autónoma Gabriel René Moreno', 'titulo2' => 'Certificación Internacional TKT Modules 1-3', 'inst2' => 'Cambridge English'],
+                4  => ['email' => 'roberto.salazar@cei.com', 'nombres' => 'Roberto', 'apellidos' => 'Salazar', 'ci' => '3841202', 'tel' => '72145602', 'prof' => 'Lic. en Filología y Traducción', 'titulo1' => 'Licenciatura en Traducción e Interpretación', 'inst1' => 'UAGRM', 'titulo2' => 'Diplomado en Educación Superior Basada en Competencias', 'inst2' => 'Escuela de Postgrado UAGRM'],
+                5  => ['email' => 'patricia.montero@cei.com', 'nombres' => 'Patricia', 'apellidos' => 'Montero', 'ci' => '3841203', 'tel' => '72145603', 'prof' => 'Especialista en Inglés Académico (IELTS C1)', 'titulo1' => 'Certificación Internacional IELTS Band 8.5', 'inst1' => 'British Council Internacional', 'titulo2' => 'Especialidad en Entornos Virtuales de Aprendizaje', 'inst2' => 'Postgrado UAGRM'],
+                6  => ['email' => 'diego.arnez@cei.com', 'nombres' => 'Diego', 'apellidos' => 'Arnez', 'ci' => '3841204', 'tel' => '72145604', 'prof' => 'Lic. en Lingüística Aplicada', 'titulo1' => 'Licenciatura en Ciencias del Lenguaje', 'inst1' => 'UAGRM - Facultad de Humanidades', 'titulo2' => 'Michigan ECPE C2 Proficiency', 'inst2' => 'University of Michigan Assessment'],
+                7  => ['email' => 'lucia.camacho@cei.com', 'nombres' => 'Lucía', 'apellidos' => 'Camacho', 'ci' => '3841205', 'tel' => '72145605', 'prof' => 'Magíster en Lingüística Inglesa', 'titulo1' => 'TOEFL iBT C2 International Certification', 'inst1' => 'ETS Educational Testing Service', 'titulo2' => 'Maestría en Educación Superior Universitaria', 'inst2' => 'Postgrado UAGRM'],
+                8  => ['email' => 'fernando.justiniano@cei.com', 'nombres' => 'Fernando', 'apellidos' => 'Justiniano', 'ci' => '3841206', 'tel' => '72145606', 'prof' => 'Docente Evaluador de Grado Intermedio', 'titulo1' => 'Especialidad en Evaluación de Competencias Lingüísticas', 'inst1' => 'Postgrado Humanidades UAGRM', 'titulo2' => 'Licenciatura en Lenguas Modernas', 'inst2' => 'UAGRM'],
+                9  => ['email' => 'claudia.banzer@cei.com', 'nombres' => 'Claudia', 'apellidos' => 'Bánzer', 'ci' => '3841207', 'tel' => '72145607', 'prof' => 'Doctora en Filología Inglesa y Suficiencia', 'titulo1' => 'Doctorado en Lingüística Aplicada y Traducción', 'inst1' => 'Universidad Complutense / Convenio UAGRM', 'titulo2' => 'Examinadora Oficial Internacional C1/C2', 'inst2' => 'Cambridge Assessment'],
+                10 => ['email' => 'arandu.karai@cei.com', 'nombres' => 'Arandú', 'apellidos' => 'Karai Guasú', 'ci' => '3841208', 'tel' => '72145608', 'prof' => 'Lic. en Lengua y Cultura Guaraní', 'titulo1' => 'Licenciatura en Educación Intercultural Bilingüe', 'inst1' => 'UAGRM - Camiri / Humanidades', 'titulo2' => 'Especialista en Gramática Guaraní Contemporánea', 'inst2' => 'ILC Nación Guaraní'],
+                11 => ['email' => 'sophie.laurent@cei.com', 'nombres' => 'Sophie', 'apellidos' => 'Laurent Ribera', 'ci' => '3841209', 'tel' => '72145609', 'prof' => 'Especialista DALF C2 en Lengua Francesa', 'titulo1' => 'Diplôme Approfondi de Langue Française (DALF C2)', 'inst1' => 'Alliance Française / Ministère de l’Éducation', 'titulo2' => 'Licenciatura en Lenguas Modernas (Mención Francés)', 'inst2' => 'UAGRM - Facultad de Humanidades'],
             ];
 
-            $docentesPorNivel = [];
-            foreach ($docentesData as $nivel => $d) {
+            $docentes = [];
+            foreach ($docentesData as $key => $d) {
                 $uDoc = $this->getOrCreateUser($d['email'], "{$d['nombres']} {$d['apellidos']}", $d['ci'], 'DOCENTE');
                 $pDoc = Personal::updateOrCreate(['ci' => $d['ci']], [
                     'user_id'          => $uDoc->id,
                     'tipo'             => 'docente',
                     'nombres'          => $d['nombres'],
                     'apellidos'        => $d['apellidos'],
-                    'fecha_nacimiento' => '1982-04-1' . $nivel,
-                    'direccion'        => 'Av. Busch y 2do Anillo - Santa Cruz',
+                    'fecha_nacimiento' => sprintf('198%d-0%d-15', ($key % 8) + 1, ($key % 8) + 1),
+                    'direccion'        => 'Av. Busch y 2do Anillo - Ciudad Universitaria',
                     'telefono'         => $d['tel'],
                     'profesion'        => $d['prof'],
                     'foto'             => 'img/default-avatar.png',
                 ]);
-                $docentesPorNivel[$nivel] = $pDoc;
+                $docentes[$key] = $pDoc;
 
                 Formacion::firstOrCreate(
-                    ['personal_id' => $pDoc->id, 'titulo' => $d['titulo']],
+                    ['personal_id' => $pDoc->id, 'titulo' => $d['titulo1']],
                     [
-                        'institucion'      => $d['inst'],
-                        'nivel'            => ($nivel >= 7) ? 'Postgrado / Maestría' : 'Licenciatura / Certificación',
-                        'fecha_graduacion' => '2020-11-15',
+                        'institucion'      => $d['inst1'],
+                        'nivel'            => 'Licenciatura / Certificación Internacional',
+                        'fecha_graduacion' => '2018-10-20',
+                        'archivo'          => 'img/logo_cei.png',
+                    ]
+                );
+                Formacion::firstOrCreate(
+                    ['personal_id' => $pDoc->id, 'titulo' => $d['titulo2']],
+                    [
+                        'institucion'      => $d['inst2'],
+                        'nivel'            => 'Postgrado / Especialidad',
+                        'fecha_graduacion' => '2022-11-15',
                         'archivo'          => 'img/logo_cei.png',
                     ]
                 );
             }
 
-            // 9. Paralelos Históricos (Bimestre I y Bimestre II) y Activos (Bimestre III - 2026)
-            $paralelosBim1 = [];
-            $paralelosBim2 = [];
-            $paralelosBim3Presencial = [];
-            $paralelosBim3Virtual = [];
-
+            // 9. Creación de Paralelos y Asignaciones Docentes para los Ciclos 1..8 (Históricos) y Ciclo 9 (Activo: Bimestre III - 2026)
             $turnos = ['MAÑANA', 'TARDE', 'NOCHE'];
             $horarios = [
                 'MAÑANA' => ['07:30:00', '09:30:00'],
@@ -294,56 +331,52 @@ class DatabaseSeeder extends Seeder
                 'NOCHE'  => ['19:00:00', '21:00:00'],
             ];
 
-            for ($i = 1; $i <= 9; $i++) {
-                $mod = $modulosIngles[$i];
-                $docente = $docentesPorNivel[$i];
-                $turnoP = $turnos[($i - 1) % 3];
-                $turnoV = $turnos[$i % 3];
+            // $paralelosHist[$cicloIdx][$moduloOrden] => Paralelo
+            $paralelosHist = [];
+            for ($cIdx = 1; $cIdx <= 8; $cIdx++) {
+                $cicloObj = $ciclos[$cIdx];
+                for ($mIdx = 1; $mIdx <= 8; $mIdx++) {
+                    // Solo necesitamos crear los paralelos históricos que realmente se cursan en la matriz diagonal
+                    $modObj = $modulosIngles[$mIdx];
+                    $docObj = $docentes[$mIdx];
+                    $turno = $turnos[($cIdx + $mIdx) % 3];
+                    $esVirtual = (($cIdx + $mIdx) % 2 === 0);
 
-                // Paralelo histórico Bimestre I (Ene-Feb 2026)
-                $p1 = Paralelo::firstOrCreate(
-                    ['nombre' => "G{$i}-A (Bim I)", 'ciclo_id' => $ciclo1->id, 'modulo_id' => $mod->id],
-                    [
-                        'modalidad'     => ($i % 2 == 1) ? 'PRESENCIAL' : 'VIRTUAL',
-                        'aula_o_enlace' => ($i % 2 == 1) ? "Aula 10{$i} - Pabellón CEI" : "https://meet.google.com/cei-bim1-mod{$i}",
-                        'turno'         => $turnoP,
-                        'hora_inicio'   => $horarios[$turnoP][0],
-                        'hora_fin'      => $horarios[$turnoP][1],
-                        'cupo_maximo'   => 30,
-                        'cupo_ocupado'  => 0,
-                    ]
-                );
-                Asignacion::firstOrCreate(
-                    ['personal_id' => $docente->id, 'paralelo_id' => $p1->id],
-                    ['fecha_asignacion' => '2026-01-05', 'estado' => 'activo']
-                );
-                $paralelosBim1[$i] = $p1;
+                    $pHist = Paralelo::firstOrCreate(
+                        ['nombre' => "G{$mIdx}-C{$cIdx}", 'ciclo_id' => $cicloObj->id, 'modulo_id' => $modObj->id],
+                        [
+                            'modalidad'     => $esVirtual ? 'VIRTUAL' : 'PRESENCIAL',
+                            'aula_o_enlace' => $esVirtual ? "https://meet.google.com/cei-c{$cIdx}-m{$mIdx}" : "Aula 20{$mIdx} - Pabellón CEI",
+                            'turno'         => $turno,
+                            'hora_inicio'   => $horarios[$turno][0],
+                            'hora_fin'      => $horarios[$turno][1],
+                            'cupo_maximo'   => 30,
+                            'cupo_ocupado'  => 0,
+                        ]
+                    );
+                    Asignacion::firstOrCreate(
+                        ['personal_id' => $docObj->id, 'paralelo_id' => $pHist->id],
+                        ['fecha_asignacion' => $cicloObj->fecha_inicio, 'estado' => 'activo']
+                    );
+                    $paralelosHist[$cIdx][$mIdx] = $pHist;
+                }
+            }
 
-                // Paralelo histórico Bimestre II (Mar-Abr 2026)
-                $p2 = Paralelo::firstOrCreate(
-                    ['nombre' => "G{$i}-A (Bim II)", 'ciclo_id' => $ciclo2->id, 'modulo_id' => $mod->id],
-                    [
-                        'modalidad'     => ($i % 2 == 0) ? 'PRESENCIAL' : 'VIRTUAL',
-                        'aula_o_enlace' => ($i % 2 == 0) ? "Aula 20{$i} - Pabellón CEI" : "https://meet.google.com/cei-bim2-mod{$i}",
-                        'turno'         => $turnoV,
-                        'hora_inicio'   => $horarios[$turnoV][0],
-                        'hora_fin'      => $horarios[$turnoV][1],
-                        'cupo_maximo'   => 30,
-                        'cupo_ocupado'  => 0,
-                    ]
-                );
-                Asignacion::firstOrCreate(
-                    ['personal_id' => $docente->id, 'paralelo_id' => $p2->id],
-                    ['fecha_asignacion' => '2026-03-02', 'estado' => 'activo']
-                );
-                $paralelosBim2[$i] = $p2;
+            // Paralelos Activos en Ciclo 9 (Bimestre III - 2026 May-Jun): 2 por cada nivel de Inglés (1 Presencial y 1 Virtual)
+            $paralelosActivosPres = [];
+            $paralelosActivosVirt = [];
+            $cicloActivo = $ciclos[9];
 
-                // Paralelos Activos Bimestre III (May-Jun 2026): 1 Presencial y 1 Virtual por cada Nivel 1..9
-                $p3Pres = Paralelo::firstOrCreate(
-                    ['nombre' => "M{$i}-P1 Presencial", 'ciclo_id' => $ciclo3->id, 'modulo_id' => $mod->id],
+            for ($mIdx = 1; $mIdx <= 9; $mIdx++) {
+                $modObj = $modulosIngles[$mIdx];
+                $docObj = $docentes[$mIdx];
+                $turnoP = $turnos[($mIdx - 1) % 3];
+
+                $pPres = Paralelo::firstOrCreate(
+                    ['nombre' => "M{$mIdx}-P1 Presencial", 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modObj->id],
                     [
                         'modalidad'     => 'PRESENCIAL',
-                        'aula_o_enlace' => "Aula 30{$i} - Campus UAGRM",
+                        'aula_o_enlace' => "Aula 30{$mIdx} - Campus UAGRM",
                         'turno'         => $turnoP,
                         'hora_inicio'   => $horarios[$turnoP][0],
                         'hora_fin'      => $horarios[$turnoP][1],
@@ -352,16 +385,16 @@ class DatabaseSeeder extends Seeder
                     ]
                 );
                 Asignacion::firstOrCreate(
-                    ['personal_id' => $docente->id, 'paralelo_id' => $p3Pres->id],
-                    ['fecha_asignacion' => '2026-05-04', 'estado' => 'activo']
+                    ['personal_id' => $docObj->id, 'paralelo_id' => $pPres->id],
+                    ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']
                 );
-                $paralelosBim3Presencial[$i] = $p3Pres;
+                $paralelosActivosPres[$mIdx] = $pPres;
 
-                $p3Virt = Paralelo::firstOrCreate(
-                    ['nombre' => "M{$i}-V1 Virtual", 'ciclo_id' => $ciclo3->id, 'modulo_id' => $mod->id],
+                $pVirt = Paralelo::firstOrCreate(
+                    ['nombre' => "M{$mIdx}-V1 Virtual", 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modObj->id],
                     [
                         'modalidad'     => 'VIRTUAL',
-                        'aula_o_enlace' => "https://meet.google.com/cei-uagrm-mod{$i}",
+                        'aula_o_enlace' => "https://meet.google.com/cei-uagrm-mod{$mIdx}",
                         'turno'         => 'NOCHE',
                         'hora_inicio'   => '19:00:00',
                         'hora_fin'      => '21:00:00',
@@ -370,29 +403,58 @@ class DatabaseSeeder extends Seeder
                     ]
                 );
                 Asignacion::firstOrCreate(
-                    ['personal_id' => $docente->id, 'paralelo_id' => $p3Virt->id],
-                    ['fecha_asignacion' => '2026-05-04', 'estado' => 'activo']
+                    ['personal_id' => $docObj->id, 'paralelo_id' => $pVirt->id],
+                    ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']
                 );
-                $paralelosBim3Virtual[$i] = $p3Virt;
+                $paralelosActivosVirt[$mIdx] = $pVirt;
             }
 
-            // 10. Población de 90 Estudiantes (10 por cada Nivel del 1 al 9)
+            // Paralelos de Guaraní y Francés (Histórico Bim II y Activos Bim III)
+            $parGuaHist1 = Paralelo::firstOrCreate(
+                ['nombre' => 'GUA-M1 (Bim II)', 'ciclo_id' => $ciclos[8]->id, 'modulo_id' => $modulosGuarani[1]->id],
+                ['modalidad' => 'PRESENCIAL', 'aula_o_enlace' => 'Aula 105 - Humanidades', 'turno' => 'MAÑANA', 'hora_inicio' => '07:30:00', 'hora_fin' => '09:30:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
+            );
+            Asignacion::firstOrCreate(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaHist1->id], ['fecha_asignacion' => $ciclos[8]->fecha_inicio, 'estado' => 'activo']);
+
+            $parGuaAct1 = Paralelo::firstOrCreate(
+                ['nombre' => 'GUA-M1 Presencial', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosGuarani[1]->id],
+                ['modalidad' => 'PRESENCIAL', 'aula_o_enlace' => 'Aula 105 - Humanidades', 'turno' => 'TARDE', 'hora_inicio' => '14:30:00', 'hora_fin' => '16:30:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
+            );
+            Asignacion::firstOrCreate(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaAct1->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
+
+            $parGuaAct2 = Paralelo::firstOrCreate(
+                ['nombre' => 'GUA-M2 Virtual', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosGuarani[2]->id],
+                ['modalidad' => 'VIRTUAL', 'aula_o_enlace' => 'https://meet.google.com/cei-guarani-m2', 'turno' => 'NOCHE', 'hora_inicio' => '19:00:00', 'hora_fin' => '21:00:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
+            );
+            Asignacion::firstOrCreate(['personal_id' => $docentes[10]->id, 'paralelo_id' => $parGuaAct2->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
+
+            $parFraHist1 = Paralelo::firstOrCreate(
+                ['nombre' => 'FRA-M1 (Bim II)', 'ciclo_id' => $ciclos[8]->id, 'modulo_id' => $modulosFrances[1]->id],
+                ['modalidad' => 'VIRTUAL', 'aula_o_enlace' => 'https://meet.google.com/cei-frances-b2', 'turno' => 'NOCHE', 'hora_inicio' => '19:00:00', 'hora_fin' => '21:00:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
+            );
+            Asignacion::firstOrCreate(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parFraHist1->id], ['fecha_asignacion' => $ciclos[8]->fecha_inicio, 'estado' => 'activo']);
+
+            $parFraAct1 = Paralelo::firstOrCreate(
+                ['nombre' => 'FRA-M1 Presencial', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosFrances[1]->id],
+                ['modalidad' => 'PRESENCIAL', 'aula_o_enlace' => 'Aula 108 - Humanidades', 'turno' => 'MAÑANA', 'hora_inicio' => '07:30:00', 'hora_fin' => '09:30:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
+            );
+            Asignacion::firstOrCreate(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parFraAct1->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
+
+            $parFraAct2 = Paralelo::firstOrCreate(
+                ['nombre' => 'FRA-M2 Virtual', 'ciclo_id' => $cicloActivo->id, 'modulo_id' => $modulosFrances[2]->id],
+                ['modalidad' => 'VIRTUAL', 'aula_o_enlace' => 'https://meet.google.com/cei-frances-m2', 'turno' => 'NOCHE', 'hora_inicio' => '19:00:00', 'hora_fin' => '21:00:00', 'cupo_maximo' => 25, 'cupo_ocupado' => 0]
+            );
+            Asignacion::firstOrCreate(['personal_id' => $docentes[11]->id, 'paralelo_id' => $parFraAct2->id], ['fecha_asignacion' => $cicloActivo->fecha_inicio, 'estado' => 'activo']);
+
+            // 10. Población Estudiantil Completa: 110 Estudiantes (90 en Inglés + 10 en Guaraní + 10 en Francés)
             $nombresM = ['Daniel', 'Roberto', 'Lucas', 'Mateo', 'Sebastián', 'Alejandro', 'Gabriel', 'Nicolás', 'Samuel', 'Joaquín', 'Andrés', 'Leonardo', 'Adrián', 'Bruno', 'Martín', 'Hugo', 'Rodrigo', 'Álvaro', 'Gonzalo', 'Iván'];
             $nombresF = ['Carla', 'Valeria', 'Camila', 'Mariana', 'Luciana', 'Sofía', 'Fernanda', 'Natalia', 'Andrea', 'Gabriela', 'Daniela', 'Victoria', 'Isabella', 'Paula', 'Renata', 'Carolina', 'Elena', 'Adriana', 'Claudia', 'Mónica'];
             $apellidosCat = ['Mendoza', 'Sosa', 'Guzmán', 'Ortiz', 'Peña', 'Suárez', 'Roca', 'Justiniano', 'Vaca', 'Ribera', 'Saucedo', 'Parada', 'Chávez', 'Cuéllar', 'Cabrera', 'Aguilera', 'Bánzer', 'Toledo', 'Paz', 'Rivero', 'Zeballos', 'Salvatierra', 'Montaño', 'Arteaga', 'Cronenbold', 'Gutiérrez', 'Kempff', 'Landívar', 'Montero', 'Durán'];
             $carreras = [
-                'Ingeniería en Sistemas',
-                'Ingeniería Informática',
-                'Ingeniería Industrial',
-                'Medicina Humana',
-                'Bioquímica y Farmacia',
-                'Derecho y Cs. Políticas',
-                'Ingeniería Comercial',
-                'Contaduría Pública',
-                'Relaciones Internacionales',
-                'Arquitectura y Urbanismo',
-                'Ingeniería Civil',
-                'Ingeniería Petrolera',
+                'Ingeniería en Sistemas', 'Ingeniería Informática', 'Ingeniería Industrial',
+                'Medicina Humana', 'Bioquímica y Farmacia', 'Derecho y Cs. Políticas',
+                'Ingeniería Comercial', 'Contaduría Pública', 'Relaciones Internacionales',
+                'Arquitectura y Urbanismo', 'Ingeniería Civil', 'Ingeniería Petrolera',
             ];
             $bancos = [
                 'BANCO UNIÓN S.A.',
@@ -404,13 +466,12 @@ class DatabaseSeeder extends Seeder
             $correlativoGlobal = 1;
             $inscripcionesParaAuditoria = [];
 
+            // 10.1 Los 90 Estudiantes de Inglés (10 por cada Nivel del 1 al 9)
             for ($nivelActual = 1; $nivelActual <= 9; $nivelActual++) {
                 for ($pos = 1; $pos <= 10; $pos++) {
                     $idx = $correlativoGlobal;
                     $esMujer = ($idx % 2 === 0);
-                    $nombre = $esMujer
-                        ? $nombresF[($idx - 1) % count($nombresF)]
-                        : $nombresM[($idx - 1) % count($nombresM)];
+                    $nombre = $esMujer ? $nombresF[($idx - 1) % count($nombresF)] : $nombresM[($idx - 1) % count($nombresM)];
                     $ap1 = $apellidosCat[($idx - 1) % count($apellidosCat)];
                     $ap2 = $apellidosCat[($idx * 3) % count($apellidosCat)];
                     if ($ap1 === $ap2) {
@@ -441,74 +502,56 @@ class DatabaseSeeder extends Seeder
                         'ppff_id'           => null,
                     ]);
 
-                    // Determinar si este estudiante entró por Examen de Nivel / Ubicación
-                    // En niveles 3, 4 y 5, los alumnos pos 8, 9 y 10 ingresaron directo por Examen de Nivel
-                    $esExamenNivelDirecto = in_array($nivelActual, [3, 4, 5]) && ($pos >= 8);
+                    // Determinar desde qué módulo inició este estudiante:
+                    // - Alumnos regulares (pos 1..8, y todos los de nivel 1, 2 y 9): iniciaron en el Módulo 1 y tienen TODA la cadena 1..nivelActual sin huecos.
+                    // - Alumnos por Examen de Nivel / Ubicación (pos 9 y 10 en niveles 3..8): ingresaron directamente en un módulo intermedio (ej. nivelActual - 1 o nivelActual).
+                    $esExamenUbicacion = ($nivelActual >= 3 && $nivelActual <= 8 && $pos >= 9);
+                    if ($esExamenUbicacion) {
+                        // Pos 9 entró en el bimestre anterior (nivelActual - 1); Pos 10 entró directo en este bimestre (nivelActual)
+                        $moduloInicio = ($pos === 9) ? max(2, $nivelActual - 1) : $nivelActual;
+                    } else {
+                        $moduloInicio = 1;
+                    }
 
-                    // A) Historial en Bimestre I (Ene-Feb 2026): si corresponde a su ruta y no entró directo al nivel actual
-                    if (!$esExamenNivelDirecto && $nivelActual >= 3) {
-                        $modBim1 = $modulosIngles[$nivelActual - 2];
-                        $parBim1 = $paralelosBim1[$nivelActual - 2];
-                        $notaBim1 = min(98, 66 + (($idx * 3) % 28));
-                        $obsBim1 = ($nivelActual - 2 > 1)
-                            ? 'Ingreso por Examen de Nivel / Ubicación y aprobado en Bimestre I'
-                            : 'Módulo aprobado en Bimestre I - 2026';
+                    // A) Registrar TODOS los módulos previos ($m = $moduloInicio .. $nivelActual - 1) en sus respectivos ciclos históricos
+                    for ($m = $moduloInicio; $m < $nivelActual; $m++) {
+                        // Si hoy en el ciclo 9 está en $nivelActual, entonces el módulo $m lo cursó en el ciclo: 9 - ($nivelActual - $m)
+                        $cicloIdxHist = 9 - ($nivelActual - $m);
+                        $cicloHistObj = $ciclos[$cicloIdxHist];
+                        $modHistObj = $modulosIngles[$m];
+                        $parHistObj = $paralelosHist[$cicloIdxHist][$m];
 
-                        $this->registrarMatriculaSemestral(
+                        $notaHist = min(98, 65 + (($idx + $m * 4) % 30));
+                        $obsHist = ($esExamenUbicacion && $m === $moduloInicio)
+                            ? 'Ingreso directo por Examen de Nivel / Ubicación'
+                            : 'Módulo aprobado satisfactoriamente';
+
+                        $this->registrarMatricula(
                             $est,
-                            $modBim1,
-                            $parBim1,
-                            sprintf('BOL-2026-B1-%04d', $idx),
+                            $modHistObj,
+                            $parHistObj,
+                            sprintf('BOL-C%02d-M%d-%04d', $cicloIdxHist, $m, $idx),
                             $banco,
-                            '2026-01-04',
-                            '2026-01-05',
+                            $cicloHistObj->fecha_inicio,
+                            $cicloHistObj->fecha_inicio,
                             'APROBADO',
-                            $notaBim1,
-                            $obsBim1,
+                            $notaHist,
+                            $obsHist,
                             $adminUser->id
                         );
                     }
 
-                    // B) Historial en Bimestre II (Mar-Abr 2026): módulo inmediato anterior (nivelActual - 1)
-                    if (!$esExamenNivelDirecto && $nivelActual >= 2) {
-                        $modBim2 = $modulosIngles[$nivelActual - 1];
-                        $parBim2 = $paralelosBim2[$nivelActual - 1];
-                        $notaBim2 = min(99, 68 + (($idx * 5) % 27));
-                        $obsBim2 = ($nivelActual === 2)
-                            ? 'Ingreso inicial aprobado en Bimestre II - 2026'
-                            : 'Promoción correlativa aprobada en Bimestre II - 2026';
-
-                        $this->registrarMatriculaSemestral(
-                            $est,
-                            $modBim2,
-                            $parBim2,
-                            sprintf('BOL-2026-B2-%04d', $idx),
-                            $banco,
-                            '2026-03-01',
-                            '2026-03-02',
-                            'APROBADO',
-                            $notaBim2,
-                            $obsBim2,
-                            $adminUser->id
-                        );
-                    }
-
-                    // C) Matrícula en el Ciclo Actual: Bimestre III - 2026 (May-Jun) en su $nivelActual
-                    // Repartir 5 en Presencial y 5 en Virtual por cada nivel
+                    // B) Registrar la matrícula del Módulo Actual ($nivelActual) en el Ciclo Activo (Ciclo 9: Bimestre III - 2026)
                     $modActual = $modulosIngles[$nivelActual];
-                    $parActual = ($pos <= 5) ? $paralelosBim3Presencial[$nivelActual] : $paralelosBim3Virtual[$nivelActual];
+                    $parActual = ($pos <= 5) ? $paralelosActivosPres[$nivelActual] : $paralelosActivosVirt[$nivelActual];
 
-                    // Distribución realista de notas en el nivel actual:
-                    // - Nivel 8 (Título Intermedio): pos 1..8 APROBADO (Graduados Intermedio), pos 9 REPROBADO, pos 10 PENDIENTE
-                    // - Nivel 9 (Título Avanzado): pos 1..9 APROBADO (Graduados Avanzado), pos 10 REPROBADO
-                    // - Niveles 1..7: pos 1..7 APROBADO, pos 8 REPROBADO, pos 9..10 PENDIENTE (Cursando)
                     if ($nivelActual === 8) {
                         if ($pos <= 8) {
                             $estadoCal = 'APROBADO';
                             $notaCal = min(98, 70 + ($pos * 3));
                         } elseif ($pos === 9) {
                             $estadoCal = 'REPROBADO';
-                            $notaCal = 42.00;
+                            $notaCal = 43.00;
                         } else {
                             $estadoCal = 'PENDIENTE';
                             $notaCal = 0.00;
@@ -516,7 +559,7 @@ class DatabaseSeeder extends Seeder
                     } elseif ($nivelActual === 9) {
                         if ($pos <= 9) {
                             $estadoCal = 'APROBADO';
-                            $notaCal = min(99, 74 + ($pos * 2));
+                            $notaCal = min(99, 75 + ($pos * 2));
                         } else {
                             $estadoCal = 'REPROBADO';
                             $notaCal = 45.00;
@@ -524,25 +567,25 @@ class DatabaseSeeder extends Seeder
                     } else {
                         if ($pos <= 7) {
                             $estadoCal = 'APROBADO';
-                            $notaCal = min(97, 62 + ($pos * 4) + ($nivelActual % 3));
+                            $notaCal = min(97, 63 + ($pos * 4) + ($nivelActual % 3));
                         } elseif ($pos === 8) {
                             $estadoCal = 'REPROBADO';
-                            $notaCal = 38.00 + $nivelActual;
+                            $notaCal = 39.00 + $nivelActual;
                         } else {
                             $estadoCal = 'PENDIENTE';
                             $notaCal = 0.00;
                         }
                     }
 
-                    $obsActual = $esExamenNivelDirecto
+                    $obsActual = ($esExamenUbicacion && $moduloInicio === $nivelActual)
                         ? 'Ingreso directo por Examen de Nivel / Ubicación'
-                        : (($estadoCal === 'APROBADO' && $nivelActual >= 8) ? 'Módulo de Graduación Aprobado satisfactoriamente' : null);
+                        : (($estadoCal === 'APROBADO' && $nivelActual >= 8) ? 'Hito de Graduación Aprobado' : null);
 
-                    $insActual = $this->registrarMatriculaSemestral(
+                    $insActual = $this->registrarMatricula(
                         $est,
                         $modActual,
                         $parActual,
-                        sprintf('BOL-2026-B3-%04d', $idx),
+                        sprintf('BOL-C09-M%d-%04d', $nivelActual, $idx),
                         $banco,
                         '2026-05-02',
                         '2026-05-04',
@@ -552,12 +595,12 @@ class DatabaseSeeder extends Seeder
                         $adminUser->id
                     );
 
-                    if ($pos === 1 && $nivelActual <= 6) {
+                    if ($pos === 1 && $nivelActual <= 8) {
                         $inscripcionesParaAuditoria[] = $insActual;
                     }
 
-                    // D) Para los primeros 10 estudiantes, registrar además una boleta DISPONIBLE lista para probar nuevas matrículas
-                    if ($idx <= 10) {
+                    // C) Boletas DISPONIBLES adicionales para los primeros 15 estudiantes (para probar Nueva Matrícula en vivo)
+                    if ($idx <= 15) {
                         BoletaPago::firstOrCreate(
                             ['numero_boleta' => sprintf('BOL-2026-DISP-%04d', $idx)],
                             [
@@ -576,7 +619,68 @@ class DatabaseSeeder extends Seeder
                 }
             }
 
-            // 11. Historial de Inscripciones Anuladas (4 casos para poblar /admin/inscripciones/anulaciones)
+            // 10.2 Estudiantes de Guaraní (10 estudiantes: CEI-2026-0091 al 0100) y Francés (10 estudiantes: CEI-2026-0101 al 0110)
+            for ($extraIdx = 1; $extraIdx <= 20; $extraIdx++) {
+                $idx = $correlativoGlobal;
+                $esGuarani = ($extraIdx <= 10);
+                $posIdioma = $esGuarani ? $extraIdx : ($extraIdx - 10); // 1..10
+                $esMujer = ($idx % 2 === 0);
+
+                $nombre = $esMujer ? $nombresF[($idx - 1) % count($nombresF)] : $nombresM[($idx - 1) % count($nombresM)];
+                $ap1 = $apellidosCat[($idx - 1) % count($apellidosCat)];
+                $ap2 = $apellidosCat[($idx * 2) % count($apellidosCat)];
+                if ($ap1 === $ap2) {
+                    $ap2 = 'Ribera';
+                }
+                $apellidos = "{$ap1} {$ap2}";
+
+                $ci = (string)(8100000 + $idx);
+                $codigoEst = sprintf('CEI-2026-%04d', $idx);
+                $email = sprintf('est%03d.%s@estudiante.cei.edu.bo', $idx, strtolower(preg_replace('/[^a-zA-Z]/', '', $ap1)));
+                $carrera = $carreras[($idx - 1) % count($carreras)];
+                $banco = $bancos[($idx - 1) % count($bancos)];
+
+                $uEst = $this->getOrCreateUser($email, "{$nombre} {$apellidos}", $ci, 'ESTUDIANTE');
+
+                $est = Estudiante::updateOrCreate(['ci' => $ci], [
+                    'usuario_id'        => $uEst->id,
+                    'codigo_estudiante' => $codigoEst,
+                    'nombres'           => $nombre,
+                    'apellidos'         => $apellidos,
+                    'carrera_facultad'  => $carrera,
+                    'fecha_nacimiento'  => sprintf('200%d-%02d-%02d', ($idx % 5) + 1, (($idx % 12) + 1), (($idx % 25) + 1)),
+                    'telefono'          => (string)(71000000 + $idx),
+                    'direccion'         => 'Santa Cruz de la Sierra - Campus Universitario UAGRM',
+                    'genero'            => $esMujer ? 'femenino' : 'masculino',
+                    'foto'              => 'img/default-avatar.png',
+                    'estado'            => 'activo',
+                    'ppff_id'           => null,
+                ]);
+
+                if ($esGuarani) {
+                    if ($posIdioma <= 5) {
+                        // Nivel 1 de Guaraní en Ciclo Activo
+                        $this->registrarMatricula($est, $modulosGuarani[1], $parGuaAct1, sprintf('BOL-GUA-M1-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 4 ? 'APROBADO' : 'PENDIENTE'), ($posIdioma <= 4 ? 82.0 : 0.0), null, $adminUser->id);
+                    } else {
+                        // Aprobó Guaraní M1 en Bimestre II + Cursa Guaraní M2 en Bimestre III
+                        $this->registrarMatricula($est, $modulosGuarani[1], $parGuaHist1, sprintf('BOL-GUA-H1-%04d', $idx), $banco, '2026-03-01', '2026-03-02', 'APROBADO', 85.0, 'Aprobado en Bimestre II', $adminUser->id);
+                        $this->registrarMatricula($est, $modulosGuarani[2], $parGuaAct2, sprintf('BOL-GUA-M2-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 9 ? 'APROBADO' : 'REPROBADO'), ($posIdioma <= 9 ? 88.0 : 44.0), null, $adminUser->id);
+                    }
+                } else {
+                    if ($posIdioma <= 5) {
+                        // Nivel 1 de Francés en Ciclo Activo
+                        $this->registrarMatricula($est, $modulosFrances[1], $parFraAct1, sprintf('BOL-FRA-M1-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 4 ? 'APROBADO' : 'PENDIENTE'), ($posIdioma <= 4 ? 80.0 : 0.0), null, $adminUser->id);
+                    } else {
+                        // Aprobó Francés M1 en Bimestre II + Cursa Francés M2 en Bimestre III
+                        $this->registrarMatricula($est, $modulosFrances[1], $parFraHist1, sprintf('BOL-FRA-H1-%04d', $idx), $banco, '2026-03-01', '2026-03-02', 'APROBADO', 84.0, 'Aprobado en Bimestre II', $adminUser->id);
+                        $this->registrarMatricula($est, $modulosFrances[2], $parFraAct2, sprintf('BOL-FRA-M2-%04d', $idx), $banco, '2026-05-03', '2026-05-04', ($posIdioma <= 9 ? 'APROBADO' : 'REPROBADO'), ($posIdioma <= 9 ? 86.0 : 41.0), null, $adminUser->id);
+                    }
+                }
+
+                $correlativoGlobal++;
+            }
+
+            // 11. Historial de Inscripciones Anuladas (4 casos en /admin/inscripciones/anulaciones)
             $motivosAnulacion = [
                 1 => 'Cambio de horario laboral justificado por el estudiante antes del inicio de exámenes.',
                 2 => 'Solicitud escrita de retiro temporal por viaje de intercambio académico.',
@@ -585,8 +689,8 @@ class DatabaseSeeder extends Seeder
             ];
 
             foreach ($motivosAnulacion as $num => $motivo) {
-                $estAnulado = Estudiante::where('codigo_estudiante', sprintf('CEI-2026-%04d', $num * 10))->first();
-                $parAnulado = $paralelosBim1[($num % 4) + 1];
+                $estAnulado = Estudiante::where('codigo_estudiante', sprintf('CEI-2026-%04d', $num))->first();
+                $parAnulado = $paralelosHist[7][$num]; // En Bimestre I - 2026, sin colisionar con sus módulos actuales
                 if ($estAnulado && $parAnulado) {
                     $bolAnulada = BoletaPago::firstOrCreate(
                         ['numero_boleta' => sprintf('BOL-2026-ANUL-%04d', $num)],
@@ -628,7 +732,16 @@ class DatabaseSeeder extends Seeder
                 }
             }
 
-            // 12. Registros de Auditoría de Calificaciones (para poblar /admin/roles/auditoria-notas)
+            // 12. Sincronizar exactamente cupo_ocupado en todos los paralelos para integridad absoluta
+            $todosParalelos = Paralelo::all();
+            foreach ($todosParalelos as $p) {
+                $inscritosActivos = Inscripcion::where('paralelo_id', $p->id)->where('estado', 'ACTIVA')->count();
+                if ($p->cupo_ocupado !== $inscritosActivos) {
+                    $p->update(['cupo_ocupado' => $inscritosActivos]);
+                }
+            }
+
+            // 13. Registros de Auditoría de Calificaciones (8 casos en /admin/roles/auditoria-notas)
             if (AuditoriaCalificacion::count() === 0) {
                 foreach ($inscripcionesParaAuditoria as $k => $insAud) {
                     $cal = $insAud->calificacion;
@@ -642,7 +755,7 @@ class DatabaseSeeder extends Seeder
                             'nota_nueva'      => $notaNueva,
                             'modificado_por'  => $adminUser->id,
                             'motivo'          => 'Rectificación de nota tras revisión de evaluación oral bimestral #' . ($k + 1),
-                            'created_at'      => now()->subDays(10 - $k),
+                            'created_at'      => now()->subDays(12 - $k),
                         ]);
                     }
                 }
