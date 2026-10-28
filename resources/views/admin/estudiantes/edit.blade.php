@@ -157,7 +157,7 @@
                         @php
                             $foto = ($estudiante->foto && file_exists(public_path($estudiante->foto)))
                                 ? asset($estudiante->foto)
-                                : asset('vendor/adminlte/dist/img/avatar.png');
+                                : asset('img/default-avatar.png');
                         @endphp
                         <label>Foto Actual / Previa:</label><br>
                         <img id="preview" src="{{ $foto }}" class="img-thumbnail rounded-circle shadow-sm" style="width: 100px; height: 100px; object-fit: cover;" alt="Foto">

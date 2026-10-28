@@ -73,7 +73,7 @@
                                         @php
                                             $foto = ($estudiante->foto && file_exists(public_path($estudiante->foto)))
                                                 ? asset($estudiante->foto)
-                                                : asset('vendor/adminlte/dist/img/avatar.png');
+                                                : asset('img/default-avatar.png');
                                         @endphp
                                         <img src="{{ $foto }}" class="img-circle elevation-1 mr-2" style="width: 38px; height: 38px; object-fit: cover;" alt="Avatar">
                                         <div>

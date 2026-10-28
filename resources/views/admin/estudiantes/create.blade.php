@@ -138,7 +138,7 @@
                         </div>
                     </div>
                     <div class="col-md-4 text-center">
-                        <img id="preview" src="{{ asset('vendor/adminlte/dist/img/avatar.png') }}" class="img-thumbnail rounded-circle shadow-sm" style="width: 90px; height: 90px; object-fit: cover;" alt="Vista previa">
+                        <img id="preview" src="{{ asset('img/default-avatar.png') }}" class="img-thumbnail rounded-circle shadow-sm" style="width: 90px; height: 90px; object-fit: cover;" alt="Vista previa">
                     </div>
                 </div>
 

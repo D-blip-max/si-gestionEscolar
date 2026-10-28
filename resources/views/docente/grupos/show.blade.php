@@ -68,7 +68,7 @@
                                 $nota = optional($ins->calificacion)->nota_final;
                                 $foto = ($ins->estudiante && $ins->estudiante->foto && file_exists(public_path($ins->estudiante->foto)))
                                     ? asset($ins->estudiante->foto)
-                                    : asset('vendor/adminlte/dist/img/avatar.png');
+                                    : asset('img/default-avatar.png');
                             @endphp
                             <tr>
                                 <td class="align-middle font-weight-bold">{{ $loop->iteration }}</td>

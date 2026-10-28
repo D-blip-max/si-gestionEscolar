@@ -26,10 +26,14 @@
         $aprobadosCount = 0;
         $tieneGraduacionIntermedia = false;
         $tieneGraduacionAvanzada = false;
+        $primerModuloOrden = $estudiante->inscripciones->where('estado', '!=', 'ANULADA')->min(function($ins) {
+            return optional($ins->modulo)->numero_orden;
+        });
 
         foreach($estudiante->inscripciones as $ins) {
             $nota = optional($ins->calificacion)->nota_final ?? null;
-            if ($nota !== null && $nota >= 51) {
+            $estadoCal = optional($ins->calificacion)->estado ?? null;
+            if ($nota !== null && $estadoCal !== 'PENDIENTE' && $nota >= 51) {
                 $aprobadosCount++;
                 if (optional($ins->modulo)->numero_orden == 8) {
                     $tieneGraduacionIntermedia = true;
@@ -39,7 +43,9 @@
                 }
             }
         }
-        $porcentajeAvance = min(100, round(($aprobadosCount / 9) * 100));
+        $convalidadosCount = ($primerModuloOrden && $primerModuloOrden > 1) ? ($primerModuloOrden - 1) : 0;
+        $totalSuperados = min(9, $aprobadosCount + $convalidadosCount);
+        $porcentajeAvance = min(100, round(($totalSuperados / 9) * 100));
     @endphp
 
     <!-- Indicador de Ruta de Titulación -->
@@ -51,7 +57,10 @@
             <div class="row align-items-center mb-4">
                 <div class="col-md-8">
                     <h5 class="text-muted mb-2">
-                        Módulos Aprobados: <strong class="text-primary">{{ $aprobadosCount }} de 9</strong> ({{ $porcentajeAvance }}% completado)
+                        Módulos Superados: <strong class="text-primary">{{ $totalSuperados }} de 9</strong> ({{ $porcentajeAvance }}% completado)
+                        @if($convalidadosCount > 0)
+                            <span class="badge badge-info ml-2"><i class="fas fa-fast-forward mr-1"></i> {{ $convalidadosCount }} por Examen de Nivel</span>
+                        @endif
                     </h5>
                     <div class="progress" style="height: 25px;">
                         <div class="progress-bar bg-success font-weight-bold" style="width: {{ $porcentajeAvance }}%">
@@ -106,6 +115,10 @@
                                 $icono = 'fa-spinner fa-spin';
                                 $texto = 'En Curso';
                             }
+                        } elseif ($primerModuloOrden && $i < $primerModuloOrden) {
+                            $claseCard = 'border-info bg-info text-white shadow-sm';
+                            $icono = 'fa-fast-forward';
+                            $texto = 'Convalidado (Ex. Nivel)';
                         }
                     @endphp
                     <div class="col-md-4 col-sm-6 mb-3">

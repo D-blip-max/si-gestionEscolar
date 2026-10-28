@@ -171,6 +171,8 @@
         <tbody>
             @php
                 $aprobados = 0;
+                $tieneIntermedio = false;
+                $tieneAvanzado = false;
             @endphp
             @forelse($estudiante->inscripciones as $ins)
                 @php
@@ -178,6 +180,12 @@
                     $estadoCal = optional($ins->calificacion)->estado;
                     if ($nota !== null && $estadoCal !== 'PENDIENTE' && $nota >= 51) {
                         $aprobados++;
+                        if (optional($ins->modulo)->numero_orden == 8) {
+                            $tieneIntermedio = true;
+                        }
+                        if (optional($ins->modulo)->numero_orden == 9) {
+                            $tieneAvanzado = true;
+                        }
                     }
                 @endphp
                 <tr>
@@ -223,12 +231,12 @@
                 </td>
                 <td style="width: 50%; text-align: right;">
                     <strong>Habilitación Título Intermedio (Mod. 8):</strong> 
-                    <span style="color: {{ $aprobados >= 8 ? '#155724' : '#666' }}; font-weight: bold;">
-                        {{ $aprobados >= 8 ? 'CUMPLIDO' : 'PENDIENTE' }}
+                    <span style="color: {{ $tieneIntermedio ? '#155724' : '#666' }}; font-weight: bold;">
+                        {{ $tieneIntermedio ? 'CUMPLIDO' : 'PENDIENTE' }}
                     </span><br>
                     <strong>Certificación Avanzada (Mod. 9):</strong> 
-                    <span style="color: {{ $aprobados >= 9 ? '#155724' : '#666' }}; font-weight: bold;">
-                        {{ $aprobados >= 9 ? 'CUMPLIDO' : 'PENDIENTE' }}
+                    <span style="color: {{ $tieneAvanzado ? '#155724' : '#666' }}; font-weight: bold;">
+                        {{ $tieneAvanzado ? 'CUMPLIDO' : 'PENDIENTE' }}
                     </span>
                 </td>
             </tr>

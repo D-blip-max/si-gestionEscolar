@@ -6,13 +6,13 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark"><i class="fas fa-user-graduate text-success mr-2"></i>Padrón de Estudiantes Graduados</h1>
-                <small class="text-muted">Nómina Oficial de Egresados (Nivel Intermedio y Avanzado)</small>
+                <h1 class="m-0 text-dark"><i class="fas fa-user-graduate text-success mr-2"></i>Graduados, Aprobados y Reprobados</h1>
+                <small class="text-muted">Estadísticas de Rendimiento Académico y Nómina de Titulación</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Inicio</a></li>
-                    <li class="breadcrumb-item active">Graduados</li>
+                    <li class="breadcrumb-item active">Graduados y Rendimiento</li>
                 </ol>
             </div>
         </div>
@@ -21,14 +21,16 @@
 
 @section('content')
 <div class="container-fluid">
-    <!-- Filtros de Graduación -->
+    <!-- Filtros de Graduación y Rendimiento -->
     <div class="card card-outline card-success shadow-sm mb-3">
         <div class="card-body py-2">
             <form method="GET" action="{{ route('admin.reportes.graduados') }}" class="form-inline">
-                <label class="mr-2 font-weight-bold text-secondary"><i class="fas fa-medal text-warning mr-1"></i> Tipo de Titulación:</label>
+                <label class="mr-2 font-weight-bold text-secondary"><i class="fas fa-filter text-primary mr-1"></i> Condición Académica:</label>
                 <select name="tipo" class="form-control form-control-sm mr-3 font-weight-bold" onchange="this.form.submit()">
-                    <option value="INTERMEDIO" {{ $tipoGraduacion === 'INTERMEDIO' ? 'selected' : '' }}>TÍTULO INTERMEDIO (Módulo 8 Aprobado)</option>
-                    <option value="AVANZADO" {{ $tipoGraduacion === 'AVANZADO' ? 'selected' : '' }}>CERTIFICACIÓN AVANZADA (Módulo 9 Aprobado)</option>
+                    <option value="INTERMEDIO" {{ $tipoGraduacion === 'INTERMEDIO' ? 'selected' : '' }}>GRADUADOS - TÍTULO INTERMEDIO (Módulo 8)</option>
+                    <option value="AVANZADO" {{ $tipoGraduacion === 'AVANZADO' ? 'selected' : '' }}>GRADUADOS - CERTIFICACIÓN AVANZADA (Módulo 9)</option>
+                    <option value="APROBADOS" {{ $tipoGraduacion === 'APROBADOS' ? 'selected' : '' }}>ESTUDIANTES APROBADOS (Nota >= 51)</option>
+                    <option value="REPROBADOS" {{ $tipoGraduacion === 'REPROBADOS' ? 'selected' : '' }}>ESTUDIANTES REPROBADOS (Nota < 51)</option>
                 </select>
 
                 <label class="mr-2 font-weight-bold text-secondary">Idioma:</label>
@@ -41,33 +43,48 @@
 
                 <div class="ml-auto">
                     <a href="{{ route('admin.reportes.graduados_pdf', request()->query()) }}" target="_blank" class="btn btn-danger btn-sm font-weight-bold">
-                        <i class="fas fa-file-pdf mr-1"></i> Exportar Padrón Oficial (PDF)
+                        <i class="fas fa-file-pdf mr-1"></i> Exportar Reporte Oficial (PDF)
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Info-Box Resumen -->
+    <!-- 4 Indicadores Globales: Graduados, Aprobados, Reprobados y Cursando -->
     <div class="row">
-        <div class="col-md-6 col-12">
-            <div class="info-box shadow-sm bg-success">
-                <span class="info-box-icon"><i class="fas fa-award"></i></span>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box shadow-sm bg-warning">
+                <span class="info-box-icon"><i class="fas fa-user-graduate"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Total de Estudiantes Graduados</span>
-                    <span class="info-box-number" style="font-size: 24px;">{{ count($estudiantes) }} Alumnos</span>
+                    <span class="info-box-text font-weight-bold">Total Graduados</span>
+                    <span class="info-box-number" style="font-size: 22px;">{{ $totalGraduados }} Alumnos</span>
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-12">
-            <div class="info-box shadow-sm bg-info">
-                <span class="info-box-icon"><i class="fas fa-chart-line"></i></span>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box shadow-sm bg-success">
+                <span class="info-box-icon"><i class="fas fa-check-circle"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Promedio General Ponderado de la Cohorte</span>
-                    @php
-                        $promedioGeneral = count($estudiantes) > 0 ? round($estudiantes->avg('promedio_egreso'), 1) : 0;
-                    @endphp
-                    <span class="info-box-number" style="font-size: 24px;">{{ $promedioGeneral }} pts</span>
+                    <span class="info-box-text font-weight-bold">Módulos Aprobados</span>
+                    <span class="info-box-number" style="font-size: 22px;">{{ $totalAprobados }} Aprobados</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box shadow-sm bg-danger">
+                <span class="info-box-icon"><i class="fas fa-times-circle"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold">Módulos Reprobados</span>
+                    <span class="info-box-number" style="font-size: 22px;">{{ $totalReprobados }} Reprobados</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+            <div class="info-box shadow-sm bg-info">
+                <span class="info-box-icon"><i class="fas fa-clock"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text font-weight-bold">En Curso (Pendientes)</span>
+                    <span class="info-box-number" style="font-size: 22px;">{{ $totalCursando }} Cursando</span>
                 </div>
             </div>
         </div>
@@ -78,7 +95,7 @@
         <div class="card-header bg-white">
             <h5 class="card-title text-bold mb-0">
                 <i class="fas fa-list-alt text-success mr-1"></i>
-                Nómina Oficial de Egresados - Nivel {{ $tipoGraduacion }}
+                Nómina Oficial - {{ $tipoGraduacion }} ({{ count($estudiantes) }} registros)
             </h5>
         </div>
         <div class="card-body">
@@ -89,11 +106,11 @@
                             <th style="width: 40px;">#</th>
                             <th>Código CEI</th>
                             <th>Cédula (CI)</th>
-                            <th>Estudiante Graduado</th>
+                            <th>Estudiante</th>
                             <th>Carrera / Origen</th>
-                            <th>Módulos Aprobados</th>
-                            <th>Promedio de Egreso</th>
-                            <th>Estado de Titulación</th>
+                            <th>Aprobados / Reprobados</th>
+                            <th>Promedio</th>
+                            <th>Condición</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,14 +123,29 @@
                                 <td class="text-center align-middle">{{ $est->ci }}</td>
                                 <td class="align-middle font-weight-bold text-dark">{{ $est->apellidos }} {{ $est->nombres }}</td>
                                 <td class="align-middle text-sm">{{ $est->carrera_facultad ?? 'Particular' }}</td>
-                                <td class="text-center align-middle font-weight-bold text-primary">{{ $est->total_modulos_aprobados }} de 9</td>
-                                <td class="text-center align-middle font-weight-bold text-success" style="font-size: 14px;">
+                                <td class="text-center align-middle font-weight-bold">
+                                    <span class="badge badge-success mr-1">{{ $est->total_modulos_aprobados }} Aprob.</span>
+                                    @if($est->total_modulos_reprobados > 0)
+                                        <span class="badge badge-danger">{{ $est->total_modulos_reprobados }} Reprob.</span>
+                                    @endif
+                                </td>
+                                <td class="text-center align-middle font-weight-bold {{ $tipoGraduacion === 'REPROBADOS' ? 'text-danger' : 'text-success' }}" style="font-size: 14px;">
                                     {{ $est->promedio_egreso }} pts
                                 </td>
                                 <td class="text-center align-middle">
-                                    <span class="badge badge-success px-2 py-1 font-weight-bold">
-                                        <i class="fas fa-check-circle"></i> APTO PARA DIPLOMA
-                                    </span>
+                                    @if($tipoGraduacion === 'REPROBADOS')
+                                        <span class="badge badge-danger px-2 py-1 font-weight-bold">
+                                            <i class="fas fa-times-circle"></i> REPROBADO
+                                        </span>
+                                    @elseif($tipoGraduacion === 'APROBADOS')
+                                        <span class="badge badge-success px-2 py-1 font-weight-bold">
+                                            <i class="fas fa-check-circle"></i> APROBADO
+                                        </span>
+                                    @else
+                                        <span class="badge badge-warning text-dark px-2 py-1 font-weight-bold">
+                                            <i class="fas fa-award"></i> APTO PARA DIPLOMA
+                                        </span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

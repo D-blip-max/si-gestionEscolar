@@ -124,7 +124,7 @@
                         @php
                             $foto = ($estudiante->foto && file_exists(public_path($estudiante->foto)))
                                 ? asset($estudiante->foto)
-                                : asset('vendor/adminlte/dist/img/avatar.png');
+                                : asset('img/default-avatar.png');
                         @endphp
                         <img src="{{ $foto }}" class="profile-user-img img-fluid img-circle shadow-sm mb-3" style="width: 100px; height: 100px; object-fit: cover;" alt="Avatar">
                         <h5 class="font-weight-bold text-dark mb-0">{{ $estudiante->apellidos }} {{ $estudiante->nombres }}</h5>

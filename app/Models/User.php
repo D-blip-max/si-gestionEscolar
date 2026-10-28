@@ -55,4 +55,20 @@ class User extends Authenticatable
         return $this->hasOne(Estudiante::class, 'usuario_id');
     }
 
+    public function adminlte_image()
+    {
+        if ($this->personal && $this->personal->foto && file_exists(public_path($this->personal->foto))) {
+            return asset($this->personal->foto);
+        }
+        if ($this->estudiante && $this->estudiante->foto && file_exists(public_path($this->estudiante->foto))) {
+            return asset($this->estudiante->foto);
+        }
+
+        return asset('img/default-avatar.png');
+    }
+
+    public function adminlte_desc()
+    {
+        return $this->roles->pluck('name')->implode(', ') ?: 'Usuario CEI';
+    }
 }

@@ -34,7 +34,7 @@
 
 
                                 <center>
-                                    <img id="preview" src="{{ url($personal->foto) }}" alt="Imagen de perfil"
+                                    <img id="preview" src="{{ ($personal->foto && file_exists(public_path($personal->foto))) ? asset($personal->foto) : asset('img/default-avatar.png') }}" alt="Imagen de perfil"
                                         class="img-fluid img-thumbnail" style="max-width: 200px; margin-top: 10px;">
                                 </center>
                                 @error('foto')

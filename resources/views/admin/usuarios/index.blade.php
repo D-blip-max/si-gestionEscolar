@@ -25,6 +25,7 @@
                             <thead class="thead-dark text-center">
                                 <tr>
                                     <th style="width: 50px;">#</th>
+                                    <th style="width: 60px;">Foto</th>
                                     <th>Nombre Completo</th>
                                     <th>Correo Electrónico</th>
                                     <th>Rol Asignado</th>
@@ -35,9 +36,12 @@
                             <tbody>
                                 @foreach ($users as $index => $user)
                                     <tr>
-                                        <td class="text-center">{{ $index + 1 }}</td>
-                                        <td>{{ $user->name }}</td>
-                                        <td>{{ $user->email }}</td>
+                                        <td class="text-center align-middle">{{ $index + 1 }}</td>
+                                        <td class="text-center align-middle">
+                                            <img src="{{ $user->adminlte_image() }}" alt="Avatar" class="img-circle elevation-1" style="width: 38px; height: 38px; object-fit: cover;">
+                                        </td>
+                                        <td class="align-middle font-weight-bold">{{ $user->name }}</td>
+                                        <td class="align-middle">{{ $user->email }}</td>
                                         <td class="text-center">
                                             @forelse ($user->roles as $rol)
                                                 @php

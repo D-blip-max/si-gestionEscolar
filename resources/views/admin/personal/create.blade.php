@@ -29,7 +29,7 @@
                                         onchange="mostrarImagen(event)" accept="image/*">
                                     <br>
                                     <center>
-                                        <img id="preview" src="" style="max-width: 200px; margin-top: 10px;">
+                                        <img id="preview" src="{{ asset('img/default-avatar.png') }}" class="img-fluid img-thumbnail" style="max-width: 180px; margin-top: 10px;">
                                     </center>
                                     @error('foto')
                                         <small style="color: red">{{ $message }}</small>

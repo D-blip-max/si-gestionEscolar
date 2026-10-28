@@ -197,79 +197,168 @@ class ReporteController extends Controller
     }
 
     /**
-     * CU-24: Reporte de Graduados (Intermedio y Avanzado)
+     * Reporte de Graduados, Aprobados y Reprobados
      */
     public function estudiantes_graduados(Request $request)
     {
-        $tipoGraduacion = $request->get('tipo', 'INTERMEDIO'); // 'INTERMEDIO' (Modulo 8) o 'AVANZADO' (Modulo 9)
+        $tipoGraduacion = $request->get('tipo', 'INTERMEDIO'); // 'INTERMEDIO', 'AVANZADO', 'APROBADOS', 'REPROBADOS'
         $idiomaId = $request->get('idioma_id');
 
-        $moduloObjetivo = ($tipoGraduacion === 'AVANZADO') ? 9 : 8;
-
-        $query = Estudiante::whereHas('inscripciones', function ($q) use ($moduloObjetivo, $idiomaId) {
-            $q->whereHas('modulo', function ($m) use ($moduloObjetivo, $idiomaId) {
-                $m->where('numero_orden', $moduloObjetivo);
-                if ($idiomaId) {
-                    $m->where('idioma_id', $idiomaId);
-                }
-            })->whereHas('calificacion', function ($c) {
-                $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51);
+        // Métricas globales de rendimiento académico (filtradas por idioma si aplica)
+        $baseInscripciones = Inscripcion::where('estado', 'ACTIVA')
+            ->when($idiomaId, function ($q) use ($idiomaId) {
+                $q->whereHas('modulo', fn($m) => $m->where('idioma_id', $idiomaId));
             });
+
+        $totalAprobados = (clone $baseInscripciones)->whereHas('calificacion', function ($c) {
+            $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51);
+        })->count();
+
+        $totalReprobados = (clone $baseInscripciones)->whereHas('calificacion', function ($c) {
+            $c->where('estado', 'REPROBADO');
+        })->count();
+
+        $totalCursando = (clone $baseInscripciones)->whereHas('calificacion', function ($c) {
+            $c->where('estado', 'PENDIENTE');
+        })->count();
+
+        $totalGraduados = Estudiante::whereHas('inscripciones', function ($q) use ($idiomaId) {
+            $q->where('estado', 'ACTIVA')
+              ->whereHas('modulo', function ($m) use ($idiomaId) {
+                  $m->whereIn('numero_orden', [8, 9]);
+                  if ($idiomaId) {
+                      $m->where('idioma_id', $idiomaId);
+                  }
+              })->whereHas('calificacion', function ($c) {
+                  $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51);
+              });
+        })->count();
+
+        // Consulta según condición seleccionada
+        $query = Estudiante::whereHas('inscripciones', function ($q) use ($tipoGraduacion, $idiomaId) {
+            $q->where('estado', 'ACTIVA');
+            if ($idiomaId) {
+                $q->whereHas('modulo', fn($m) => $m->where('idioma_id', $idiomaId));
+            }
+
+            if ($tipoGraduacion === 'INTERMEDIO') {
+                $q->whereHas('modulo', fn($m) => $m->where('numero_orden', 8))
+                  ->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51));
+            } elseif ($tipoGraduacion === 'AVANZADO') {
+                $q->whereHas('modulo', fn($m) => $m->where('numero_orden', 9))
+                  ->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51));
+            } elseif ($tipoGraduacion === 'APROBADOS') {
+                $q->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51));
+            } elseif ($tipoGraduacion === 'REPROBADOS') {
+                $q->whereHas('calificacion', fn($c) => $c->where('estado', 'REPROBADO'));
+            }
         })->with([
             'inscripciones.modulo.idioma',
             'inscripciones.calificacion'
         ]);
 
-        $estudiantes = $query->get()->map(function ($est) {
-            $aprobadas = $est->inscripciones->filter(fn($i) => optional($i->calificacion)->nota_final >= 51);
-            $est->promedio_egreso = $aprobadas->count() > 0 
-                ? round($aprobadas->avg(fn($i) => optional($i->calificacion)->nota_final), 1) 
+        $estudiantes = $query->get()->map(function ($est) use ($tipoGraduacion) {
+            $aprobadas = $est->inscripciones->filter(fn($i) => optional($i->calificacion)->estado === 'APROBADO' && optional($i->calificacion)->nota_final >= 51);
+            $reprobadas = $est->inscripciones->filter(fn($i) => optional($i->calificacion)->estado === 'REPROBADO');
+            $evaluadas = ($tipoGraduacion === 'REPROBADOS') ? $reprobadas : $aprobadas;
+
+            $est->promedio_egreso = $evaluadas->count() > 0 
+                ? round($evaluadas->avg(fn($i) => optional($i->calificacion)->nota_final), 1) 
                 : 0;
             $est->total_modulos_aprobados = $aprobadas->count();
+            $est->total_modulos_reprobados = $reprobadas->count();
+            $est->ultimo_modulo = optional($evaluadas->last()?->modulo)->nombre ?? optional($est->inscripciones->last()?->modulo)->nombre ?? 'General';
             return $est;
         });
 
         $idiomas = Idioma::where('estado', 'activo')->get();
 
-        return view('admin.reportes.graduados', compact('estudiantes', 'tipoGraduacion', 'idiomaId', 'idiomas'));
+        return view('admin.reportes.graduados', compact(
+            'estudiantes',
+            'tipoGraduacion',
+            'idiomaId',
+            'idiomas',
+            'totalGraduados',
+            'totalAprobados',
+            'totalReprobados',
+            'totalCursando'
+        ));
     }
 
     /**
-     * CU-24: Reporte de Graduados en PDF
+     * Reporte de Graduados, Aprobados y Reprobados en PDF
      */
     public function estudiantes_graduados_pdf(Request $request)
     {
         $tipoGraduacion = $request->get('tipo', 'INTERMEDIO');
         $idiomaId = $request->get('idioma_id');
-        $moduloObjetivo = ($tipoGraduacion === 'AVANZADO') ? 9 : 8;
 
-        $estudiantes = Estudiante::whereHas('inscripciones', function ($q) use ($moduloObjetivo, $idiomaId) {
-            $q->whereHas('modulo', function ($m) use ($moduloObjetivo, $idiomaId) {
-                $m->where('numero_orden', $moduloObjetivo);
-                if ($idiomaId) {
-                    $m->where('idioma_id', $idiomaId);
-                }
-            })->whereHas('calificacion', function ($c) {
-                $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51);
+        $baseInscripciones = Inscripcion::where('estado', 'ACTIVA')
+            ->when($idiomaId, function ($q) use ($idiomaId) {
+                $q->whereHas('modulo', fn($m) => $m->where('idioma_id', $idiomaId));
             });
+
+        $totalAprobados = (clone $baseInscripciones)->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51))->count();
+        $totalReprobados = (clone $baseInscripciones)->whereHas('calificacion', fn($c) => $c->where('estado', 'REPROBADO'))->count();
+        $totalCursando = (clone $baseInscripciones)->whereHas('calificacion', fn($c) => $c->where('estado', 'PENDIENTE'))->count();
+        $totalGraduados = Estudiante::whereHas('inscripciones', function ($q) use ($idiomaId) {
+            $q->where('estado', 'ACTIVA')
+              ->whereHas('modulo', function ($m) use ($idiomaId) {
+                  $m->whereIn('numero_orden', [8, 9]);
+                  if ($idiomaId) {
+                      $m->where('idioma_id', $idiomaId);
+                  }
+              })->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51));
+        })->count();
+
+        $estudiantes = Estudiante::whereHas('inscripciones', function ($q) use ($tipoGraduacion, $idiomaId) {
+            $q->where('estado', 'ACTIVA');
+            if ($idiomaId) {
+                $q->whereHas('modulo', fn($m) => $m->where('idioma_id', $idiomaId));
+            }
+
+            if ($tipoGraduacion === 'INTERMEDIO') {
+                $q->whereHas('modulo', fn($m) => $m->where('numero_orden', 8))
+                  ->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51));
+            } elseif ($tipoGraduacion === 'AVANZADO') {
+                $q->whereHas('modulo', fn($m) => $m->where('numero_orden', 9))
+                  ->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51));
+            } elseif ($tipoGraduacion === 'APROBADOS') {
+                $q->whereHas('calificacion', fn($c) => $c->where('estado', 'APROBADO')->where('nota_final', '>=', 51));
+            } elseif ($tipoGraduacion === 'REPROBADOS') {
+                $q->whereHas('calificacion', fn($c) => $c->where('estado', 'REPROBADO'));
+            }
         })->with([
             'inscripciones.modulo.idioma',
             'inscripciones.calificacion'
-        ])->get()->map(function ($est) {
-            $aprobadas = $est->inscripciones->filter(fn($i) => optional($i->calificacion)->nota_final >= 51);
-            $est->promedio_egreso = $aprobadas->count() > 0 
-                ? round($aprobadas->avg(fn($i) => optional($i->calificacion)->nota_final), 1) 
+        ])->get()->map(function ($est) use ($tipoGraduacion) {
+            $aprobadas = $est->inscripciones->filter(fn($i) => optional($i->calificacion)->estado === 'APROBADO' && optional($i->calificacion)->nota_final >= 51);
+            $reprobadas = $est->inscripciones->filter(fn($i) => optional($i->calificacion)->estado === 'REPROBADO');
+            $evaluadas = ($tipoGraduacion === 'REPROBADOS') ? $reprobadas : $aprobadas;
+
+            $est->promedio_egreso = $evaluadas->count() > 0 
+                ? round($evaluadas->avg(fn($i) => optional($i->calificacion)->nota_final), 1) 
                 : 0;
+            $est->total_modulos_aprobados = $aprobadas->count();
+            $est->total_modulos_reprobados = $reprobadas->count();
             return $est;
         });
 
         $configuracion = Configuracion::first();
 
-        $pdf = Pdf::loadView('admin.reportes.graduados_pdf', compact('estudiantes', 'tipoGraduacion', 'configuracion'));
+        $pdf = Pdf::loadView('admin.reportes.graduados_pdf', compact(
+            'estudiantes',
+            'tipoGraduacion',
+            'configuracion',
+            'totalGraduados',
+            'totalAprobados',
+            'totalReprobados',
+            'totalCursando'
+        ));
         $pdf->setPaper('letter', 'portrait');
         $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 
-        return $pdf->stream("Padrón_Graduados_{$tipoGraduacion}.pdf");
+        return $pdf->stream("Reporte_Rendimiento_{$tipoGraduacion}.pdf");
     }
 }
 

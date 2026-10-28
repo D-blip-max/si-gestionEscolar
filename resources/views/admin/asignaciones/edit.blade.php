@@ -73,7 +73,7 @@
                                 @php
                                     $foto = ($asignacion->personal && $asignacion->personal->foto && file_exists(public_path($asignacion->personal->foto)))
                                         ? asset($asignacion->personal->foto)
-                                        : asset('vendor/adminlte/dist/img/avatar5.png');
+                                        : asset('img/default-avatar.png');
                                 @endphp
                                 <img src="{{ $foto }}" class="img-thumbnail rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover;" alt="Docente">
                             </div>

@@ -123,9 +123,10 @@ class InscripcionController extends Controller
                 ]);
             }
 
-            // 4. Validar Prerrequisitos Correlativos del Módulo
+            // 4. Validar Prerrequisitos Correlativos del Módulo (salvo ingreso por Examen de Nivel / Ubicación)
+            $esExamenNivel = $request->boolean('examen_nivel');
             $modulo = Modulo::findOrFail($request->modulo_id);
-            if ($modulo->prerrequisito_id) {
+            if ($modulo->prerrequisito_id && !$esExamenNivel) {
                 $moduloPrereq = Modulo::find($modulo->prerrequisito_id);
                 $aprobado = Inscripcion::where('estudiante_id', $request->estudiante_id)
                     ->where('modulo_id', $modulo->prerrequisito_id)
@@ -136,7 +137,7 @@ class InscripcionController extends Controller
                 if (!$aprobado) {
                     $nombrePrereq = $moduloPrereq ? $moduloPrereq->nombre : 'Módulo Previo';
                     throw ValidationException::withMessages([
-                        'modulo_id' => "Control de Correlativas: El estudiante debe aprobar previamente el '{$nombrePrereq}' (Nota >= 51) para poder inscribirse a este módulo."
+                        'modulo_id' => "Control de Correlativas: El estudiante debe aprobar previamente el '{$nombrePrereq}' (Nota >= 51) o habilitar la opción 'Ingreso por Examen de Nivel / Ubicación'."
                     ]);
                 }
             }
@@ -163,6 +164,7 @@ class InscripcionController extends Controller
                 'inscripcion_id' => $inscripcion->id,
                 'nota_final'     => 0,
                 'estado'         => 'PENDIENTE',
+                'observaciones'  => $esExamenNivel ? 'Ingreso directo por Examen de Nivel / Ubicación' : null,
                 'updated_by'     => Auth::id(),
             ]);
 

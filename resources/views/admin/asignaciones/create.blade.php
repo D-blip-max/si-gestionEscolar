@@ -70,7 +70,7 @@
                         <hr>
                         <div class="row align-items-center">
                             <div class="col-md-4 text-center">
-                                <img id="doc_foto" src="{{ asset('vendor/adminlte/dist/img/avatar5.png') }}" 
+                                <img id="doc_foto" src="{{ asset('img/default-avatar.png') }}" 
                                      class="img-thumbnail rounded-circle shadow-sm mb-2" 
                                      style="width: 130px; height: 130px; object-fit: cover;" alt="Docente">
                                 <div class="badge badge-success px-3 py-1"><i class="fas fa-check-circle"></i> Docente Activo</div>

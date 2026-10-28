@@ -103,12 +103,15 @@
     <div class="summary-box">
         <table style="width: 100%;">
             <tr>
-                <td style="width: 50%;">
-                    <strong>Total Egresados Habilitados:</strong> {{ count($estudiantes) }} estudiantes<br>
-                    <strong>Criterio Legal:</strong> Aprobación de Módulos Correlativos con promedio aprobatorio (&ge;51 pts)
+                <td style="width: 55%;">
+                    <strong>Resumen General de Rendimiento Académico:</strong><br>
+                    &bull; <strong>Graduados:</strong> {{ $totalGraduados ?? 0 }} | 
+                    <strong>Módulos Aprobados:</strong> {{ $totalAprobados ?? 0 }} | 
+                    <strong>Módulos Reprobados:</strong> {{ $totalReprobados ?? 0 }} | 
+                    <strong>En Curso:</strong> {{ $totalCursando ?? 0 }}
                 </td>
-                <td style="width: 50%; text-align: right;">
-                    <strong>Destino del Trámite:</strong> Rectorado / Vicerrectorado Académico<br>
+                <td style="width: 45%; text-align: right;">
+                    <strong>Registros en este Reporte ({{ $tipoGraduacion }}):</strong> {{ count($estudiantes) }}<br>
                     <strong>Gestión Académica:</strong> {{ date('Y') }}
                 </td>
             </tr>
@@ -123,7 +126,7 @@
                 <th style="width: 70px;">Cédula (CI)</th>
                 <th>Apellidos y Nombres</th>
                 <th>Carrera / Origen</th>
-                <th style="width: 70px;">Prom. Egreso</th>
+                <th style="width: 70px;">Promedio</th>
                 <th style="width: 90px;">Condición</th>
             </tr>
         </thead>
@@ -136,11 +139,13 @@
                     <td style="font-weight: bold;">{{ $est->apellidos }} {{ $est->nombres }}</td>
                     <td>{{ $est->carrera_facultad ?? 'Particular' }}</td>
                     <td style="text-align: center; font-weight: bold;">{{ $est->promedio_egreso }} pts</td>
-                    <td style="text-align: center; font-weight: bold; color: #155724;">HABILITADO</td>
+                    <td style="text-align: center; font-weight: bold; color: {{ $tipoGraduacion === 'REPROBADOS' ? '#721c24' : '#155724' }};">
+                        {{ $tipoGraduacion === 'REPROBADOS' ? 'REPROBADO' : ($tipoGraduacion === 'APROBADOS' ? 'APROBADO' : 'HABILITADO') }}
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; padding: 10px; color: #888;">No se registran estudiantes graduados para este criterio.</td>
+                    <td colspan="7" style="text-align: center; padding: 10px; color: #888;">No se registran estudiantes para este criterio ({{ $tipoGraduacion }}).</td>
                 </tr>
             @endforelse
         </tbody>

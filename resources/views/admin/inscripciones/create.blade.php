@@ -146,9 +146,26 @@
                             <input type="hidden" name="modulo_id" id="modulo_id" value="">
                         </div>
 
+                        <!-- Modalidad Examen de Nivel / Ubicación -->
+                        <div class="form-group bg-light border rounded p-2 mb-3">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" id="examen_nivel" name="examen_nivel" value="1" {{ old('examen_nivel') ? 'checked' : '' }}>
+                                <label class="custom-control-label font-weight-bold text-primary" for="examen_nivel" style="cursor: pointer;">
+                                    <i class="fas fa-fast-forward mr-1"></i> Ingreso por Examen de Nivel / Ubicación
+                                </label>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                                Active esta opción si el estudiante dio examen de nivel para inscribirse directamente a un módulo superior (Mód. 2 al 9) sin haber cursado los módulos previos.
+                            </small>
+                        </div>
+
                         <!-- Alerta Dinámica de Prerrequisitos -->
                         <div id="alerta-prerrequisito" style="display: none;" class="alert alert-danger py-2 text-sm">
                             <i class="fas fa-lock mr-1"></i> <span id="msg-prerrequisito"></span>
+                        </div>
+
+                        <div id="alerta-examen-nivel" style="display: none;" class="alert alert-info py-2 text-sm">
+                            <i class="fas fa-check-double mr-1"></i> <strong>Examen de Nivel habilitado:</strong> Se autoriza la inscripción directa a este módulo eximiendo las correlativas previas.
                         </div>
 
                         <!-- Resumen del paralelo elegido -->
@@ -227,6 +244,9 @@
                 });
             });
 
+            var cumplePrerrequisito = true;
+            var mensajePrerrequisito = '';
+
             // 2. Al seleccionar Paralelo, extraer módulo y verificar correlativas
             $('#paralelo_id').on('change', function() {
                 var selectedOption = $(this).find('option:selected');
@@ -252,23 +272,41 @@
                             data: { estudiante_id: estudianteId, modulo_id: moduloId },
                             dataType: 'json',
                             success: function(resp) {
-                                if (resp.cumple) {
-                                    $('#alerta-prerrequisito').hide();
-                                    $('#btn-inscribir').prop('disabled', false);
-                                } else {
-                                    $('#msg-prerrequisito').text(resp.mensaje);
-                                    $('#alerta-prerrequisito').show();
-                                    $('#btn-inscribir').prop('disabled', true);
-                                }
+                                cumplePrerrequisito = resp.cumple;
+                                mensajePrerrequisito = resp.mensaje;
+                                actualizarEstadoPrerrequisito();
                             }
                         });
                     }
                 } else {
                     $('#detalle-paralelo').hide();
                     $('#alerta-prerrequisito').hide();
+                    $('#alerta-examen-nivel').hide();
                 }
                 verificarFormulario();
             });
+
+            $('#examen_nivel').on('change', function() {
+                actualizarEstadoPrerrequisito();
+            });
+
+            function actualizarEstadoPrerrequisito() {
+                var esExamenNivel = $('#examen_nivel').is(':checked');
+                if (cumplePrerrequisito) {
+                    $('#alerta-prerrequisito').hide();
+                    $('#alerta-examen-nivel').toggle(esExamenNivel);
+                } else {
+                    if (esExamenNivel) {
+                        $('#alerta-prerrequisito').hide();
+                        $('#alerta-examen-nivel').show();
+                    } else {
+                        $('#msg-prerrequisito').text(mensajePrerrequisito + ' (Si ingresó por Examen de Ubicación, active la casilla "Ingreso por Examen de Nivel").');
+                        $('#alerta-prerrequisito').show();
+                        $('#alerta-examen-nivel').hide();
+                    }
+                }
+                verificarFormulario();
+            }
 
             $('#boleta_pago_id').on('change', function() {
                 verificarFormulario();
@@ -278,7 +316,8 @@
                 var est = $('#estudiante_id').val();
                 var bol = $('#boleta_pago_id').val();
                 var par = $('#paralelo_id').val();
-                var tieneBloqueo = $('#alerta-prerrequisito').is(':visible');
+                var esExamenNivel = $('#examen_nivel').is(':checked');
+                var tieneBloqueo = !cumplePrerrequisito && !esExamenNivel;
 
                 if (est && bol && par && !tieneBloqueo) {
                     $('#btn-inscribir').prop('disabled', false);

@@ -30,7 +30,7 @@
                     @php
                         $foto = ($estudiante->foto && file_exists(public_path($estudiante->foto)))
                             ? asset($estudiante->foto)
-                            : asset('vendor/adminlte/dist/img/avatar.png');
+                            : asset('img/default-avatar.png');
                     @endphp
                     <img src="{{ $foto }}" class="img-thumbnail rounded-circle shadow-sm" style="width: 110px; height: 110px; object-fit: cover;" alt="Avatar">
                 </div>
@@ -57,14 +57,18 @@
 
     <!-- Indicador de Ruta de Graduación Modular (1 al 9) -->
     @php
-        // Calcular módulos aprobados por idioma
+        // Calcular módulos aprobados y convalidados por examen de nivel
         $aprobadosCount = 0;
         $tieneGraduacionIntermedia = false;
         $tieneGraduacionAvanzada = false;
+        $primerModuloOrden = $estudiante->inscripciones->where('estado', '!=', 'ANULADA')->min(function($ins) {
+            return optional($ins->modulo)->numero_orden;
+        });
 
         foreach($estudiante->inscripciones as $ins) {
             $nota = optional($ins->calificacion)->nota_final ?? null;
-            if ($nota !== null && $nota >= 51) {
+            $estadoCal = optional($ins->calificacion)->estado ?? null;
+            if ($nota !== null && $estadoCal !== 'PENDIENTE' && $nota >= 51) {
                 $aprobadosCount++;
                 if (optional($ins->modulo)->numero_orden == 8) {
                     $tieneGraduacionIntermedia = true;
@@ -74,7 +78,9 @@
                 }
             }
         }
-        $porcentajeAvance = min(100, round(($aprobadosCount / 9) * 100));
+        $convalidadosCount = ($primerModuloOrden && $primerModuloOrden > 1) ? ($primerModuloOrden - 1) : 0;
+        $totalSuperados = min(9, $aprobadosCount + $convalidadosCount);
+        $porcentajeAvance = min(100, round(($totalSuperados / 9) * 100));
     @endphp
 
     <div class="card shadow-sm mb-3">
@@ -84,7 +90,12 @@
         <div class="card-body">
             <div class="row align-items-center mb-3">
                 <div class="col-md-8">
-                    <label class="text-muted mb-1">Progreso General del Programa: <strong>{{ $aprobadosCount }} de 9 Módulos Aprobados ({{ $porcentajeAvance }}%)</strong></label>
+                    <label class="text-muted mb-1">
+                        Progreso General del Programa: <strong>{{ $totalSuperados }} de 9 Módulos Superados ({{ $porcentajeAvance }}%)</strong>
+                        @if($convalidadosCount > 0)
+                            <span class="badge badge-info ml-2"><i class="fas fa-fast-forward mr-1"></i> {{ $convalidadosCount }} Convalidado(s) por Examen de Nivel</span>
+                        @endif
+                    </label>
                     <div class="progress" style="height: 22px;">
                         <div class="progress-bar bg-success font-weight-bold" style="width: {{ $porcentajeAvance }}%">
                             {{ $porcentajeAvance }}%
@@ -138,6 +149,10 @@
                                 $icono = 'fa-spinner fa-spin';
                                 $estadoTexto = 'Cursando';
                             }
+                        } elseif ($primerModuloOrden && $i < $primerModuloOrden) {
+                            $colorClase = 'border-info bg-info text-white';
+                            $icono = 'fa-fast-forward';
+                            $estadoTexto = 'Ex. Nivel';
                         }
                     @endphp
                     <div class="p-2 border rounded shadow-xs mb-2 {{ $colorClase }}" style="flex: 1 1 10%; min-width: 95px; margin: 3px;">
