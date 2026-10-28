@@ -84,6 +84,7 @@ class InscripcionController extends Controller
             'boleta_pago_id' => 'required|exists:boletas_pago,id',
             'modulo_id'      => 'required|exists:modulos,id',
             'paralelo_id'    => 'required|exists:paralelos,id',
+            'examen_nivel'   => 'nullable|boolean',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -104,6 +105,16 @@ class InscripcionController extends Controller
             $paralelo = Paralelo::where('id', $request->paralelo_id)
                 ->lockForUpdate()
                 ->firstOrFail();
+
+            if ((int) $paralelo->modulo_id !== (int) $request->modulo_id) {
+                throw ValidationException::withMessages(['modulo_id' => 'El módulo no corresponde al grupo seleccionado.']);
+            }
+            if (!$paralelo->ciclo || $paralelo->ciclo->estado === 'CERRADO') {
+                throw ValidationException::withMessages(['paralelo_id' => 'El ciclo del grupo está cerrado o no está configurado.']);
+            }
+            if (!Estudiante::whereKey($request->estudiante_id)->where('estado', 'activo')->exists()) {
+                throw ValidationException::withMessages(['estudiante_id' => 'El estudiante está inactivo.']);
+            }
 
             if ($paralelo->cupo_ocupado >= $paralelo->cupo_maximo) {
                 throw ValidationException::withMessages([
@@ -130,6 +141,7 @@ class InscripcionController extends Controller
                 $moduloPrereq = Modulo::find($modulo->prerrequisito_id);
                 $aprobado = Inscripcion::where('estudiante_id', $request->estudiante_id)
                     ->where('modulo_id', $modulo->prerrequisito_id)
+                    ->where('estado', 'ACTIVA')
                     ->whereHas('calificacion', function ($q) {
                         $q->where('estado', 'APROBADO')->where('nota_final', '>=', 51);
                     })->exists();
@@ -215,7 +227,7 @@ class InscripcionController extends Controller
             }
 
             // Regla 1: Validar que no tenga nota definitiva asignada
-            if ($inscripcion->calificacion && $inscripcion->calificacion->nota_final > 0) {
+            if ($inscripcion->calificacion && $inscripcion->calificacion->estado !== 'PENDIENTE') {
                 return redirect()->back()
                     ->with('mensaje', 'Operación Bloqueada: El estudiante ya tiene calificación final asentada en este módulo. No puede anularse.')
                     ->with('icono', 'error');
@@ -271,6 +283,10 @@ class InscripcionController extends Controller
      */
     public function verificar_prerrequisito(Request $request)
     {
+        $request->validate([
+            'estudiante_id' => 'required|exists:estudiantes,id',
+            'modulo_id' => 'required|exists:modulos,id',
+        ]);
         $estudianteId = $request->get('estudiante_id');
         $moduloId = $request->get('modulo_id');
 
@@ -282,6 +298,7 @@ class InscripcionController extends Controller
         $prereq = Modulo::find($modulo->prerrequisito_id);
         $aprobado = Inscripcion::where('estudiante_id', $estudianteId)
             ->where('modulo_id', $modulo->prerrequisito_id)
+                    ->where('estado', 'ACTIVA')
             ->whereHas('calificacion', function ($q) {
                 $q->where('estado', 'APROBADO')->where('nota_final', '>=', 51);
             })->exists();

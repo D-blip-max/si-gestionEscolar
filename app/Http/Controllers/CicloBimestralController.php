@@ -65,8 +65,8 @@ class CicloBimestralController extends Controller
 
     public function activar(string $id)
     {
-        CicloBimestral::where('estado', 'ACTIVO')->update(['estado' => 'CERRADO']);
         $ciclo = CicloBimestral::findOrFail($id);
+        CicloBimestral::where('estado', 'ACTIVO')->update(['estado' => 'CERRADO']);
         $ciclo->update(['estado' => 'ACTIVO']);
 
         return redirect()->back()

@@ -95,11 +95,11 @@ class EstudiantePortalController extends Controller
 
         // Verificar hitos de graduación
         $aptoIntermedio = $estudiante->inscripciones->contains(function ($ins) {
-            return optional($ins->modulo)->numero_orden == 8 && optional($ins->calificacion)->nota_final >= 51;
+            return $ins->estado === 'ACTIVA' && optional($ins->calificacion)->estado === 'APROBADO' && optional($ins->modulo)->numero_orden == 8 && optional($ins->calificacion)->nota_final >= 51;
         });
 
         $aptoAvanzado = $estudiante->inscripciones->contains(function ($ins) {
-            return optional($ins->modulo)->numero_orden == 9 && optional($ins->calificacion)->nota_final >= 51;
+            return $ins->estado === 'ACTIVA' && optional($ins->calificacion)->estado === 'APROBADO' && optional($ins->modulo)->numero_orden == 9 && optional($ins->calificacion)->nota_final >= 51;
         });
 
         return view('estudiante.mis_documentos', compact('estudiante', 'aptoIntermedio', 'aptoAvanzado'));
@@ -116,9 +116,10 @@ class EstudiantePortalController extends Controller
         }
 
         $tipo = strtoupper($tipo);
+        abort_unless(in_array($tipo, ['INTERMEDIO', 'AVANZADO'], true), 404);
         $moduloNumero = ($tipo === 'AVANZADO') ? 9 : 8;
 
-        $aprobado = $estudiante->inscripciones()->whereHas('modulo', function ($q) use ($moduloNumero) {
+        $aprobado = $estudiante->inscripciones()->where('estado', 'ACTIVA')->whereHas('modulo', function ($q) use ($moduloNumero) {
             $q->where('numero_orden', $moduloNumero);
         })->whereHas('calificacion', function ($q) {
             $q->where('estado', 'APROBADO')->where('nota_final', '>=', 51);

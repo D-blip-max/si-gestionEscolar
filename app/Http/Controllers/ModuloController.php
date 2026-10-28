@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Idioma;
 use App\Models\Modulo;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ModuloController extends Controller
 {
@@ -28,7 +29,7 @@ class ModuloController extends Controller
             'numero_orden'     => 'required|integer|min:1|max:20',
             'nivel'            => 'required|in:BASICO,INTERMEDIO,AVANZADO',
             'duracion_meses'   => 'nullable|integer|min:1|max:12',
-            'prerrequisito_id' => 'nullable|exists:modulos,id',
+            'prerrequisito_id' => ['nullable', Rule::exists('modulos', 'id')->where('idioma_id', $request->idioma_id)],
         ]);
 
         // Evitar duplicado de orden por idioma
@@ -70,7 +71,7 @@ class ModuloController extends Controller
             'numero_orden'     => 'required|integer|min:1|max:20',
             'nivel'            => 'required|in:BASICO,INTERMEDIO,AVANZADO',
             'duracion_meses'   => 'nullable|integer|min:1|max:12',
-            'prerrequisito_id' => 'nullable|exists:modulos,id|different:id',
+            'prerrequisito_id' => ['nullable', Rule::exists('modulos', 'id')->where('idioma_id', $request->idioma_id), Rule::notIn([$modulo->id])],
         ]);
 
         // Evitar duplicado en otro registro
@@ -112,6 +113,10 @@ class ModuloController extends Controller
             return redirect()->route('admin.modulos.index')
                 ->with('mensaje', 'No se puede eliminar el módulo porque es prerrequisito de otro módulo posterior.')
                 ->with('icono', 'error');
+        }
+
+        if ($modulo->inscripciones()->exists() || $modulo->paralelos()->exists()) {
+            return back()->with('mensaje', 'No se puede eliminar un módulo con grupos o historial académico.')->with('icono', 'error');
         }
 
         $modulo->delete();

@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class DocenteCalificacionController extends Controller
 {
@@ -56,7 +57,8 @@ class DocenteCalificacionController extends Controller
         $request->validate([
             'paralelo_id'            => 'required|exists:paralelos,id',
             'notas'                  => 'required|array',
-            'notas.*.inscripcion_id' => 'required|exists:inscripciones,id',
+            'notas.*.inscripcion_id' => ['required', 'distinct', Rule::exists('inscripciones', 'id')->where(fn ($query) => $query->where('paralelo_id', $request->input('paralelo_id'))->where('estado', 'ACTIVA'))],
+            'notas.*.observaciones' => 'nullable|string|max:2000',
             'notas.*.nota_final'     => 'required|numeric|min:0|max:100',
         ]);
 
@@ -93,9 +95,7 @@ class DocenteCalificacionController extends Controller
 
                 $calificacion->nota_final = $nota;
                 $calificacion->estado = $estado;
-                if ($observaciones) {
-                    $calificacion->observaciones = $observaciones;
-                }
+                $calificacion->observaciones = $observaciones;
                 $calificacion->updated_by = $user->id;
                 $calificacion->save();
             }

@@ -122,6 +122,10 @@ class BoletaPagoController extends Controller
                 ->with('icono', 'error');
         }
 
+        if (\App\Models\Inscripcion::where('boleta_pago_id', $boleta->id)->exists()) {
+            return back()->with('mensaje', 'La boleta tiene historial de inscripciones y no puede eliminarse.')->with('icono', 'error');
+        }
+
         if ($boleta->archivo_comprobante && file_exists(public_path($boleta->archivo_comprobante))) {
             @unlink(public_path($boleta->archivo_comprobante));
         }

@@ -34,6 +34,11 @@ class Modulo extends Model
         return $this->belongsTo(Modulo::class, 'prerrequisito_id');
     }
 
+    public function inscripciones()
+    {
+        return $this->hasMany(Inscripcion::class);
+    }
+
     public function paralelos()
     {
         return $this->hasMany(Paralelo::class);

@@ -91,10 +91,8 @@ class AsignacionController extends Controller
                 ->whereHas('paralelo', function ($query) use ($paralelo) {
                     $query->where('ciclo_id', $paralelo->ciclo_id)
                         ->where('turno', $paralelo->turno)
-                        ->where(function ($q) use ($paralelo) {
-                            $q->whereBetween('hora_inicio', [$paralelo->hora_inicio, $paralelo->hora_fin])
-                              ->orWhereBetween('hora_fin', [$paralelo->hora_inicio, $paralelo->hora_fin]);
-                        });
+                        ->where('hora_inicio', '<', $paralelo->hora_fin)
+                        ->where('hora_fin', '>', $paralelo->hora_inicio);
                 })->exists();
 
             if ($choqueHorario) {
@@ -176,6 +174,17 @@ class AsignacionController extends Controller
                 ->withInput()
                 ->with('mensaje', 'El grupo seleccionado ya está asignado a otro docente.')
                 ->with('icono', 'error');
+        }
+
+        if ($request->estado === 'activo' && $paralelo->hora_inicio && $paralelo->hora_fin) {
+            $choque = Asignacion::where('personal_id', $request->personal_id)
+                ->where('id', '!=', $asignacion->id)->where('estado', 'activo')
+                ->whereHas('paralelo', fn ($q) => $q->where('ciclo_id', $paralelo->ciclo_id)
+                    ->where('hora_inicio', '<', $paralelo->hora_fin)
+                    ->where('hora_fin', '>', $paralelo->hora_inicio))->exists();
+            if ($choque) {
+                return back()->withInput()->with('mensaje', 'El docente ya tiene un grupo en ese horario.')->with('icono', 'error');
+            }
         }
 
         $asignacion->update([

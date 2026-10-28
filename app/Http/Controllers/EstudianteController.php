@@ -208,6 +208,9 @@ class EstudianteController extends Controller
     public function destroy($id)
     {
         $estudiante = Estudiante::findOrFail($id);
+        if ($estudiante->inscripciones()->exists() || $estudiante->boletas()->exists()) {
+            return back()->with('mensaje', 'El estudiante tiene historial académico o boletas. Desactívelo en lugar de eliminarlo.')->with('icono', 'error');
+        }
         $usuario = User::find($estudiante->usuario_id);
 
         if ($estudiante->foto && file_exists(public_path($estudiante->foto))) {

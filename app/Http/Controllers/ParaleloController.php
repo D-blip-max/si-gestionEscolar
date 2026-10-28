@@ -40,8 +40,8 @@ class ParaleloController extends Controller
             'modalidad'     => 'required|in:PRESENCIAL,VIRTUAL',
             'aula_o_enlace' => 'required|string|max:255',
             'turno'         => 'required|in:MAÑANA,TARDE,NOCHE',
-            'hora_inicio'   => 'nullable',
-            'hora_fin'      => 'nullable',
+            'hora_inicio'   => 'nullable|date_format:H:i,H:i:s',
+            'hora_fin'      => 'nullable|date_format:H:i,H:i:s|after:hora_inicio',
             'cupo_maximo'   => 'required|integer|min:1|max:150',
         ]);
 
@@ -74,10 +74,17 @@ class ParaleloController extends Controller
             'modalidad'     => 'required|in:PRESENCIAL,VIRTUAL',
             'aula_o_enlace' => 'required|string|max:255',
             'turno'         => 'required|in:MAÑANA,TARDE,NOCHE',
-            'hora_inicio'   => 'nullable',
-            'hora_fin'      => 'nullable',
+            'hora_inicio'   => 'nullable|date_format:H:i,H:i:s',
+            'hora_fin'      => 'nullable|date_format:H:i,H:i:s|after:hora_inicio',
             'cupo_maximo'   => 'required|integer|min:1|max:150',
         ]);
+
+        if ((int) $request->cupo_maximo < $paralelo->cupo_ocupado) {
+            return back()->withInput()->with('mensaje', 'El cupo máximo no puede ser menor al número de inscritos.')->with('icono', 'error');
+        }
+        if ($paralelo->inscripciones()->exists() && ((int) $request->modulo_id !== (int) $paralelo->modulo_id || (int) $request->ciclo_id !== (int) $paralelo->ciclo_id)) {
+            return back()->withInput()->with('mensaje', 'No se puede cambiar módulo o ciclo de un grupo con historial académico.')->with('icono', 'error');
+        }
 
         $paralelo->update([
             'nombre'        => strtoupper(trim($request->nombre)),
@@ -100,7 +107,7 @@ class ParaleloController extends Controller
     {
         $paralelo = Paralelo::findOrFail($id);
 
-        if ($paralelo->cupo_ocupado > 0) {
+        if ($paralelo->inscripciones()->exists()) {
             return redirect()->back()
                 ->with('mensaje', 'No se puede eliminar el grupo porque ya tiene alumnos inscritos.')
                 ->with('icono', 'error');
