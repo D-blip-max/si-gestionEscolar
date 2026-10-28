@@ -39,6 +39,7 @@
                             <th>Inscritos</th>
                             <th>Aprobados</th>
                             <th>Reprobados</th>
+                            <th>Estado del Acta</th>
                             <th style="width: 140px;">Acta Oficial</th>
                         </tr>
                     </thead>
@@ -48,10 +49,17 @@
                                 $total = $p->inscripciones->count();
                                 $aprob = $p->inscripciones->filter(fn($i) => optional($i->calificacion)->estado === 'APROBADO')->count();
                                 $reprob = $p->inscripciones->filter(fn($i) => optional($i->calificacion)->estado === 'REPROBADO')->count();
+                                $pend = $total - ($aprob + $reprob);
+                                $esCicloActivo = optional($p->ciclo)->estado === 'ACTIVO';
                             @endphp
                             <tr>
                                 <td class="text-center align-middle font-weight-bold">{{ $loop->iteration }}</td>
-                                <td class="text-center align-middle">{{ optional($p->ciclo)->nombre }}</td>
+                                <td class="text-center align-middle">
+                                    {{ optional($p->ciclo)->nombre }}
+                                    @if($esCicloActivo)
+                                        <span class="badge badge-primary ml-1">ACTUAL</span>
+                                    @endif
+                                </td>
                                 <td class="align-middle">
                                     <strong>{{ optional($p->modulo->idioma)->nombre }}</strong> - {{ optional($p->modulo)->nombre }}
                                 </td>
@@ -67,6 +75,21 @@
                                 <td class="text-center align-middle font-weight-bold">{{ $total }}</td>
                                 <td class="text-center align-middle text-success font-weight-bold">{{ $aprob }}</td>
                                 <td class="text-center align-middle text-danger font-weight-bold">{{ $reprob }}</td>
+                                <td class="text-center align-middle">
+                                    @if(!$esCicloActivo)
+                                        <span class="badge badge-secondary px-2 py-1">
+                                            <i class="fas fa-lock mr-1"></i> ACTA CERRADA
+                                        </span>
+                                    @elseif($pend === 0 && $total > 0)
+                                        <span class="badge badge-success px-2 py-1">
+                                            <i class="fas fa-check-double mr-1"></i> CALIFICADA (VIGENTE)
+                                        </span>
+                                    @else
+                                        <span class="badge badge-warning text-dark px-2 py-1">
+                                            <i class="fas fa-unlock mr-1"></i> ACTA ABIERTA ({{ $pend }} pend.)
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="text-center align-middle">
                                     <a href="{{ route('docente.actas.pdf', $p->id) }}" target="_blank" class="btn btn-danger btn-sm font-weight-bold shadow-sm">
                                         <i class="fas fa-file-pdf mr-1"></i> Imprimir Acta

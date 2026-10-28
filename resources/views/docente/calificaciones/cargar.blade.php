@@ -47,6 +47,22 @@
         </div>
     @endif
 
+    @php
+        $esCicloCerrado = optional($paralelo->ciclo)->estado === 'CERRADO';
+        $bloqueadoParaDocente = $esCicloCerrado && !auth()->user()->hasRole('ADMINISTRADOR');
+    @endphp
+
+    @if($esCicloCerrado)
+        <div class="alert alert-secondary shadow-sm mb-3">
+            <i class="fas fa-lock mr-2"></i>
+            <strong>Acta Oficial Cerrada ({{ optional($paralelo->ciclo)->nombre }}):</strong>
+            Este grupo pertenece a un ciclo bimestral anterior que ya fue concluido y consolidado.
+            @if($bloqueadoParaDocente)
+                La planilla se muestra únicamente en modo consulta.
+            @endif
+        </div>
+    @endif
+
     <!-- Cabecera del Grupo -->
     <div class="card card-outline card-primary shadow-sm mb-3">
         <div class="card-body">
@@ -126,6 +142,7 @@
                                                max="100" 
                                                step="0.5" 
                                                required
+                                               {{ $bloqueadoParaDocente ? 'readonly disabled' : '' }}
                                                oninput="actualizarEstado({{ $loop->index }})">
                                     </td>
                                     <td class="align-middle">
@@ -139,6 +156,7 @@
                                                name="notas[{{ $loop->index }}][observaciones]" 
                                                class="form-control form-control-sm" 
                                                value="{{ old('notas.'.$loop->index.'.observaciones', optional($calificacion)->observaciones) }}" 
+                                               {{ $bloqueadoParaDocente ? 'readonly disabled' : '' }}
                                                placeholder="Opcional">
                                     </td>
                                 </tr>
@@ -154,9 +172,9 @@
 
             <div class="card-footer bg-white text-right">
                 <a href="{{ route('docente.grupos.index') }}" class="btn btn-secondary mr-2">
-                    <i class="fas fa-times mr-1"></i> Cancelar
+                    <i class="fas fa-arrow-left mr-1"></i> Volver a Mis Grupos
                 </a>
-                @if(count($paralelo->inscripciones) > 0)
+                @if(count($paralelo->inscripciones) > 0 && !$bloqueadoParaDocente)
                     <button type="submit" class="btn btn-success font-weight-bold">
                         <i class="fas fa-save mr-1"></i> Guardar Calificaciones Definitivas
                     </button>

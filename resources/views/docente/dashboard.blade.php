@@ -224,7 +224,7 @@
         <div class="card-header bg-white">
             <h5 class="card-title font-weight-bold mb-0">
                 <i class="fas fa-history text-secondary mr-1"></i>
-                Historial de Grupos Dictados y Resultados de Aprobación / Reprobación
+                Grupos Dictados Tiempo Atrás (Actas Cerradas — Ciclos Anteriores)
             </h5>
         </div>
         <div class="card-body table-responsive p-0">
@@ -234,6 +234,7 @@
                         <th>Ciclo Bimestral</th>
                         <th>Idioma y Módulo</th>
                         <th>Grupo / Modalidad</th>
+                        <th class="text-center">Estado de Acta</th>
                         <th class="text-center">Total Alumnos</th>
                         <th class="text-center">Aprobados (>= 51)</th>
                         <th class="text-center">Reprobados (< 51)</th>
@@ -263,6 +264,11 @@
                                 <strong>{{ $p->nombre }}</strong>
                                 <small class="text-muted">({{ $p->modalidad }} - {{ $p->turno }})</small>
                             </td>
+                            <td class="text-center">
+                                <span class="badge badge-secondary px-2 py-1">
+                                    <i class="fas fa-lock mr-1"></i> ACTA CERRADA
+                                </span>
+                            </td>
                             <td class="text-center font-weight-bold">{{ $cant }}</td>
                             <td class="text-center">
                                 <span class="badge badge-success px-2">{{ $aprob }} aprobados</span>
@@ -283,7 +289,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-3">
+                            <td colspan="9" class="text-center text-muted py-3">
                                 Sin registros de ciclos bimestrales anteriores.
                             </td>
                         </tr>
