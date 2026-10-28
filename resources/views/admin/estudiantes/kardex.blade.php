@@ -117,12 +117,13 @@
                             return optional($ins->modulo)->numero_orden == $i;
                         });
                         $nota = optional(optional($inscripcionModulo)->calificacion)->nota_final;
+                        $estadoCal = optional(optional($inscripcionModulo)->calificacion)->estado;
                         $colorClase = 'border-secondary text-muted bg-light';
                         $icono = 'fa-circle';
                         $estadoTexto = 'Pendiente';
 
                         if ($inscripcionModulo) {
-                            if ($nota !== null) {
+                            if ($nota !== null && $estadoCal !== 'PENDIENTE') {
                                 if ($nota >= 51) {
                                     $colorClase = 'border-success bg-success text-white';
                                     $icono = 'fa-check-circle';
@@ -182,17 +183,18 @@
                         @forelse($estudiante->inscripciones as $ins)
                             @php
                                 $nota = optional($ins->calificacion)->nota_final;
+                                $estadoCal = optional($ins->calificacion)->estado;
                                 $esVirtual = strtoupper(optional($ins->paralelo)->modalidad) === 'VIRTUAL';
                             @endphp
                             <tr>
                                 <td class="align-middle font-weight-bold">{{ $loop->iteration }}</td>
                                 <td class="align-middle">
                                     <span class="badge badge-light border px-2 py-1">
-                                        <i class="far fa-calendar-alt text-primary mr-1"></i> {{ optional($ins->paralelo->ciclo)->nombre ?? 'Ciclo' }}
+                                        <i class="far fa-calendar-alt text-primary mr-1"></i> {{ optional(optional($ins->paralelo)->ciclo)->nombre ?? 'Ciclo' }}
                                     </span>
                                 </td>
                                 <td class="align-middle text-left">
-                                    <strong>{{ optional($ins->modulo->idioma)->nombre }}</strong><br>
+                                    <strong>{{ optional(optional($ins->modulo)->idioma)->nombre }}</strong><br>
                                     <span class="text-muted">{{ optional($ins->modulo)->nombre }} (Orden: {{ optional($ins->modulo)->numero_orden }})</span>
                                 </td>
                                 <td class="align-middle">
@@ -218,14 +220,14 @@
                                     </span>
                                 </td>
                                 <td class="align-middle font-weight-bold" style="font-size: 1.1rem;">
-                                    @if($nota !== null)
+                                    @if($nota !== null && $estadoCal !== 'PENDIENTE')
                                         <span class="{{ $nota >= 51 ? 'text-success' : 'text-danger' }}">{{ $nota }}</span>
                                     @else
                                         <span class="text-muted font-italic font-weight-normal text-sm">En Curso</span>
                                     @endif
                                 </td>
                                 <td class="align-middle">
-                                    @if($nota !== null)
+                                    @if($nota !== null && $estadoCal !== 'PENDIENTE')
                                         @if($nota >= 51)
                                             <span class="badge badge-success px-2 py-1"><i class="fas fa-check-circle mr-1"></i> APROBADO</span>
                                         @else

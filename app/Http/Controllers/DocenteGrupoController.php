@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Auth;
 class DocenteGrupoController extends Controller
 {
     /**
-     * CU-16: Mis Grupos Asignados (Docente)
+     * Mis Grupos Asignados (Docente)
      */
     public function index()
     {
         $user = Auth::user();
 
-        // Si es administrador, puede ver todos los grupos asignados o supervisar
-        if ($user->hasRole('ADMINISTRADOR')) {
+        // Si es administrador o directivo, puede ver todos los grupos asignados o supervisar
+        if ($user->hasAnyRole(['ADMINISTRADOR', 'DIRECTOR/A GENERAL', 'DIRECTOR/A ACADÉMICO', 'SECRETARIO/A'])) {
             $asignaciones = Asignacion::with([
                 'personal.usuario',
                 'paralelo.modulo.idioma',
@@ -28,7 +28,7 @@ class DocenteGrupoController extends Controller
                 },
                 'paralelo.inscripciones.estudiante',
                 'paralelo.inscripciones.calificacion'
-            ])->where('estado', 'activo')
+            ])->where('estado', 'ACTIVO')
               ->orderBy('id', 'desc')
               ->get();
 
@@ -37,7 +37,8 @@ class DocenteGrupoController extends Controller
 
         $docente = $user->personal;
         if (!$docente) {
-            abort(403, 'El usuario actual no tiene una ficha de personal docente vinculada.');
+            $asignaciones = collect();
+            return view('docente.grupos.index', compact('asignaciones'));
         }
 
         $asignaciones = Asignacion::with([
@@ -51,7 +52,7 @@ class DocenteGrupoController extends Controller
             'paralelo.inscripciones.calificacion'
         ])
         ->where('personal_id', $docente->id)
-        ->where('estado', 'activo')
+        ->where('estado', 'ACTIVO')
         ->orderBy('id', 'desc')
         ->get();
 
@@ -59,7 +60,7 @@ class DocenteGrupoController extends Controller
     }
 
     /**
-     * CU-16: Ver Lista de Alumnos del Grupo
+     * Ver Lista de Alumnos del Grupo
      */
     public function show($id)
     {
@@ -75,7 +76,7 @@ class DocenteGrupoController extends Controller
         ])->findOrFail($id);
 
         $user = Auth::user();
-        if (!$user->hasRole('ADMINISTRADOR')) {
+        if (!$user->hasAnyRole(['ADMINISTRADOR', 'DIRECTOR/A GENERAL', 'DIRECTOR/A ACADÉMICO', 'SECRETARIO/A'])) {
             $docente = $user->personal;
             if (!$docente || optional($paralelo->asignacion)->personal_id !== $docente->id) {
                 abort(403, 'No tiene autorización para visualizar los alumnos de este grupo.');

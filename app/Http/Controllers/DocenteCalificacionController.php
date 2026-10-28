@@ -38,7 +38,7 @@ class DocenteCalificacionController extends Controller
         ])->findOrFail($paralelo_id);
 
         $user = Auth::user();
-        if (!$user->hasRole('ADMINISTRADOR')) {
+        if (!$user->hasAnyRole(['ADMINISTRADOR', 'DIRECTOR/A GENERAL', 'DIRECTOR/A ACADÉMICO'])) {
             $docente = $user->personal;
             if (!$docente || optional($paralelo->asignacion)->personal_id !== $docente->id) {
                 abort(403, 'No autorizado para asentar calificaciones en este grupo modular.');
@@ -49,7 +49,7 @@ class DocenteCalificacionController extends Controller
     }
 
     /**
-     * CU-17: Guardar Notas Finales en Lote (Garantía ACID + Auditoría)
+     * Guardar Notas Finales en Lote
      */
     public function guardar_lote(Request $request)
     {
@@ -63,7 +63,7 @@ class DocenteCalificacionController extends Controller
         $paralelo = Paralelo::findOrFail($request->paralelo_id);
 
         $user = Auth::user();
-        if (!$user->hasRole('ADMINISTRADOR')) {
+        if (!$user->hasAnyRole(['ADMINISTRADOR', 'DIRECTOR/A GENERAL', 'DIRECTOR/A ACADÉMICO'])) {
             $docente = $user->personal;
             if (!$docente || optional($paralelo->asignacion)->personal_id !== $docente->id) {
                 abort(403, 'No autorizado para asentar calificaciones en este grupo modular.');
@@ -87,7 +87,6 @@ class DocenteCalificacionController extends Controller
                         'nota_anterior'   => $notaAnterior,
                         'nota_nueva'      => $nota,
                         'modificado_por'  => $user->id,
-                        'usuario_id'      => $user->id,
                         'created_at'      => now(),
                     ]);
                 }
@@ -108,13 +107,13 @@ class DocenteCalificacionController extends Controller
     }
 
     /**
-     * CU-18: Listado de Actas Oficiales
+     * Listado de Actas Oficiales
      */
     public function actas_index()
     {
         $user = Auth::user();
 
-        if ($user->hasRole('ADMINISTRADOR')) {
+        if ($user->hasAnyRole(['ADMINISTRADOR', 'DIRECTOR/A GENERAL', 'DIRECTOR/A ACADÉMICO', 'SECRETARIO/A'])) {
             $paralelos = Paralelo::with([
                 'modulo.idioma',
                 'ciclo',
@@ -127,7 +126,8 @@ class DocenteCalificacionController extends Controller
         } else {
             $docente = $user->personal;
             if (!$docente) {
-                abort(403, 'Usuario sin ficha docente.');
+                $paralelos = collect();
+                return view('docente.calificaciones.actas_index', compact('paralelos'));
             }
 
             $paralelos = Paralelo::with([
@@ -147,7 +147,7 @@ class DocenteCalificacionController extends Controller
     }
 
     /**
-     * CU-18: Generar Acta Oficial de Calificaciones en PDF
+     * Generar Acta Oficial de Calificaciones en PDF
      */
     public function acta_pdf($paralelo_id)
     {
@@ -163,7 +163,7 @@ class DocenteCalificacionController extends Controller
         ])->findOrFail($paralelo_id);
 
         $user = Auth::user();
-        if (!$user->hasRole('ADMINISTRADOR')) {
+        if (!$user->hasAnyRole(['ADMINISTRADOR', 'DIRECTOR/A GENERAL', 'DIRECTOR/A ACADÉMICO', 'SECRETARIO/A'])) {
             $docente = $user->personal;
             if (!$docente || optional($paralelo->asignacion)->personal_id !== $docente->id) {
                 abort(403, 'No autorizado para emitir el acta de este grupo.');

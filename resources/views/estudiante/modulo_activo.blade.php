@@ -39,7 +39,7 @@
                                 MODALIDAD {{ strtoupper(optional($paralelo)->modalidad) }}
                             </span>
                             <span class="badge badge-light border text-muted">
-                                <i class="far fa-calendar-alt text-primary mr-1"></i> {{ optional($paralelo->ciclo)->nombre }}
+                                <i class="far fa-calendar-alt text-primary mr-1"></i> {{ optional(optional($paralelo)->ciclo)->nombre }}
                             </span>
                         </div>
                     </div>
@@ -47,10 +47,10 @@
                     <div class="card-body py-4">
                         <div class="text-center mb-4">
                             <h2 class="font-weight-bold text-primary mb-1">
-                                {{ optional($modulo->idioma)->nombre }} - {{ $modulo->nombre }}
+                                {{ optional(optional($modulo)->idioma)->nombre }} - {{ optional($modulo)->nombre }}
                             </h2>
                             <p class="text-muted font-weight-bold">
-                                Nivel: <span class="text-uppercase">{{ $modulo->nivel }}</span> | Grupo: {{ $paralelo->nombre }}
+                                Nivel: <span class="text-uppercase">{{ optional($modulo)->nivel }}</span> | Grupo: {{ optional($paralelo)->nombre }}
                             </p>
                         </div>
 
@@ -62,7 +62,7 @@
                                 <p class="text-muted text-sm mb-3">
                                     Su clase se encuentra habilitada. Ingrese puntualmente con su cuenta de estudiante.
                                 </p>
-                                @if($paralelo->aula_o_enlace)
+                                @if(optional($paralelo)->aula_o_enlace)
                                     <a href="{{ $paralelo->aula_o_enlace }}" target="_blank" class="btn btn-info btn-lg px-5 font-weight-bold shadow">
                                         <i class="fas fa-external-link-alt mr-2"></i> ENTRAR A LA CLASE VIRTUAL
                                     </a>
@@ -74,7 +74,7 @@
                                 <h4 class="font-weight-bold text-dark">Clase Presencial en Campus</h4>
                                 <p class="text-muted text-sm mb-2">Su aula física asignada para este ciclo bimestral es:</p>
                                 <div class="display-4 font-weight-bold text-primary mb-2">
-                                    {{ $paralelo->aula_o_enlace ?? 'Aula 101' }}
+                                    {{ optional($paralelo)->aula_o_enlace ?? 'Aula 101' }}
                                 </div>
                                 <small class="text-muted">Preséntese portando su documento de identidad.</small>
                             @endif
@@ -86,7 +86,7 @@
                                 <div class="border rounded p-2 bg-light">
                                     <small class="text-muted font-weight-bold">TURNO Y HORARIO</small>
                                     <div class="font-weight-bold text-dark mt-1">
-                                        {{ $paralelo->turno }} ({{ substr($paralelo->hora_inicio,0,5) }} - {{ substr($paralelo->hora_fin,0,5) }})
+                                        {{ optional($paralelo)->turno }} ({{ substr(optional($paralelo)->hora_inicio ?? '00:00',0,5) }} - {{ substr(optional($paralelo)->hora_fin ?? '00:00',0,5) }})
                                     </div>
                                 </div>
                             </div>

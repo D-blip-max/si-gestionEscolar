@@ -56,28 +56,28 @@ class RoleController extends Controller
             $name = strtolower($permiso->name);
 
             if (str_contains($name, 'configuracion') || str_contains($name, 'usuarios') || str_contains($name, 'roles') || str_contains($name, 'seguridad')) {
-                return 'Paquete 1: Administración y Seguridad';
+                return 'Administración y Seguridad';
             }
             if (str_contains($name, 'idiomas') || str_contains($name, 'modulos') || str_contains($name, 'paralelos') || str_contains($name, 'ciclos') || str_contains($name, 'catalogos') || str_contains($name, 'gestion') || str_contains($name, 'periodos') || str_contains($name, 'niveles') || str_contains($name, 'grados') || str_contains($name, 'turnos') || str_contains($name, 'materias')) {
-                return 'Paquete 2: Catálogos Académicos';
+                return 'Catálogos Académicos';
             }
             if (str_contains($name, 'personal') || str_contains($name, 'asignaciones') || str_contains($name, 'formaciones')) {
-                return 'Paquete 3: Personal y Docencia';
+                return 'Personal y Docencia';
             }
             if (str_contains($name, 'estudiantes') || str_contains($name, 'boletas') || str_contains($name, 'ppffs')) {
-                return 'Paquete 4: Estudiantes y Boletas';
+                return 'Estudiantes y Boletas';
             }
             if (str_contains($name, 'inscripciones') || str_contains($name, 'matriculaciones')) {
-                return 'Paquete 5: Inscripciones y Matrícula';
+                return 'Inscripciones y Matrícula';
             }
             if (str_contains($name, 'docente') || str_contains($name, 'calificaciones') || str_contains($name, 'actas') || str_contains($name, 'asistencias')) {
-                return 'Paquete 6: Control de Notas';
+                return 'Control de Notas';
             }
             if (str_contains($name, 'estudiante.portal') || str_contains($name, 'estudiante.clases') || str_contains($name, 'estudiante.avance') || str_contains($name, 'estudiante.documentos')) {
-                return 'Paquete 7: Portal del Estudiante';
+                return 'Portal del Estudiante';
             }
             if (str_contains($name, 'reportes') || str_contains($name, 'pagos')) {
-                return 'Paquete 8: Reportes y Finanzas';
+                return 'Reportes y Finanzas';
             }
 
             return 'Otros Permisos Generales';

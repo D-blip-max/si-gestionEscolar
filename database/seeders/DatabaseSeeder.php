@@ -241,7 +241,6 @@ class DatabaseSeeder extends Seeder
 
             $est = Estudiante::firstOrCreate(['ci' => $item['ci']], [
                 'usuario_id' => $uEst->id,
-                'user_id' => $uEst->id,
                 'codigo_estudiante' => sprintf('CEI-2026-%04d', $correlativo++),
                 'nombres' => $item['nombres'],
                 'apellidos' => $item['apellidos'],
@@ -249,15 +248,15 @@ class DatabaseSeeder extends Seeder
                 'fecha_nacimiento' => '2002-05-10',
                 'telefono' => $item['telefono'],
                 'direccion' => 'Santa Cruz de la Sierra - Campus Universitario',
-                'genero' => ($correlativo % 2 == 0) ? 'Femenino' : 'Masculino',
-                'estado' => 1,
+                'genero' => ($correlativo % 2 == 0) ? 'femenino' : 'masculino',
+                'estado' => 'activo',
                 'ppff_id' => null
             ]);
 
             // Boleta Bancaria Universitaria de muestra
             $boleta = BoletaPago::firstOrCreate(['numero_boleta' => 'BOL-2026-000' . $est->id], [
                 'estudiante_id' => $est->id,
-                'banco' => 'BANCO UNIÓN S.A.',
+                'banco_entidad' => 'BANCO UNIÓN S.A.',
                 'fecha_deposito' => '2026-01-14',
                 'monto' => 350.00,
                 'concepto' => 'Matrícula Módulo 1 Inglés CEI',
@@ -266,19 +265,28 @@ class DatabaseSeeder extends Seeder
             ]);
 
             // Inscripción Activa al Módulo 1 en el ciclo
-            Inscripcion::firstOrCreate([
+            $paraleloAsignado = ($correlativo % 2 == 0) ? $paralelo1 : $paralelo2;
+            $inscripcion = Inscripcion::firstOrCreate([
                 'estudiante_id' => $est->id,
-                'ciclo_id' => $ciclo1->id,
-                'modulo_id' => $m1->id
+                'modulo_id' => $m1->id,
+                'paralelo_id' => $paraleloAsignado->id,
             ], [
-                'paralelo_id' => ($correlativo % 2 == 0) ? $paralelo1->id : $paralelo2->id,
                 'boleta_pago_id' => $boleta->id,
-                'costo_matricula' => 350.00,
                 'fecha_inscripcion' => '2026-01-15',
                 'estado' => 'ACTIVA',
-                'observacion' => 'Inscripción modular regular ciclo 2026-I',
-                'usuario_id' => $adminUser->id
+                'inscrito_por' => $adminUser->id
             ]);
+
+            if ($inscripcion->wasRecentlyCreated) {
+                $paraleloAsignado->increment('cupo_ocupado');
+                \App\Models\Calificacion::firstOrCreate([
+                    'inscripcion_id' => $inscripcion->id
+                ], [
+                    'nota_final' => 0.00,
+                    'estado' => 'PENDIENTE',
+                    'observaciones' => 'Inscrito regularmente'
+                ]);
+            }
         }
     }
 }

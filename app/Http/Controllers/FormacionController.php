@@ -10,6 +10,23 @@ use Illuminate\Support\Facades\File;
 class FormacionController extends Controller
 {
     /**
+     * Acceso directo desde el menú lateral a Formación Académica
+     */
+    public function index_general()
+    {
+        $personal = Personal::where('tipo', 'docente')->orderBy('id', 'desc')->first()
+            ?? Personal::orderBy('id', 'desc')->first();
+
+        if (!$personal) {
+            return redirect()->route('admin.personal.index', 'docente')
+                ->with('mensaje', 'Aún no existe personal registrado para gestionar su formación académica.')
+                ->with('icono', 'warning');
+        }
+
+        return redirect()->route('admin.personal.formaciones.index', $personal->id);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index($id)

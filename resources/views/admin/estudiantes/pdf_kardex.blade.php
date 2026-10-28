@@ -175,15 +175,16 @@
             @forelse($estudiante->inscripciones as $ins)
                 @php
                     $nota = optional($ins->calificacion)->nota_final;
-                    if ($nota !== null && $nota >= 51) {
+                    $estadoCal = optional($ins->calificacion)->estado;
+                    if ($nota !== null && $estadoCal !== 'PENDIENTE' && $nota >= 51) {
                         $aprobados++;
                     }
                 @endphp
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ optional($ins->paralelo->ciclo)->nombre ?? 'Ciclo' }}</td>
+                    <td>{{ optional(optional($ins->paralelo)->ciclo)->nombre ?? 'Ciclo' }}</td>
                     <td style="text-align: left;">
-                        <strong>{{ optional($ins->modulo->idioma)->nombre }}</strong> - {{ optional($ins->modulo)->nombre }}
+                        <strong>{{ optional(optional($ins->modulo)->idioma)->nombre }}</strong> - {{ optional($ins->modulo)->nombre }}
                     </td>
                     <td>{{ strtoupper(optional($ins->modulo)->nivel ?? 'General') }}</td>
                     <td>{{ strtoupper(optional($ins->paralelo)->modalidad ?? 'Presencial') }}</td>
@@ -191,10 +192,10 @@
                         {{ optional(optional(optional($ins->paralelo)->asignacion)->personal)->apellidos }} {{ optional(optional(optional($ins->paralelo)->asignacion)->personal)->nombres ?? 'Docente' }}
                     </td>
                     <td>
-                        <strong>{{ $nota !== null ? $nota : '-' }}</strong>
+                        <strong>{{ ($nota !== null && $estadoCal !== 'PENDIENTE') ? $nota : '-' }}</strong>
                     </td>
                     <td>
-                        @if($nota !== null)
+                        @if($nota !== null && $estadoCal !== 'PENDIENTE')
                             @if($nota >= 51)
                                 <span class="aprobado">APROBADO</span>
                             @else

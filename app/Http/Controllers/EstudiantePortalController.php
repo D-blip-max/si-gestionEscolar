@@ -12,16 +12,14 @@ use Illuminate\Support\Facades\Auth;
 class EstudiantePortalController extends Controller
 {
     /**
-     * Helper para obtener el estudiante autenticado o el primero para ADMIN/Supervisión
+     * Helper para obtener el estudiante autenticado o el primero para supervisión
      */
     private function getEstudiante()
     {
         $user = Auth::user();
-        $estudiante = Estudiante::where('usuario_id', $user->id)
-            ->orWhere('user_id', $user->id)
-            ->first();
+        $estudiante = Estudiante::where('usuario_id', $user->id)->first();
 
-        if (!$estudiante && $user->hasRole('ADMINISTRADOR')) {
+        if (!$estudiante && $user->hasAnyRole(['ADMINISTRADOR', 'DIRECTOR/A GENERAL', 'DIRECTOR/A ACADÉMICO', 'DIRECTOR/A ADMINISTRATIVO', 'SECRETARIO/A'])) {
             $estudiante = Estudiante::first();
         }
 
@@ -29,13 +27,15 @@ class EstudiantePortalController extends Controller
     }
 
     /**
-     * CU-19: Mi Módulo y Acceso a Clases (Presencial / Meet)
+     * Mi Módulo y Acceso a Clases (Presencial / Meet)
      */
     public function modulo_activo()
     {
         $estudiante = $this->getEstudiante();
         if (!$estudiante) {
-            abort(403, 'No tiene una ficha de estudiante vinculada a esta cuenta.');
+            return redirect()->route('home')
+                ->with('mensaje', 'Aún no existe una ficha de estudiante vinculada o registrada en el sistema.')
+                ->with('icono', 'warning');
         }
 
         $inscripcionActual = Inscripcion::with([
@@ -54,13 +54,15 @@ class EstudiantePortalController extends Controller
     }
 
     /**
-     * CU-20: Avance Curricular y Ruta de Graduación (1 al 9)
+     * Avance Curricular y Ruta de Graduación (1 al 9)
      */
     public function avance_curricular()
     {
         $estudiante = $this->getEstudiante();
         if (!$estudiante) {
-            abort(403, 'No tiene una ficha de estudiante vinculada.');
+            return redirect()->route('home')
+                ->with('mensaje', 'Aún no existe una ficha de estudiante vinculada o registrada en el sistema.')
+                ->with('icono', 'warning');
         }
 
         $estudiante->load([
@@ -73,13 +75,15 @@ class EstudiantePortalController extends Controller
     }
 
     /**
-     * CU-21: Historial de Documentos y Certificados Oficiales
+     * Historial de Documentos y Certificados Oficiales
      */
     public function mis_documentos()
     {
         $estudiante = $this->getEstudiante();
         if (!$estudiante) {
-            abort(403, 'No tiene una ficha de estudiante vinculada.');
+            return redirect()->route('home')
+                ->with('mensaje', 'Aún no existe una ficha de estudiante vinculada o registrada en el sistema.')
+                ->with('icono', 'warning');
         }
 
         $estudiante->load([

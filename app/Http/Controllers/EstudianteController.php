@@ -90,7 +90,6 @@ class EstudianteController extends Controller
             // 4. Crear registro en estudiantes
             $estudiante = Estudiante::create([
                 'usuario_id'        => $usuario->id,
-                'user_id'           => $usuario->id,
                 'codigo_estudiante' => $codigo,
                 'nombres'           => trim($request->nombres),
                 'apellidos'         => trim($request->apellidos),
@@ -227,7 +226,22 @@ class EstudianteController extends Controller
     }
 
     /**
-     * CU-12: Kárdex Académico Modular
+     * Acceso directo desde menú lateral al Kárdex Académico
+     */
+    public function kardex_general()
+    {
+        $estudiante = Estudiante::orderBy('id', 'desc')->first();
+        if (!$estudiante) {
+            return redirect()->route('admin.estudiantes.index')
+                ->with('mensaje', 'Aún no existen estudiantes registrados para consultar el Kárdex.')
+                ->with('icono', 'warning');
+        }
+
+        return redirect()->route('admin.estudiantes.kardex', $estudiante->id);
+    }
+
+    /**
+     * Kárdex Académico Modular
      */
     public function kardex($id)
     {
@@ -239,14 +253,15 @@ class EstudianteController extends Controller
             'inscripciones.modulo.idioma',
             'inscripciones.paralelo.ciclo',
             'inscripciones.paralelo.asignacion.personal',
-            'inscripciones.boletaPago'
+            'inscripciones.boletaPago',
+            'inscripciones.calificacion'
         ])->findOrFail($id);
 
         return view('admin.estudiantes.kardex', compact('estudiante'));
     }
 
     /**
-     * CU-12: Descarga de Kárdex en PDF
+     * Descarga de Kárdex en PDF
      */
     public function kardex_pdf($id)
     {
@@ -259,7 +274,8 @@ class EstudianteController extends Controller
             'inscripciones.modulo.idioma',
             'inscripciones.paralelo.ciclo',
             'inscripciones.paralelo.asignacion.personal',
-            'inscripciones.boletaPago'
+            'inscripciones.boletaPago',
+            'inscripciones.calificacion'
         ])->findOrFail($id);
 
         $pdf = Pdf::loadView('admin.estudiantes.pdf_kardex', compact('configuracion', 'estudiante'));

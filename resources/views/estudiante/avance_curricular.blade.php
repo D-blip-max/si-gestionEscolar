@@ -85,12 +85,13 @@
                             return optional($ins->modulo)->numero_orden == $i;
                         });
                         $nota = optional(optional($inscripcionModulo)->calificacion)->nota_final;
+                        $estadoCal = optional(optional($inscripcionModulo)->calificacion)->estado;
                         $claseCard = 'border-secondary bg-light text-muted';
                         $icono = 'fa-lock';
                         $texto = 'Pendiente';
 
                         if ($inscripcionModulo) {
-                            if ($nota !== null) {
+                            if ($nota !== null && $estadoCal !== 'PENDIENTE') {
                                 if ($nota >= 51) {
                                     $claseCard = 'border-success bg-success text-white shadow-sm';
                                     $icono = 'fa-check-circle';

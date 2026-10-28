@@ -34,7 +34,7 @@ class ParaleloController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nombre'        => 'required|string|max:10',
+            'nombre'        => 'required|string|max:100',
             'ciclo_id'      => 'required|exists:ciclos_bimestrales,id',
             'modulo_id'     => 'required|exists:modulos,id',
             'modalidad'     => 'required|in:PRESENCIAL,VIRTUAL',
@@ -68,7 +68,7 @@ class ParaleloController extends Controller
         $paralelo = Paralelo::findOrFail($id);
 
         $request->validate([
-            'nombre'        => 'required|string|max:10',
+            'nombre'        => 'required|string|max:100',
             'ciclo_id'      => 'required|exists:ciclos_bimestrales,id',
             'modulo_id'     => 'required|exists:modulos,id',
             'modalidad'     => 'required|in:PRESENCIAL,VIRTUAL',

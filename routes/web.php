@@ -59,20 +59,21 @@ Route::delete('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController:
 // =========================================================================
 // MÓDULO 3: PERSONAL Y DOCENCIA (PADRÓN, FORMACIÓN, ASIGNACIONES)
 // =========================================================================
-Route::get('/admin/personal/{tipo?}', [App\Http\Controllers\PersonalController::class, 'index'])->name('admin.personal.index')->middleware('auth', 'can:admin.personal.index');
-Route::get('/admin/personal/create/{tipo?}', [App\Http\Controllers\PersonalController::class, 'create'])->name('admin.personal.create')->middleware('auth', 'can:admin.personal.create');
-Route::post('/admin/personal/create', [App\Http\Controllers\PersonalController::class, 'store'])->name('admin.personal.store')->middleware('auth', 'can:admin.personal.store');
-Route::get('/admin/personal/show/{id}', [App\Http\Controllers\PersonalController::class, 'show'])->name('admin.personal.show')->middleware('auth', 'can:admin.personal.show');
-Route::get('/admin/personal/{id}/edit', [App\Http\Controllers\PersonalController::class, 'edit'])->name('admin.personal.edit')->middleware('auth', 'can:admin.personal.edit');
-Route::put('/admin/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])->name('admin.personal.update')->middleware('auth', 'can:admin.personal.update');
-Route::delete('/admin/personal/{id}', [App\Http\Controllers\PersonalController::class, 'destroy'])->name('admin.personal.destroy')->middleware('auth', 'can:admin.personal.destroy');
-
+Route::get('/admin/personal/formaciones', [App\Http\Controllers\FormacionController::class, 'index_general'])->name('admin.personal.formaciones.general')->middleware('auth', 'can:admin.personal.formaciones.index');
 Route::get('/admin/personal/{id}/formaciones', [App\Http\Controllers\FormacionController::class, 'index'])->name('admin.personal.formaciones.index')->middleware('auth', 'can:admin.personal.formaciones.index');
 Route::get('/admin/personal/{id}/formaciones/create', [App\Http\Controllers\FormacionController::class, 'create'])->name('admin.personal.formaciones.create')->middleware('auth', 'can:admin.personal.formaciones.create');
 Route::post('/admin/personal/{id}/formaciones/create', [App\Http\Controllers\FormacionController::class, 'store'])->name('admin.personal.formaciones.store')->middleware('auth', 'can:admin.personal.formaciones.store');
 Route::get('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'edit'])->name('admin.personal.formaciones.edit')->middleware('auth', 'can:admin.personal.formaciones.edit');
 Route::put('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'update'])->name('admin.personal.formaciones.update')->middleware('auth', 'can:admin.personal.formaciones.update');
 Route::delete('/admin/personal/formaciones/{id}', [App\Http\Controllers\FormacionController::class, 'destroy'])->name('admin.personal.formaciones.destroy')->middleware('auth', 'can:admin.personal.formaciones.destroy');
+
+Route::get('/admin/personal/create/{tipo?}', [App\Http\Controllers\PersonalController::class, 'create'])->name('admin.personal.create')->middleware('auth', 'can:admin.personal.create');
+Route::post('/admin/personal/create', [App\Http\Controllers\PersonalController::class, 'store'])->name('admin.personal.store')->middleware('auth', 'can:admin.personal.store');
+Route::get('/admin/personal/show/{id}', [App\Http\Controllers\PersonalController::class, 'show'])->name('admin.personal.show')->middleware('auth', 'can:admin.personal.show');
+Route::get('/admin/personal/{id}/edit', [App\Http\Controllers\PersonalController::class, 'edit'])->name('admin.personal.edit')->middleware('auth', 'can:admin.personal.edit');
+Route::put('/admin/personal/{id}', [App\Http\Controllers\PersonalController::class, 'update'])->name('admin.personal.update')->middleware('auth', 'can:admin.personal.update');
+Route::delete('/admin/personal/{id}', [App\Http\Controllers\PersonalController::class, 'destroy'])->name('admin.personal.destroy')->middleware('auth', 'can:admin.personal.destroy');
+Route::get('/admin/personal/{tipo?}', [App\Http\Controllers\PersonalController::class, 'index'])->name('admin.personal.index')->middleware('auth', 'can:admin.personal.index');
 
 Route::get('/admin/asignaciones', [App\Http\Controllers\AsignacionController::class, 'index'])->name('admin.asignaciones.index')->middleware('auth', 'can:admin.asignaciones.index');
 Route::get('/admin/asignaciones/create', [App\Http\Controllers\AsignacionController::class, 'create'])->name('admin.asignaciones.create')->middleware('auth', 'can:admin.asignaciones.create');
@@ -87,16 +88,16 @@ Route::delete('/admin/asignaciones/{id}', [App\Http\Controllers\AsignacionContro
 // MÓDULO 4: ESTUDIANTES Y BOLETAS BANCARIAS
 // =========================================================================
 Route::get('/admin/estudiantes/buscar/ajax', [App\Http\Controllers\EstudianteController::class, 'buscar_estudiante_ajax'])->name('admin.estudiantes.buscar_ajax')->middleware('auth');
+Route::get('/admin/estudiantes/kardex', [App\Http\Controllers\EstudianteController::class, 'kardex_general'])->name('admin.estudiantes.kardex.general')->middleware('auth');
 Route::get('/admin/estudiantes', [App\Http\Controllers\EstudianteController::class, 'index'])->name('admin.estudiantes.index')->middleware('auth', 'can:admin.estudiantes.index');
 Route::get('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class, 'create'])->name('admin.estudiantes.create')->middleware('auth', 'can:admin.estudiantes.create');
 Route::post('/admin/estudiantes/create', [App\Http\Controllers\EstudianteController::class, 'store'])->name('admin.estudiantes.store')->middleware('auth', 'can:admin.estudiantes.store');
-Route::get('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class, 'show'])->name('admin.estudiantes.show')->middleware('auth', 'can:admin.estudiantes.show');
+Route::get('/admin/estudiantes/{id}/kardex', [App\Http\Controllers\EstudianteController::class, 'kardex'])->name('admin.estudiantes.kardex')->middleware('auth');
+Route::get('/admin/estudiantes/{id}/kardex-pdf', [App\Http\Controllers\EstudianteController::class, 'kardex_pdf'])->name('admin.estudiantes.kardex_pdf')->middleware('auth');
 Route::get('/admin/estudiantes/{id}/edit', [App\Http\Controllers\EstudianteController::class, 'edit'])->name('admin.estudiantes.edit')->middleware('auth', 'can:admin.estudiantes.edit');
 Route::put('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class, 'update'])->name('admin.estudiantes.update')->middleware('auth', 'can:admin.estudiantes.update');
 Route::delete('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class, 'destroy'])->name('admin.estudiantes.destroy')->middleware('auth', 'can:admin.estudiantes.destroy');
-
-Route::get('/admin/estudiantes/{id}/kardex', [App\Http\Controllers\EstudianteController::class, 'kardex'])->name('admin.estudiantes.kardex')->middleware('auth');
-Route::get('/admin/estudiantes/{id}/kardex-pdf', [App\Http\Controllers\EstudianteController::class, 'kardex_pdf'])->name('admin.estudiantes.kardex_pdf')->middleware('auth');
+Route::get('/admin/estudiantes/{id}', [App\Http\Controllers\EstudianteController::class, 'show'])->name('admin.estudiantes.show')->middleware('auth', 'can:admin.estudiantes.show');
 
 Route::get('/admin/boletas', [App\Http\Controllers\BoletaPagoController::class, 'index'])->name('admin.boletas.index')->middleware('auth');
 Route::post('/admin/boletas', [App\Http\Controllers\BoletaPagoController::class, 'store'])->name('admin.boletas.store')->middleware('auth');
