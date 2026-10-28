@@ -51,4 +51,9 @@ class Paralelo extends Model
     {
         return $this->hasMany(Asignacion::class);
     }
+
+    public function inscripciones()
+    {
+        return $this->hasMany(Inscripcion::class, 'paralelo_id');
+    }
 }

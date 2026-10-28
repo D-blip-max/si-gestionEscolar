@@ -48,11 +48,11 @@ class User extends Authenticatable
         ];
     }
 
-    public function personal() {//relacion 1 a 1
-        return $this->HasOne(Personal::class);
+    public function personal() {
+        return $this->hasOne(Personal::class, 'user_id');
     }
     public function estudiante() {
-        return $this->HasOne(Estudiante::class);
+        return $this->hasOne(Estudiante::class, 'usuario_id');
     }
 
 }
