@@ -24,7 +24,7 @@
 <div class="container-fluid">
     <div class="card card-outline card-danger shadow-sm">
         <div class="card-header bg-white">
-            <h3 class="card-title text-bold"><i class="fas fa-undo-alt mr-1"></i> Registro de Matrículas Anuladas y Reversiones ACID</h3>
+            <h3 class="card-title text-bold"><i class="fas fa-undo-alt mr-1"></i> Registro de Matrículas Anuladas y Reversiones</h3>
             <div class="card-tools">
                 <a href="{{ route('admin.inscripciones.index') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-arrow-left mr-1"></i> Volver a Inscripciones Activas

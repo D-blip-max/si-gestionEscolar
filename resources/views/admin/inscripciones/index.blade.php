@@ -169,14 +169,14 @@
             @csrf
             <div class="modal-content shadow-lg border-0">
                 <div class="modal-header bg-warning text-dark font-weight-bold">
-                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle mr-2"></i>Anular Matrícula Modular (CU-15)</h5>
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle mr-2"></i>Anular Matrícula Modular</h5>
                     <button type="button" class="close text-dark" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <p>Está a punto de anular la inscripción de: <strong id="anular-estudiante"></strong> en el módulo <strong id="anular-modulo"></strong>.</p>
                     
                     <div class="alert alert-light border py-2 text-sm">
-                        <i class="fas fa-info-circle text-info mr-1"></i> <strong>Efectos de la anulación ACID:</strong>
+                        <i class="fas fa-info-circle text-info mr-1"></i> <strong>Efectos de la anulación:</strong>
                         <ul class="mb-0 pl-3">
                             <li>La boleta bancaria volverá automáticamente al estado <code>DISPONIBLE</code>.</li>
                             <li>Se liberará un cupo en el grupo modular asignado.</li>

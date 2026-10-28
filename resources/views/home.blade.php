@@ -129,7 +129,7 @@
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-clipboard-check fa-2x text-danger mb-2"></i>
                         <h6 class="font-weight-bold">Paquete 5: Matrícula</h6>
-                        <small class="text-muted d-block mb-2">Inscripción ACID y Ficha PDF</small>
+                        <small class="text-muted d-block mb-2">Inscripción Modular y Ficha PDF</small>
                         <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-outline-danger btn-xs">Nueva Matrícula</a>
                     </div>
                 </div>

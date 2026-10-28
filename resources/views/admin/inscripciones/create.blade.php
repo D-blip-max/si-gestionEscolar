@@ -6,8 +6,8 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1 class="m-0 text-dark"><i class="fas fa-user-plus text-primary mr-2"></i>Nueva Matrícula Modular (ACID)</h1>
-                <small class="text-muted">CU-13: Inscripción con Validación de Boleta Bancaria y Control de Prerrequisitos</small>
+                <h1 class="m-0 text-dark"><i class="fas fa-user-plus text-primary mr-2"></i>Nueva Matrícula Modular</h1>
+                <small class="text-muted">Inscripción con Validación de Boleta Bancaria y Control de Prerrequisitos</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
