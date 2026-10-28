@@ -203,4 +203,30 @@ class FlujoAcademicoTest extends TestCase
         $this->assertEquals(30, $this->grupo->fresh()->cupo_maximo);
     }
 
+    public function test_dashboards_especificos_por_rol_renderizan_correctamente(): void
+    {
+        $this->matricular();
+        $inscripcion = Inscripcion::firstOrFail();
+
+        $this->actingAs($this->estudiante->usuario);
+        $this->get(route('home'))->assertOk()->assertSee('Histórico Completo de Notas');
+        $this->get(route('estudiante.documentos.kardex_pdf'))->assertOk();
+        $this->get(route('estudiante.documentos.ficha_pdf', $inscripcion->id))->assertOk();
+
+        $docenteUser = User::factory()->create();
+        $docenteUser->assignRole('DOCENTE');
+        $docente = \App\Models\Personal::create(['user_id' => $docenteUser->id, 'tipo' => 'docente', 'nombres' => 'Docente', 'apellidos' => 'Titular', 'ci' => 'DOC-99', 'fecha_nacimiento' => '1985-01-01', 'telefono' => '70000000', 'direccion' => 'UAGRM', 'profesion' => 'Lic. Inglés', 'foto' => 'img/default-avatar.png']);
+        \App\Models\Asignacion::create(['personal_id' => $docente->id, 'paralelo_id' => $this->grupo->id, 'fecha_asignacion' => '2026-05-01', 'estado' => 'activo']);
+
+        $this->actingAs($docenteUser)->get(route('home'))->assertOk()->assertSee('Grupos Asignados');
+
+        $secretariaUser = User::factory()->create();
+        $secretariaUser->assignRole('SECRETARIO/A');
+        $this->actingAs($secretariaUser)->get(route('home'))->assertOk()->assertSee('SECRETARIO/A');
+
+        $cajeroUser = User::factory()->create();
+        $cajeroUser->assignRole('CAJERO/A');
+        $this->actingAs($cajeroUser)->get(route('home'))->assertOk()->assertSee('CAJERO/A');
+    }
+
 }

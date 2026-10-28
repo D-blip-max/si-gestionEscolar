@@ -95,14 +95,82 @@ class EstudiantePortalController extends Controller
 
         // Verificar hitos de graduación
         $aptoIntermedio = $estudiante->inscripciones->contains(function ($ins) {
-            return $ins->estado === 'ACTIVA' && optional($ins->calificacion)->estado === 'APROBADO' && optional($ins->modulo)->numero_orden == 8 && optional($ins->calificacion)->nota_final >= 51;
+            return $ins->estado === 'ACTIVA'
+                && optional($ins->calificacion)->estado === 'APROBADO'
+                && optional($ins->calificacion)->nota_final >= 51
+                && (optional($ins->modulo)->numero_orden == 8 || (optional(optional($ins->modulo)->idioma)->codigo === 'GUA' && optional($ins->modulo)->numero_orden == 2));
         });
 
         $aptoAvanzado = $estudiante->inscripciones->contains(function ($ins) {
-            return $ins->estado === 'ACTIVA' && optional($ins->calificacion)->estado === 'APROBADO' && optional($ins->modulo)->numero_orden == 9 && optional($ins->calificacion)->nota_final >= 51;
+            return $ins->estado === 'ACTIVA'
+                && optional($ins->calificacion)->estado === 'APROBADO'
+                && optional($ins->calificacion)->nota_final >= 51
+                && (optional($ins->modulo)->numero_orden == 9 || (optional(optional($ins->modulo)->idioma)->codigo === 'GUA' && optional($ins->modulo)->numero_orden == 2));
         });
 
         return view('estudiante.mis_documentos', compact('estudiante', 'aptoIntermedio', 'aptoAvanzado'));
+    }
+
+    /**
+     * Descarga del Kárdex Académico Oficial en PDF por el propio estudiante
+     */
+    public function kardex_pdf()
+    {
+        $estudiante = $this->getEstudiante();
+        if (!$estudiante) {
+            abort(403, 'No tiene una ficha de estudiante vinculada.');
+        }
+
+        $estudiante->load([
+            'usuario',
+            'inscripciones' => function ($q) {
+                $q->orderBy('created_at', 'asc');
+            },
+            'inscripciones.modulo.idioma',
+            'inscripciones.paralelo.ciclo',
+            'inscripciones.paralelo.asignacion.personal',
+            'inscripciones.boletaPago',
+            'inscripciones.calificacion'
+        ]);
+
+        $configuracion = Configuracion::first();
+
+        $pdf = Pdf::loadView('admin.estudiantes.pdf_kardex', compact('configuracion', 'estudiante'));
+        $pdf->setPaper('letter', 'portrait');
+        $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+
+        return $pdf->stream('kardex_' . ($estudiante->codigo_estudiante ?? $estudiante->ci) . '.pdf');
+    }
+
+    /**
+     * Descarga de Ficha de Matrícula en PDF por el propio estudiante
+     */
+    public function ficha_pdf($inscripcion_id)
+    {
+        $estudiante = $this->getEstudiante();
+        if (!$estudiante) {
+            abort(403, 'No tiene una ficha de estudiante vinculada.');
+        }
+
+        $inscripcion = Inscripcion::with([
+            'estudiante.usuario',
+            'modulo.idioma',
+            'paralelo.ciclo',
+            'paralelo.asignacion.personal',
+            'boletaPago'
+        ])->findOrFail($inscripcion_id);
+
+        if ($inscripcion->estudiante_id !== $estudiante->id && !Auth::user()->hasRole('ADMINISTRADOR')) {
+            abort(403, 'No autorizado para descargar esta ficha de matrícula.');
+        }
+
+        $configuracion = Configuracion::first();
+
+        $pdf = Pdf::loadView('admin.inscripciones.pdf_matricula', compact('inscripcion', 'configuracion'));
+        $pdf->setPaper('letter', 'portrait');
+        $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+
+        return $pdf->stream('Ficha_Matricula_' . ($inscripcion->estudiante->codigo_estudiante ?? $inscripcion->id) . '.pdf');
     }
 
     /**

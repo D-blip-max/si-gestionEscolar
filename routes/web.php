@@ -133,6 +133,8 @@ Route::get('/docente/actas/grupo/{paralelo_id}/pdf', [App\Http\Controllers\Docen
 Route::get('/estudiante/modulo-activo', [App\Http\Controllers\EstudiantePortalController::class, 'modulo_activo'])->name('estudiante.clases.index')->middleware('auth');
 Route::get('/estudiante/avance-curricular', [App\Http\Controllers\EstudiantePortalController::class, 'avance_curricular'])->name('estudiante.avance.index')->middleware('auth');
 Route::get('/estudiante/mis-documentos', [App\Http\Controllers\EstudiantePortalController::class, 'mis_documentos'])->name('estudiante.documentos.index')->middleware('auth');
+Route::get('/estudiante/mis-documentos/kardex-pdf', [App\Http\Controllers\EstudiantePortalController::class, 'kardex_pdf'])->name('estudiante.documentos.kardex_pdf')->middleware('auth');
+Route::get('/estudiante/mis-documentos/ficha-pdf/{inscripcion_id}', [App\Http\Controllers\EstudiantePortalController::class, 'ficha_pdf'])->name('estudiante.documentos.ficha_pdf')->middleware('auth');
 Route::get('/estudiante/mis-documentos/certificado/{tipo}', [App\Http\Controllers\EstudiantePortalController::class, 'certificado_pdf'])->name('estudiante.documentos.certificado')->middleware('auth');
 
 // =========================================================================

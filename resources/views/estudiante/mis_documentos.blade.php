@@ -41,7 +41,7 @@
                     </p>
                 </div>
                 <div class="card-footer bg-white border-top-0 pt-0">
-                    <a href="{{ route('admin.estudiantes.kardex_pdf', $estudiante->id) }}" target="_blank" class="btn btn-primary btn-block font-weight-bold">
+                    <a href="{{ route('estudiante.documentos.kardex_pdf') }}" target="_blank" class="btn btn-primary btn-block font-weight-bold">
                         <i class="fas fa-file-pdf mr-1"></i> Descargar Kárdex Oficial (PDF)
                     </a>
                 </div>
@@ -70,7 +70,7 @@
                         $ultimaInscripcion = $estudiante->inscripciones->where('estado', 'ACTIVA')->last();
                     @endphp
                     @if($ultimaInscripcion)
-                        <a href="{{ route('admin.inscripciones.pdf', $ultimaInscripcion->id) }}" target="_blank" class="btn btn-info btn-block font-weight-bold">
+                        <a href="{{ route('estudiante.documentos.ficha_pdf', $ultimaInscripcion->id) }}" target="_blank" class="btn btn-info btn-block font-weight-bold">
                             <i class="fas fa-file-pdf mr-1"></i> Descargar Ficha de Matrícula #{{ $ultimaInscripcion->id }}
                         </a>
                     @else
