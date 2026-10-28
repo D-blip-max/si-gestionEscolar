@@ -30,7 +30,7 @@ php artisan cache:clear || true
 # 4. Esperar disponibilidad de base de datos antes de migrar
 echo "==> Verificando conexión a la base de datos..."
 for i in $(seq 1 30); do
-    if php artisan db:show > /dev/null 2>&1; then
+    if php artisan migrate:status > /dev/null 2>&1; then
         echo "==> Conexión a la base de datos exitosa."
         break
     fi

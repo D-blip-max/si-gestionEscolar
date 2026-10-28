@@ -113,7 +113,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleSeeder::class);
 
         // Si la base de datos aún tiene solo los 5 alumnos de prueba iniciales (< 110),
-        // limpiar paralelos, boletas e inscripciones previas para poblar el semestre completo sin duplicados
+        // limpiar estudiantes, paralelos, boletas e inscripciones previas para poblar el semestre completo sin colisiones de código/CI
         if (Estudiante::count() < 110) {
             DB::statement('SET FOREIGN_KEY_CHECKS=0;');
             AuditoriaCalificacion::truncate();
@@ -123,7 +123,17 @@ class DatabaseSeeder extends Seeder
             Asignacion::truncate();
             Paralelo::truncate();
             CicloBimestral::truncate();
+            Estudiante::truncate();
+            Formacion::truncate();
             DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+            User::whereIn('email', [
+                'luis.gomez@cei.com',
+                'andrea.perez@cei.com',
+                'diego.vargas@cei.com',
+                'valeria.castro@cei.com',
+                'mateo.roca@cei.com',
+            ])->delete();
         }
 
         DB::transaction(function () {
@@ -487,9 +497,9 @@ class DatabaseSeeder extends Seeder
 
                     $uEst = $this->getOrCreateUser($email, "{$nombre} {$apellidos}", $ci, 'ESTUDIANTE');
 
-                    $est = Estudiante::updateOrCreate(['ci' => $ci], [
+                    $est = Estudiante::updateOrCreate(['codigo_estudiante' => $codigoEst], [
+                        'ci'                => $ci,
                         'usuario_id'        => $uEst->id,
-                        'codigo_estudiante' => $codigoEst,
                         'nombres'           => $nombre,
                         'apellidos'         => $apellidos,
                         'carrera_facultad'  => $carrera,
@@ -642,9 +652,9 @@ class DatabaseSeeder extends Seeder
 
                 $uEst = $this->getOrCreateUser($email, "{$nombre} {$apellidos}", $ci, 'ESTUDIANTE');
 
-                $est = Estudiante::updateOrCreate(['ci' => $ci], [
+                $est = Estudiante::updateOrCreate(['codigo_estudiante' => $codigoEst], [
+                    'ci'                => $ci,
                     'usuario_id'        => $uEst->id,
-                    'codigo_estudiante' => $codigoEst,
                     'nombres'           => $nombre,
                     'apellidos'         => $apellidos,
                     'carrera_facultad'  => $carrera,
