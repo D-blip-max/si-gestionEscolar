@@ -61,7 +61,7 @@ class InscripcionController extends Controller
             ->orderBy('apellidos')
             ->get();
 
-        $idiomas = Idioma::where('estado', 'activo')->get();
+        $idiomas = Idioma::where('estado', 'ACTIVO')->get();
         $ciclos = CicloBimestral::where('estado', '!=', 'CERRADO')->get();
 
         $paralelos = Paralelo::with(['modulo.idioma', 'ciclo'])

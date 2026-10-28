@@ -140,7 +140,7 @@ class ReporteController extends Controller
         $porTurno = $inscripciones->groupBy(fn($i) => optional($i->paralelo)->turno ?? 'General')->map->count();
 
         $ciclos = CicloBimestral::orderBy('id', 'desc')->get();
-        $idiomas = Idioma::where('estado', 'activo')->get();
+        $idiomas = Idioma::where('estado', 'ACTIVO')->get();
 
         return view('admin.reportes.inscritos_modalidad', compact(
             'inscripciones',
@@ -271,7 +271,7 @@ class ReporteController extends Controller
             return $est;
         });
 
-        $idiomas = Idioma::where('estado', 'activo')->get();
+        $idiomas = Idioma::where('estado', 'ACTIVO')->get();
 
         return view('admin.reportes.graduados', compact(
             'estudiantes',

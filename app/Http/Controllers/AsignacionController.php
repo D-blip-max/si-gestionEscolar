@@ -54,7 +54,7 @@ class AsignacionController extends Controller
 
         $docente->foto_url = ($docente->foto && file_exists(public_path($docente->foto)))
             ? asset($docente->foto)
-            : asset('vendor/adminlte/dist/img/avatar5.png');
+            : asset('img/default-avatar.png');
 
         return response()->json($docente);
     }
