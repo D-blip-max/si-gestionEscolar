@@ -35,10 +35,11 @@ COPY . .
 RUN npm run build
 RUN composer dump-autoload --optimize
 
-RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache \
-    && chmod -R 777 storage bootstrap/cache
+RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs bootstrap/cache public/uploads \
+    && chmod -R 777 storage bootstrap/cache public/uploads
 
 COPY nginx.conf /etc/nginx/sites-available/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
