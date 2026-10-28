@@ -250,7 +250,7 @@
                                 <label for="monto">Monto Depositado (Bs.): <b class="text-danger">*</b></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend"><span class="input-group-text">Bs.</span></div>
-                                    <input type="number" step="0.50" min="1" name="monto" id="monto" class="form-control font-weight-bold" value="{{ old('monto', '150.00') }}" required>
+                                    <input type="number" step="0.50" min="1" name="monto" id="monto" class="form-control font-weight-bold" value="{{ old('monto', '250.00') }}" required>
                                 </div>
                             </div>
                         </div>

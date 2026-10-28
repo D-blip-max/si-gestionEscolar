@@ -66,7 +66,7 @@ class DatabaseSeeder extends Seeder
                 'estudiante_id'  => $est->id,
                 'banco_entidad'  => $banco,
                 'fecha_deposito' => $fechaDeposito,
-                'monto'          => 350.00,
+                'monto'          => 250.00,
                 'concepto'       => 'Matrícula ' . $modulo->nombre,
                 'estado'         => 'UTILIZADA',
                 'registrado_por' => $adminId,
@@ -607,7 +607,7 @@ class DatabaseSeeder extends Seeder
                                 'estudiante_id'  => $est->id,
                                 'banco_entidad'  => $banco,
                                 'fecha_deposito' => '2026-06-15',
-                                'monto'          => 350.00,
+                                'monto'          => 250.00,
                                 'concepto'       => 'Depósito Adelantado Próximo Módulo CEI',
                                 'estado'         => 'DISPONIBLE',
                                 'registrado_por' => $adminUser->id,
@@ -698,7 +698,7 @@ class DatabaseSeeder extends Seeder
                             'estudiante_id'  => $estAnulado->id,
                             'banco_entidad'  => 'BANCO UNIÓN S.A.',
                             'fecha_deposito' => '2026-01-08',
-                            'monto'          => 350.00,
+                            'monto'          => 250.00,
                             'concepto'       => 'Matrícula Reversada / Anulada',
                             'estado'         => 'ANULADA',
                             'registrado_por' => $adminUser->id,
@@ -732,7 +732,8 @@ class DatabaseSeeder extends Seeder
                 }
             }
 
-            // 12. Sincronizar exactamente cupo_ocupado en todos los paralelos para integridad absoluta
+            // 12. Sincronizar exactamente cupo_ocupado en todos los paralelos y asegurar arancel oficial de 250.00 Bs
+            BoletaPago::where('monto', 350.00)->update(['monto' => 250.00]);
             $todosParalelos = Paralelo::all();
             foreach ($todosParalelos as $p) {
                 $inscritosActivos = Inscripcion::where('paralelo_id', $p->id)->where('estado', 'ACTIVA')->count();
