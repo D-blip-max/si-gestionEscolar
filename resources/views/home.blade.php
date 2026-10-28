@@ -24,14 +24,38 @@
 
 @section('content')
 <div class="container-fluid">
-    <!-- Banner de Ciclo Activo -->
+    <!-- Banner de Ciclo Activo y Filtro por Gestión Anual -->
     <div class="alert alert-primary shadow-sm mb-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <div>
-                <h5 class="mb-0 font-weight-bold"><i class="fas fa-calendar-check mr-2"></i>Ciclo Bimestral Vigente: {{ optional($cicloActivo)->nombre ?? 'Bimestre I - 2026' }}</h5>
-                <small class="text-white-50">Período Académico activo para inscripciones y calificaciones modulares.</small>
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div class="mb-2 mb-md-0">
+                <h5 class="mb-0 font-weight-bold">
+                    <i class="fas fa-calendar-check mr-2"></i>Ciclo Bimestral Vigente: {{ optional($cicloActivo)->nombre ?? 'Bimestre III - 2026 (May-Jun)' }}
+                </h5>
+                <small class="text-white-50">
+                    Mostrando indicadores financieros y académicos de:
+                    <strong class="text-white">
+                        {{ $gestionSeleccionada === 'TODAS' ? 'Todas las Gestiones (Acumulado Histórico)' : 'Gestión Anual ' . $gestionSeleccionada }}
+                    </strong>
+                </small>
             </div>
-            <span class="badge badge-light text-primary font-weight-bold px-3 py-2">ESTADO ACTIVO</span>
+            <div class="d-flex align-items-center">
+                <form action="{{ route('home') }}" method="GET" class="form-inline mr-2">
+                    <label for="select-gestion" class="text-white font-weight-bold mr-2 mb-0 small">
+                        <i class="fas fa-filter mr-1"></i>Ver Gestión:
+                    </label>
+                    <select name="gestion" id="select-gestion" class="form-control form-control-sm font-weight-bold text-primary border-0 shadow-sm" onchange="this.form.submit()">
+                        @foreach ($gestionesDisponibles as $g)
+                            <option value="{{ $g }}" {{ (string)$gestionSeleccionada === (string)$g ? 'selected' : '' }}>
+                                Gestión {{ $g }}
+                            </option>
+                        @endforeach
+                        <option value="TODAS" {{ $gestionSeleccionada === 'TODAS' ? 'selected' : '' }}>
+                            Todas (2025 - 2026)
+                        </option>
+                    </select>
+                </form>
+                <span class="badge badge-light text-primary font-weight-bold px-3 py-2">ESTADO ACTIVO</span>
+            </div>
         </div>
     </div>
 
@@ -40,8 +64,8 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-info shadow-sm">
                 <div class="inner">
-                    <h3>{{ $totalEstudiantes }}</h3>
-                    <p>Estudiantes Autónomos</p>
+                    <h3 class="kpi-number">{{ $totalEstudiantes }}</h3>
+                    <p>Estudiantes {{ $gestionSeleccionada === 'TODAS' ? 'Autónomos' : 'Activos (' . $gestionSeleccionada . ')' }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-user-graduate"></i></div>
                 <a href="{{ route('admin.estudiantes.index') }}" class="small-box-footer">Padrón de Estudiantes <i class="fas fa-arrow-circle-right"></i></a>
@@ -51,8 +75,8 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-success shadow-sm">
                 <div class="inner">
-                    <h3>Bs. {{ number_format($totalRecaudado, 2) }}</h3>
-                    <p>Recaudación Fiscalizada</p>
+                    <h3 class="kpi-number">Bs. {{ number_format($totalRecaudado, 2) }}</h3>
+                    <p>Recaudación {{ $gestionSeleccionada === 'TODAS' ? 'Total' : 'Gestión ' . $gestionSeleccionada }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-file-invoice-dollar"></i></div>
                 <a href="{{ route('admin.boletas.index') }}" class="small-box-footer">Conciliación de Boletas <i class="fas fa-arrow-circle-right"></i></a>
@@ -62,7 +86,7 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-warning shadow-sm">
                 <div class="inner">
-                    <h3>{{ $totalDocentes }}</h3>
+                    <h3 class="kpi-number">{{ $totalDocentes }}</h3>
                     <p>Docentes Titulares</p>
                 </div>
                 <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
@@ -73,8 +97,8 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-danger shadow-sm">
                 <div class="inner">
-                    <h3>{{ $totalInscripciones }}</h3>
-                    <p>Matrículas Registradas</p>
+                    <h3 class="kpi-number">{{ $totalInscripciones }}</h3>
+                    <p>Matrículas {{ $gestionSeleccionada === 'TODAS' ? 'Registradas' : 'Gestión ' . $gestionSeleccionada }}</p>
                 </div>
                 <div class="icon"><i class="fas fa-clipboard-check"></i></div>
                 <a href="{{ route('admin.inscripciones.index') }}" class="small-box-footer">Listado de Matrículas <i class="fas fa-arrow-circle-right"></i></a>
@@ -168,6 +192,10 @@
 
 @section('css')
 <style>
+    .small-box .inner h3.kpi-number {
+        font-size: 1.85rem;
+        white-space: nowrap;
+    }
     .hover-card:hover {
         background-color: #ffffff !important;
         box-shadow: 0 4px 8px rgba(0,0,0,0.08);

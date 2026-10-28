@@ -111,9 +111,17 @@ class DatabaseSeeder extends Seeder
         // 1. Matriz de Roles y Permisos RBAC
         $this->call(RoleSeeder::class);
 
-        // Si ya están cargados los 110 estudiantes del semestre, asegurar monto 250.00 Bs y terminar de inmediato
+        // Si ya están cargados los 110 estudiantes del semestre, asegurar monto 250.00 Bs, completar los 6 bimestres de 2026 y terminar de inmediato
         if (Estudiante::count() >= 110) {
             BoletaPago::where('monto', '!=', 250.00)->update(['monto' => 250.00]);
+            CicloBimestral::firstOrCreate(
+                ['nombre' => 'Bimestre V - 2026 (Sep-Oct)'],
+                ['gestion' => 2026, 'fecha_inicio' => '2026-09-07', 'fecha_fin' => '2026-10-31', 'estado' => 'FUTURO']
+            );
+            CicloBimestral::firstOrCreate(
+                ['nombre' => 'Bimestre VI - 2026 (Nov-Dic)'],
+                ['gestion' => 2026, 'fecha_inicio' => '2026-11-03', 'fecha_fin' => '2026-12-19', 'estado' => 'FUTURO']
+            );
             return;
         }
 
@@ -179,7 +187,7 @@ class DatabaseSeeder extends Seeder
                 'estado'      => 'ACTIVO',
             ]);
 
-            // 5. Los 10 Ciclos Bimestrales (6 de 2025 + 3 del 1er Semestre 2026 + 1 Futuro)
+            // 5. Los 12 Ciclos Bimestrales (6 de 2025 + 6 de 2026 completos hasta fin de año)
             // Permiten que un alumno de Módulo 9 tenga sus 9 bimestres históricos completos sin huecos
             $ciclosDef = [
                 1  => ['nombre' => 'Bimestre I - 2025 (Ene-Feb)',   'gestion' => 2025, 'inicio' => '2025-01-06', 'fin' => '2025-02-28', 'estado' => 'CERRADO'],
@@ -192,6 +200,8 @@ class DatabaseSeeder extends Seeder
                 8  => ['nombre' => 'Bimestre II - 2026 (Mar-Abr)',  'gestion' => 2026, 'inicio' => '2026-03-02', 'fin' => '2026-04-30', 'estado' => 'CERRADO'],
                 9  => ['nombre' => 'Bimestre III - 2026 (May-Jun)', 'gestion' => 2026, 'inicio' => '2026-05-04', 'fin' => '2026-06-30', 'estado' => 'ACTIVO'],
                 10 => ['nombre' => 'Bimestre IV - 2026 (Jul-Ago)',  'gestion' => 2026, 'inicio' => '2026-07-06', 'fin' => '2026-08-31', 'estado' => 'FUTURO'],
+                11 => ['nombre' => 'Bimestre V - 2026 (Sep-Oct)',   'gestion' => 2026, 'inicio' => '2026-09-07', 'fin' => '2026-10-31', 'estado' => 'FUTURO'],
+                12 => ['nombre' => 'Bimestre VI - 2026 (Nov-Dic)',  'gestion' => 2026, 'inicio' => '2026-11-03', 'fin' => '2026-12-19', 'estado' => 'FUTURO'],
             ];
 
             $ciclos = [];

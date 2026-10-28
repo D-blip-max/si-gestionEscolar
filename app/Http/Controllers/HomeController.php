@@ -28,7 +28,7 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -41,14 +41,42 @@ class HomeController extends Controller
             return redirect()->route('docente.grupos.index');
         }
 
-        // Dashboard Gerencial / Administrativo CEI
-        $totalEstudiantes = Estudiante::count();
-        $totalDocentes = Personal::where('tipo', 'docente')->count();
-        $totalParalelos = Paralelo::count();
-        $totalInscripciones = Inscripcion::where('estado', 'ACTIVA')->count();
-        $totalRecaudado = BoletaPago::where('estado', '!=', 'ANULADA')->sum('monto');
-
         $cicloActivo = CicloBimestral::where('estado', 'ACTIVO')->first();
+        $gestionesDisponibles = CicloBimestral::select('gestion')
+            ->distinct()
+            ->orderBy('gestion', 'desc')
+            ->pluck('gestion');
+
+        // Por defecto mostrar la gestión del ciclo activo (2026), o permitir ver 2025 / Todas ('TODAS')
+        $gestionSeleccionada = $request->input('gestion', optional($cicloActivo)->gestion ?? 2026);
+
+        $totalDocentes = Personal::where('tipo', 'docente')->count();
+
+        if ($gestionSeleccionada === 'TODAS') {
+            $totalEstudiantes = Estudiante::count();
+            $totalParalelos = Paralelo::count();
+            $totalInscripciones = Inscripcion::where('estado', 'ACTIVA')->count();
+            $totalRecaudado = BoletaPago::where('estado', '!=', 'ANULADA')->sum('monto');
+        } else {
+            $anio = (int) $gestionSeleccionada;
+
+            $totalEstudiantes = Estudiante::whereHas('inscripciones.paralelo.ciclo', function ($q) use ($anio) {
+                $q->where('gestion', $anio);
+            })->count();
+
+            $totalParalelos = Paralelo::whereHas('ciclo', function ($q) use ($anio) {
+                $q->where('gestion', $anio);
+            })->count();
+
+            $totalInscripciones = Inscripcion::where('estado', 'ACTIVA')
+                ->whereHas('paralelo.ciclo', function ($q) use ($anio) {
+                    $q->where('gestion', $anio);
+                })->count();
+
+            $totalRecaudado = BoletaPago::where('estado', '!=', 'ANULADA')
+                ->whereYear('fecha_deposito', $anio)
+                ->sum('monto');
+        }
 
         return view('home', compact(
             'totalEstudiantes',
@@ -56,7 +84,9 @@ class HomeController extends Controller
             'totalParalelos',
             'totalInscripciones',
             'totalRecaudado',
-            'cicloActivo'
+            'cicloActivo',
+            'gestionesDisponibles',
+            'gestionSeleccionada'
         ));
     }
 }
