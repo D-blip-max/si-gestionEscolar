@@ -13,6 +13,9 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        // Reset cached roles and permissions
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
         $admin = Role::firstOrCreate(['name' => 'ADMINISTRADOR']);
         $director_general = Role::firstOrCreate(['name' => 'DIRECTOR/A GENERAL']);
         $director_academico = Role::firstOrCreate(['name' => 'DIRECTOR/A ACADÉMICO']);
