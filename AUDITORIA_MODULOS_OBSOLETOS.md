@@ -184,15 +184,9 @@ SISTEMA DE GESTIÓN ACADÉMICA CEI
 
 ---
 
-## 7. Recomendaciones y Hoja de Ruta para Depuración
+## 7. Estado de la Depuración y Limpieza Realizada
 
-Si el equipo de desarrollo desea limpiar el repositorio para la entrega final:
+✅ **Fase 1 completada:** Se depuró [`routes/web.php`](file:///c:/wamp64/www/SisLaravel6/routes/web.php) eliminando todas las rutas de los 11 módulos escolares obsoletos y unificando el esquema de rutas bajo los 8 módulos oficiales del CEI.
+✅ **Fase 2 completada:** Se eliminaron las 11 carpetas de vistas huérfanas en `resources/views/admin/` (`ppffs`, `matriculaciones`, `pagos`, `calificaciones`, `asistencias`, `grados`, `materias`, `gestiones`, `periodos`, `niveles`, `turnos` y `index.blade.php`).
+✅ **Fase 3 completada:** Se reescribió [`database/seeders/DatabaseSeeder.php`](file:///c:/wamp64/www/SisLaravel6/database/seeders/DatabaseSeeder.php) eliminando todas las semillas de colegio y dejando únicamente datos 100% compatibles con la operativa modular del CEI (Roles, Idiomas, Ciclos, Módulos 1-9, Paralelos, Docentes y Estudiantes adultos autónomos).
 
-1. **Fase 1 (Inmediata y Segura):**
-   - Comentar o eliminar las rutas huérfanas en `routes/web.php` (`admin/ppffs`, `admin/matriculaciones`, `admin/asistencias`, `admin/pagos`, `admin/calificaciones`, `admin/materias`, `admin/grados`, `admin/gestiones`, `admin/periodos`, `admin/niveles`, `admin/turnos`). Esto cierra endpoints inaccesibles y refuerza la seguridad.
-2. **Fase 2 (Limpieza de Vistas):**
-   - Eliminar o archivar las 11 carpetas de vistas huérfanas en `resources/views/admin/` que ya no son accesibles desde ningún menú.
-3. **Fase 3 (Limpieza de Seeders):**
-   - Limpiar de `DatabaseSeeder.php` los bloques que crean datos de colegios (`Ppff`, `Grado`, `Materia`, etc.) para que futuros despliegues o pruebas inicialicen un entorno CEI puro.
-4. **Fase 4 (Opcional - Depuración de BD):**
-   - Mantener las tablas en base de datos mientras no causen conflicto, o crear una migración de limpieza (`dropIfExists`) si se desea un esquema 100% puro para la entrega documental final.

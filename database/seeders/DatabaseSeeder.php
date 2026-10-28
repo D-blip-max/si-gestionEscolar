@@ -6,25 +6,17 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Configuracion;
-use App\Models\Gestion;
-use App\Models\Periodo;
-use App\Models\Nivel;
-use App\Models\Grado;
 use App\Models\Paralelo;
-use App\Models\Turno;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Materia;
 use Spatie\Permission\Models\Role;
 use App\Models\Personal;
-use App\Models\Ppff;
-use App\Models\Matriculacion;
 use App\Models\Estudiante;
 use App\Models\Asignacion;
 use App\Models\Idioma;
 use App\Models\Modulo;
 use App\Models\CicloBimestral;
-
-
+use App\Models\BoletaPago;
+use App\Models\Inscripcion;
 
 class DatabaseSeeder extends Seeder
 {
@@ -35,10 +27,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // 1. Matriz de Roles y Permisos RBAC
         $this->call(RoleSeeder::class);
 
-        // Admin user
+        // 2. Administrador Principal (Superadmin)
         $adminUser = User::firstOrCreate([
             'email' => 'admin@admin.com'
         ], [
@@ -49,20 +41,21 @@ class DatabaseSeeder extends Seeder
             $adminUser->assignRole('ADMINISTRADOR');
         }
 
+        // 3. Configuración Institucional CEI - UAGRM
         if (Configuracion::count() == 0) {
             Configuracion::create([
-                'nombre' => 'Cei',
-                'descripcion' => 'Curso de Extension de Idiomas',
-                'direccion' => 'Ñuflo de Chavez',
-                'telefono' => '75657007 - 54646787',
+                'nombre' => 'CEI - Centro de Extensión de Idiomas',
+                'descripcion' => 'Instituto de Formación Lingüística - Universidad Autónoma Gabriel René Moreno',
+                'direccion' => 'Campus Universitario UAGRM, Calle Ñuflo de Chávez',
+                'telefono' => '75657007 - 3345678',
                 'divisa' => 'Bs',
-                'correo_electronico' => 'cei@gmail.com',
-                'web' => 'https://cei.com',
+                'correo_electronico' => 'contacto@cei-uagrm.edu.bo',
+                'web' => 'https://si-gestionescolar-production.up.railway.app',
                 'logo' => 'img/logo_cei.png'
             ]);
         }
 
-        // --- PAQUETE 2: IDIOMAS Y MÓDULOS DEL CEI ---
+        // 4. Catálogos Académicos: Idiomas
         $ingles = Idioma::firstOrCreate(['codigo' => 'ENG'], [
             'nombre' => 'Inglés',
             'descripcion' => 'Programa modular de Lengua Inglesa (Básico, Intermedio y Avanzado)',
@@ -75,7 +68,7 @@ class DatabaseSeeder extends Seeder
             'estado' => 'ACTIVO'
         ]);
 
-        // Ciclos Bimestrales
+        // 5. Ciclos Bimestrales
         $ciclo1 = CicloBimestral::firstOrCreate(['nombre' => 'Bimestre I - 2026 (Ene-Feb)'], [
             'gestion' => 2026,
             'fecha_inicio' => '2026-01-15',
@@ -90,7 +83,7 @@ class DatabaseSeeder extends Seeder
             'estado' => 'FUTURO'
         ]);
 
-        // Módulos 1 al 9 de Inglés con correlatividades
+        // 6. Módulos 1 al 9 de Inglés con correlatividades y reglas de graduación
         $m1 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 1], [
             'nombre' => 'Módulo 1', 'nivel' => 'BASICO', 'duracion_meses' => 2, 'prerrequisito_id' => null, 'es_modulo_graduacion' => false
         ]);
@@ -110,7 +103,7 @@ class DatabaseSeeder extends Seeder
             'nombre' => 'Módulo 6', 'nivel' => 'INTERMEDIO', 'duracion_meses' => 2, 'prerrequisito_id' => $m5->id, 'es_modulo_graduacion' => false
         ]);
         $m7 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 7], [
-            'nombre' => 'Módulo 7', 'nivel' => 'INTERMEDIO', 'duracion_meses' => 2, 'prerrequisito_id' => $m6->id, 'es_modulo_graduacion' => false
+            'nivel' => 'INTERMEDIO', 'nombre' => 'Módulo 7', 'duracion_meses' => 2, 'prerrequisito_id' => $m6->id, 'es_modulo_graduacion' => false
         ]);
         $m8 = Modulo::firstOrCreate(['idioma_id' => $ingles->id, 'numero_orden' => 8], [
             'nombre' => 'Módulo 8', 'nivel' => 'INTERMEDIO', 'duracion_meses' => 2, 'prerrequisito_id' => $m7->id, 'es_modulo_graduacion' => true
@@ -119,437 +112,173 @@ class DatabaseSeeder extends Seeder
             'nombre' => 'Módulo 9', 'nivel' => 'AVANZADO', 'duracion_meses' => 2, 'prerrequisito_id' => $m8->id, 'es_modulo_graduacion' => true
         ]);
 
-        // Datos de compatibilidad inicial (sólo si no existen)
-        if (Gestion::count() == 0) {
-            Gestion::create(['nombre' => '2023']);
-        Gestion::create(['nombre' => '2024']);
-        Gestion::create(['nombre' => '2025']);
-
-        // Creación de Periodos (Trimestres) vinculados a la Gestión
-        Periodo::create(['nombre' => '1er Trimestre', 'gestion_id' => 1]);
-        Periodo::create(['nombre' => '2do Trimestre', 'gestion_id' => 1]);
-        Periodo::create(['nombre' => '3er Trimestre', 'gestion_id' => 1]);
-        Periodo::create(['nombre' => '1er Trimestre', 'gestion_id' => 2]);
-        Periodo::create(['nombre' => '2do Trimestre', 'gestion_id' => 2]);
-        Periodo::create(['nombre' => '3er Trimestre', 'gestion_id' => 2]);
-        Periodo::create(['nombre' => '1er Trimestre', 'gestion_id' => 3]);
-        Periodo::create(['nombre' => '2do Trimestre', 'gestion_id' => 3]);
-        Periodo::create(['nombre' => '3er Trimestre', 'gestion_id' => 3]);
-
-        // Creación de Niveles
-        Nivel::create(['nombre' => 'INICIAL']);
-        Nivel::create(['nombre' => 'PRIMARIA']);
-        Nivel::create(['nombre' => 'SECUNDARIA']);
-
-        // Creación de Grados vinculados a su respectivo Nivel
-        Grado::create(['nombre' => '1ro Inicial', 'nivel_id' => 1]);
-        Grado::create(['nombre' => '2do Inicial', 'nivel_id' => 1]);
-
-        Grado::create(['nombre' => '1ro Primaria', 'nivel_id' => 2]);
-        Grado::create(['nombre' => '2do Primaria', 'nivel_id' => 2]);
-        Grado::create(['nombre' => '3ro Primaria', 'nivel_id' => 2]);
-        Grado::create(['nombre' => '4to Primaria', 'nivel_id' => 2]);
-        Grado::create(['nombre' => '5to Primaria', 'nivel_id' => 2]);
-        Grado::create(['nombre' => '6to Primaria', 'nivel_id' => 2]);
-
-        Grado::create(['nombre' => '1ro Secundaria', 'nivel_id' => 3]);
-        Grado::create(['nombre' => '2do Secundaria', 'nivel_id' => 3]);
-        Grado::create(['nombre' => '3ro Secundaria', 'nivel_id' => 3]);
-        Grado::create(['nombre' => '4to Secundaria', 'nivel_id' => 3]);
-        Grado::create(['nombre' => '5to Secundaria', 'nivel_id' => 3]);
-        Grado::create(['nombre' => '6to Secundaria', 'nivel_id' => 3]);
-
-
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 1]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 2]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 3]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 4]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 5]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 6]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 7]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 8]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 9]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 10]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 11]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 12]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 13]);
-        Paralelo::create(['nombre' => 'A', 'grado_id' => 14]);
-
-        Turno::create(['nombre' => 'Mañana']);
-        Turno::create(['nombre' => 'Tarde']);
-        Turno::create(['nombre' => 'Noche']);
-
-        Materia::create(['nombre' => 'ARTES PLÁSTICAS Y VISUALES']);
-        Materia::create(['nombre' => 'BIOLOGÍA - GEOGRAFÍA']);
-        Materia::create(['nombre' => 'CIENCIAS SOCIALES']);
-        Materia::create(['nombre' => 'COMPUTACIÓN']);
-        Materia::create(['nombre' => 'COSMOVISIONES, FILOSOFÍA Y PSICOLOGÍA']);
-        Materia::create(['nombre' => 'EDUCACIÓN FÍSICA Y DEPORTES']);
-        Materia::create(['nombre' => 'EDUCACIÓN MUSICAL']);
-        Materia::create(['nombre' => 'FÍSICA']);
-        Materia::create(['nombre' => 'LENGUA CASTELLANA Y ORIGINARIA']);
-        Materia::create(['nombre' => 'LENGUA EXTRANJERA']);
-        Materia::create(['nombre' => 'MATEMÁTICA']);
-        Materia::create(['nombre' => 'QUÍMICA']);
-        Materia::create(['nombre' => 'VALORES, ESPIRITUALIDADES Y RELIGIONES']);
-        Materia::create(['nombre' => 'TÉCNICA TECNOLÓGICA GENERAL']);
-
-        // Administrativo 1
-        User::create([
-            'name' => 'Juan Mendoza',
-            'email' => 'juan.mendoza@escuela.com',
-            'password' => Hash::make('87654321')
-        ])->assignRole('DIRECTOR/A GENERAL');
-
-        Personal::create([
-            'user_id' => 2,
-            'tipo' => 'administrativo',
-            'nombres' => 'Juan',
-            'apellidos' => 'Mendoza',
-            'ci' => '87654321',
-            'fecha_nacimiento' => '1985-05-15',
-            'direccion' => 'Av. Libertad 123',
-            'telefono' => '76543210',
-            'profesion' => 'Lic. en Matemáticas',
-            'foto' => 'uploads/fotos/juan.jpg'
+        // 7. Paralelos CEI (Presencial y Virtual)
+        $paralelo1 = Paralelo::firstOrCreate(['nombre' => 'Paralelo 1 - Básico Presencial', 'ciclo_id' => $ciclo1->id, 'modulo_id' => $m1->id], [
+            'modalidad' => 'PRESENCIAL',
+            'aula_o_enlace' => 'Aula 102 - Pabellón Central UAGRM',
+            'turno' => 'MAÑANA',
+            'hora_inicio' => '07:30:00',
+            'hora_fin' => '09:30:00',
+            'cupo_maximo' => 25,
+            'cupo_ocupado' => 0
         ]);
 
-        // Administrativo 2
-        User::create([
-            'name' => 'Carlos Rojas',
-            'email' => 'carlos.rojas@escuela.com',
-            'password' => Hash::make('76543210')
-        ])->assignRole('DIRECTOR/A ACADÉMICO');
-
-        Personal::create([
-            'user_id' => 3,
-            'tipo' => 'administrativo',
-            'nombres' => 'Carlos',
-            'apellidos' => 'Rojas',
-            'ci' => '76543210',
-            'fecha_nacimiento' => '1978-11-22',
-            'direccion' => 'Calle Junín 456',
-            'telefono' => '65432109',
-            'profesion' => 'Contador Público',
-            'foto' => 'uploads/fotos/' . time() . '_carlos.jpg'
+        $paralelo2 = Paralelo::firstOrCreate(['nombre' => 'Paralelo 2 - Básico Virtual', 'ciclo_id' => $ciclo1->id, 'modulo_id' => $m1->id], [
+            'modalidad' => 'VIRTUAL',
+            'aula_o_enlace' => 'https://meet.google.com/cei-uagrm-ingles1',
+            'turno' => 'NOCHE',
+            'hora_inicio' => '19:00:00',
+            'hora_fin' => '21:00:00',
+            'cupo_maximo' => 30,
+            'cupo_ocupado' => 0
         ]);
 
-        // Administrativo 3
-        User::create([
-            'name' => 'Ana Torres',
-            'email' => 'ana.torres@escuela.com',
-            'password' => Hash::make('65432109')
-        ])->assignRole('DIRECTOR/A ADMINISTRATIVO');
-
-        Personal::create([
-            'user_id' => 4,
-            'tipo' => 'administrativo',
-            'nombres' => 'Ana',
-            'apellidos' => 'Torres',
-            'ci' => '65432109',
-            'fecha_nacimiento' => '1992-03-30',
-            'direccion' => 'Av. Bolívar 789',
-            'telefono' => '54321098',
-            'profesion' => 'Lic. en Administración',
-            'foto' => 'uploads/fotos/' . time() . '_ana.jpg'
+        // 8. Personal Administrativo Institucional
+        $uAdmin1 = User::firstOrCreate(['email' => 'juan.mendoza@cei.com'], [
+            'name' => 'Juan Mendoza', 'password' => Hash::make('87654321')
+        ]);
+        $uAdmin1->syncRoles(['DIRECTOR/A GENERAL']);
+        Personal::firstOrCreate(['ci' => '87654321'], [
+            'user_id' => $uAdmin1->id, 'tipo' => 'administrativo', 'nombres' => 'Juan', 'apellidos' => 'Mendoza',
+            'fecha_nacimiento' => '1985-05-15', 'direccion' => 'Av. Libertad 123', 'telefono' => '76543210',
+            'profesion' => 'Lic. en Lingüística y Gestión Educativa', 'foto' => 'uploads/fotos/juan.jpg'
         ]);
 
-        // Administrativo 4
-        User::create([
-            'name' => 'Jorge Paz',
-            'email' => 'jorge.paz@escuela.com',
-            'password' => Hash::make('54321098')
-        ])->assignRole('CAJERO/A');
-
-        Personal::create([
-            'user_id' => 5,
-            'tipo' => 'administrativo',
-            'nombres' => 'Jorge',
-            'apellidos' => 'Paz',
-            'ci' => '54321098',
-            'fecha_nacimiento' => '1980-07-18',
-            'direccion' => 'Calle Sucre 321',
-            'telefono' => '43210987',
-            'profesion' => 'Contaduria Pública',
-            'foto' => 'uploads/fotos/' . time() . '_jorge.jpg'
+        $uAdmin2 = User::firstOrCreate(['email' => 'carlos.rojas@cei.com'], [
+            'name' => 'Carlos Rojas', 'password' => Hash::make('76543210')
+        ]);
+        $uAdmin2->syncRoles(['DIRECTOR/A ACADÉMICO']);
+        Personal::firstOrCreate(['ci' => '76543210'], [
+            'user_id' => $uAdmin2->id, 'tipo' => 'administrativo', 'nombres' => 'Carlos', 'apellidos' => 'Rojas',
+            'fecha_nacimiento' => '1978-11-22', 'direccion' => 'Calle Junín 456', 'telefono' => '65432109',
+            'profesion' => 'Magíster en Educación Superior', 'foto' => 'uploads/fotos/carlos.jpg'
         ]);
 
-        // Administrativo 5
-        User::create([
-            'name' => 'Sofía Jiménez',
-            'email' => 'sofia.jimenez@escuela.com',
-            'password' => Hash::make('43210987')
-        ])->assignRole('SECRETARIO/A');
-
-        Personal::create([
-            'user_id' => 6,
-            'tipo' => 'administrativo',
-            'nombres' => 'Sofía',
-            'apellidos' => 'Jiménez',
-            'ci' => '43210987',
-            'fecha_nacimiento' => '1987-09-25',
-            'direccion' => 'Av. América 654',
-            'telefono' => '32109876',
-            'profesion' => 'Secretariado Ejecutivo',
-            'foto' => 'uploads/fotos/' . time() . '_sofia.jpg'
+        $uAdmin3 = User::firstOrCreate(['email' => 'ana.torres@cei.com'], [
+            'name' => 'Ana Torres', 'password' => Hash::make('65432109')
+        ]);
+        $uAdmin3->syncRoles(['DIRECTOR/A ADMINISTRATIVO']);
+        Personal::firstOrCreate(['ci' => '65432109'], [
+            'user_id' => $uAdmin3->id, 'tipo' => 'administrativo', 'nombres' => 'Ana', 'apellidos' => 'Torres',
+            'fecha_nacimiento' => '1992-03-30', 'direccion' => 'Av. Bolívar 789', 'telefono' => '54321098',
+            'profesion' => 'Lic. en Administración Financiera', 'foto' => 'uploads/fotos/ana.jpg'
         ]);
 
-        // Administrativo 6
-        User::create([
-            'name' => 'Ricardo Montero',
-            'email' => 'ricardo.montero@escuela.com',
-            'password' => Hash::make('11223344')
-        ])->assignRole('REGENTE');
-
-        Personal::create([
-            'user_id' => 7,
-            'tipo' => 'administrativo',
-            'nombres' => 'Ricardo',
-            'apellidos' => 'Montero',
-            'ci' => '11223344',
-            'fecha_nacimiento' => '1975-12-05',
-            'direccion' => 'Av. Ejecutivos 1500, Piso 10',
-            'telefono' => '70011223',
-            'profesion' => 'Magíster en Gestión Educativa',
-            'foto' => 'uploads/fotos/' . time() . '_ricardo.jpg',
-            'created_at' => now()->subYears(3) // Fecha de ingreso hace 3 años
+        $uCaja = User::firstOrCreate(['email' => 'jorge.paz@cei.com'], [
+            'name' => 'Jorge Paz', 'password' => Hash::make('54321098')
+        ]);
+        $uCaja->syncRoles(['CAJERO/A']);
+        Personal::firstOrCreate(['ci' => '54321098'], [
+            'user_id' => $uCaja->id, 'tipo' => 'administrativo', 'nombres' => 'Jorge', 'apellidos' => 'Paz',
+            'fecha_nacimiento' => '1980-07-18', 'direccion' => 'Calle Sucre 321', 'telefono' => '43210987',
+            'profesion' => 'Contador General (Tesorería)', 'foto' => 'uploads/fotos/jorge.jpg'
         ]);
 
-        // Docente 1 - Patrón: Puro Par (Ascendente)
-        $user1 = User::create([
-            'name' => 'María Fernández',
-            'email' => 'maria.fernandez@escuela.com',
-            'password' => Hash::make('24680246')
-        ])->assignRole('DOCENTE');
-
-        Personal::create([
-            'user_id' => $user1->id, // Relación directa
-            'tipo' => 'docente',
-            'nombres' => 'María',
-            'apellidos' => 'Fernández',
-            'ci' => '24680246',
-            'fecha_nacimiento' => '1980-03-15',
-            'direccion' => 'Calle Las Flores 245',
-            'telefono' => '79123456',
-            'profesion' => 'Lic. en Lengua y Literatura',
-            'foto' => 'uploads/fotos/' . time() . '_maria.jpg'
+        $uSecretaria = User::firstOrCreate(['email' => 'sofia.jimenez@cei.com'], [
+            'name' => 'Sofía Jiménez', 'password' => Hash::make('43210987')
+        ]);
+        $uSecretaria->syncRoles(['SECRETARIO/A']);
+        Personal::firstOrCreate(['ci' => '43210987'], [
+            'user_id' => $uSecretaria->id, 'tipo' => 'administrativo', 'nombres' => 'Sofía', 'apellidos' => 'Jiménez',
+            'fecha_nacimiento' => '1987-09-25', 'direccion' => 'Av. América 654', 'telefono' => '32109876',
+            'profesion' => 'Secretariado Ejecutivo y Atención CEI', 'foto' => 'uploads/fotos/sofia.jpg'
         ]);
 
-        // Docente 2 - Patrón: Puro Impar (Descendente)
-        $user2 = User::create([
-            'name' => 'Carlos Ríos',
-            'email' => 'carlos.rios@escuela.com',
-            'password' => Hash::make('97531975')
-        ])->assignRole('DOCENTE');
-
-        Personal::create([
-            'user_id' => $user2->id,
-            'tipo' => 'docente',
-            'nombres' => 'Carlos',
-            'apellidos' => 'Ríos',
-            'ci' => '97531975',
-            'fecha_nacimiento' => '1975-07-22',
-            'direccion' => 'Av. Ciencias 789',
-            'telefono' => '71234567',
-            'profesion' => 'Magíster en Matemáticas',
-            'foto' => 'uploads/fotos/' . time() . '_carlos.jpg'
+        // 9. Personal Docente CEI
+        $uDoc1 = User::firstOrCreate(['email' => 'maria.fernandez@cei.com'], [
+            'name' => 'María Fernández', 'password' => Hash::make('24680246')
+        ]);
+        $uDoc1->syncRoles(['DOCENTE']);
+        $pDoc1 = Personal::firstOrCreate(['ci' => '24680246'], [
+            'user_id' => $uDoc1->id, 'tipo' => 'docente', 'nombres' => 'María', 'apellidos' => 'Fernández',
+            'fecha_nacimiento' => '1980-03-15', 'direccion' => 'Calle Las Flores 245', 'telefono' => '79123456',
+            'profesion' => 'Lic. en Lengua Inglesa y Literatura', 'foto' => 'uploads/fotos/maria.jpg'
         ]);
 
-        // Docente 3 - Patrón: Ascendente Simple
-        $user3 = User::create([
-            'name' => 'Ricardo Méndez',
-            'email' => 'ricardo.mendez@escuela.com',
-            'password' => Hash::make('12345678')
-        ])->assignRole('DOCENTE');
-
-        Personal::create([
-            'user_id' => $user3->id,
-            'tipo' => 'docente',
-            'nombres' => 'Ricardo',
-            'apellidos' => 'Méndez',
-            'ci' => '12345678',
-            'fecha_nacimiento' => '1988-06-10',
-            'direccion' => 'Barrio Lindo 123',
-            'telefono' => '70011223',
-            'profesion' => 'Ingeniero Civil',
-            'foto' => 'uploads/fotos/' . time() . '_ricardo.jpg'
+        $uDoc2 = User::firstOrCreate(['email' => 'carlos.rios@cei.com'], [
+            'name' => 'Carlos Ríos', 'password' => Hash::make('97531975')
+        ]);
+        $uDoc2->syncRoles(['DOCENTE']);
+        $pDoc2 = Personal::firstOrCreate(['ci' => '97531975'], [
+            'user_id' => $uDoc2->id, 'tipo' => 'docente', 'nombres' => 'Carlos', 'apellidos' => 'Ríos',
+            'fecha_nacimiento' => '1975-07-22', 'direccion' => 'Av. Ciencias 789', 'telefono' => '71234567',
+            'profesion' => 'Certificado C2 Cambridge / Docente Titular', 'foto' => 'uploads/fotos/carlos_doc.jpg'
         ]);
 
-        // Docente 4 - Patrón: Descendente Simple
-        $user4 = User::create([
-            'name' => 'Elena Suárez',
-            'email' => 'elena.suarez@escuela.com',
-            'password' => Hash::make('8765321')
-        ])->assignRole('DOCENTE');
-
-        Personal::create([
-            'user_id' => $user4->id,
-            'tipo' => 'docente',
-            'nombres' => 'Elena',
-            'apellidos' => 'Suárez',
-            'ci' => '8765321',
-            'fecha_nacimiento' => '1992-02-28',
-            'direccion' => 'Calle Junín 456',
-            'telefono' => '70044556',
-            'profesion' => 'Lic. en Historia',
-            'foto' => 'uploads/fotos/' . time() . '_elena.jpg'
+        // 10. Asignación Académica Oficial CEI
+        Asignacion::firstOrCreate([
+            'personal_id' => $pDoc1->id,
+            'paralelo_id' => $paralelo1->id
+        ], [
+            'fecha_asignacion' => '2026-01-15',
+            'estado' => 'ACTIVO'
         ]);
 
-        // Docente 5 - Patrón: Espejo (Capicúa)
-        $user5 = User::create([
-            'name' => 'Jorge Vaca',
-            'email' => 'jorge.vaca@escuela.com',
-            'password' => Hash::make('13577531')
-        ])->assignRole('DOCENTE');
-
-        Personal::create([
-            'user_id' => $user5->id,
-            'tipo' => 'docente',
-            'nombres' => 'Jorge',
-            'apellidos' => 'Vaca',
-            'ci' => '13577531',
-            'fecha_nacimiento' => '1985-11-20',
-            'direccion' => 'UV 45, Av. Bush',
-            'telefono' => '70088990',
-            'profesion' => 'Lic. en Geografía',
-            'foto' => 'uploads/fotos/' . time() . '_jorge.jpg'
+        Asignacion::firstOrCreate([
+            'personal_id' => $pDoc2->id,
+            'paralelo_id' => $paralelo2->id
+        ], [
+            'fecha_asignacion' => '2026-01-15',
+            'estado' => 'ACTIVO'
         ]);
-        //padres de familia
-        $p1 = Ppff::create(['nombres' => 'Ricardo', 'apellidos' => 'Mendoza Luna', 'ci' => '1000001', 'fecha_nacimiento' => '1975-04-12', 'telefono' => '71000001', 'parentesco' => 'Padre', 'ocupacion' => 'Ingeniero Civil', 'direccion' => 'Av. Banzer, Calle 4 Este #45']);
-        $p2 = Ppff::create(['nombres' => 'Beatriz', 'apellidos' => 'Sosa Villalba', 'ci' => '1000002', 'fecha_nacimiento' => '1978-08-22', 'telefono' => '71000002', 'parentesco' => 'Madre', 'ocupacion' => 'Contadora', 'direccion' => 'Barrio Equipetrol, Calle Tucumán #12']);
-        $p3 = Ppff::create(['nombres' => 'Humberto', 'apellidos' => 'Guzmán Rico', 'ci' => '1000003', 'fecha_nacimiento' => '1980-01-30', 'telefono' => '71000003', 'parentesco' => 'Tutor', 'ocupacion' => 'Abogado', 'direccion' => 'Zona Sur, Av. Las Lomas#300']);
-        $p4 = Ppff::create(['nombres' => 'Elena', 'apellidos' => 'Paredes Soliz', 'ci' => '1000004', 'fecha_nacimiento' => '1982-11-15', 'telefono' => '71000004', 'parentesco' => 'Madre', 'ocupacion' => 'Médico Pediatra', 'direccion' => 'Condominio La Riviera, dpto 4B']);
-        $p5 = Ppff::create(['nombres' => 'Marcos', 'apellidos' => 'Peña Durán', 'ci' => '1000005', 'fecha_nacimiento' => '1976-06-05', 'telefono' => '71000005', 'parentesco' => 'Padre', 'ocupacion' => 'Arquitecto', 'direccion' => 'Urb. Los Pinos, Pasaje C #5']);
-        $p6 = Ppff::create(['nombres' => 'Raquel', 'apellidos' => 'Ortiz Bravo', 'ci' => '1000006', 'fecha_nacimiento' => '1979-09-18', 'telefono' => '71000006', 'parentesco' => 'Madre', 'ocupacion' => 'Diseñadora Gráfica', 'direccion' => 'Av. Piraí, 4to Anillo #88']);
-        $p7 = Ppff::create(['nombres' => 'Gustavo', 'apellidos' => 'Ramos Calle', 'ci' => '1000007', 'fecha_nacimiento' => '1981-03-25', 'telefono' => '71000007', 'parentesco' => 'Padre', 'ocupacion' => 'Chef Ejecutiva', 'direccion' => 'Barrio Lujan, Av. San Aurelio#150']);
-        $p8 = Ppff::create(['nombres' => 'Clara', 'apellidos' => 'Vaca Méndez', 'ci' => '1000008', 'fecha_nacimiento' => '1983-12-10', 'telefono' => '71000008', 'parentesco' => 'Madre', 'ocupacion' => 'Administradora', 'direccion' => 'Villa Primero de Mayo, Calle 7']);
-        $p9 = Ppff::create(['nombres' => 'Silvia', 'apellidos' => 'Rojas Terceros', 'ci' => '1000009', 'fecha_nacimiento' => '1977-05-20', 'telefono' => '71000009', 'parentesco' => 'Tutor', 'ocupacion' => 'Periodista', 'direccion' => 'Plan 3000, Av. Principal #22']);
-        $p10 = Ppff::create(['nombres' => 'Andrés', 'apellidos' => 'Zeballos Paz', 'ci' => '1000010', 'fecha_nacimiento' => '1974-02-28', 'telefono' => '71000010', 'parentesco' => 'Padre', 'ocupacion' => 'Transportista', 'direccion' => 'Av. Santos Dumont, Calle Lanza #10']);
 
-        // --- HIJOS DE P1 ---
-        $u1 = User::create(['name' => 'Daniel Mendoza', 'email' => 'daniel.m@estudiante.com', 'password' => Hash::make('111001')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u1->id, 'ppff_id' => $p1->id, 'nombres' => 'Daniel', 'apellidos' => 'Mendoza', 'ci' => '111001', 'fecha_nacimiento' => '2010-05-10', 'telefono' => '60000001', 'direccion' => 'Av. Banzer #45', 'foto' => 'uploads/estudiantes/est1.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+        // 11. Estudiantes Universitarios Autónomos CEI
+        $estudiantesData = [
+            ['nombres' => 'Daniel', 'apellidos' => 'Mendoza Luna', 'ci' => '111001', 'email' => 'daniel.m@estudiante.cei.edu.bo', 'carrera' => 'Ingeniería en Sistemas', 'telefono' => '71000001'],
+            ['nombres' => 'Carla', 'apellidos' => 'Sosa Villalba', 'ci' => '111002', 'email' => 'carla.s@estudiante.cei.edu.bo', 'carrera' => 'Bioquímica y Farmacia', 'telefono' => '71000002'],
+            ['nombres' => 'Roberto', 'apellidos' => 'Guzmán Rico', 'ci' => '111003', 'email' => 'roberto.g@estudiante.cei.edu.bo', 'carrera' => 'Derecho y Cs. Políticas', 'telefono' => '71000003'],
+            ['nombres' => 'Valeria', 'apellidos' => 'Ortiz Bravo', 'ci' => '111004', 'email' => 'valeria.o@estudiante.cei.edu.bo', 'carrera' => 'Medicina Humana', 'telefono' => '71000004'],
+            ['nombres' => 'Lucas', 'apellidos' => 'Peña Durán', 'ci' => '111005', 'email' => 'lucas.p@estudiante.cei.edu.bo', 'carrera' => 'Ingeniería Comercial', 'telefono' => '71000005'],
+        ];
 
-        $u2 = User::create(['name' => 'Carla Mendoza', 'email' => 'carla.m@estudiante.com', 'password' => Hash::make('111002')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u2->id, 'ppff_id' => $p1->id, 'nombres' => 'Carla', 'apellidos' => 'Mendoza', 'ci' => '111002', 'fecha_nacimiento' => '2012-08-15', 'telefono' => '60000002', 'direccion' => 'Av. Banzer #45', 'foto' => 'uploads/estudiantes/est2.jpg', 'genero' => 'Femenino', 'estado' => 1]);
+        $correlativo = 1;
+        foreach ($estudiantesData as $item) {
+            $uEst = User::firstOrCreate(['email' => $item['email']], [
+                'name' => "{$item['nombres']} {$item['apellidos']}",
+                'password' => Hash::make($item['ci'])
+            ]);
+            $uEst->syncRoles(['ESTUDIANTE']);
 
-        $u3 = User::create(['name' => 'Roberto Mendoza', 'email' => 'roberto.m@estudiante.com', 'password' => Hash::make('111003')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u3->id, 'ppff_id' => $p1->id, 'nombres' => 'Roberto', 'apellidos' => 'Mendoza', 'ci' => '111003', 'fecha_nacimiento' => '2014-03-20', 'telefono' => '60000003', 'direccion' => 'Av. Banzer #45', 'foto' => 'uploads/estudiantes/est3.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+            $est = Estudiante::firstOrCreate(['ci' => $item['ci']], [
+                'usuario_id' => $uEst->id,
+                'user_id' => $uEst->id,
+                'codigo_estudiante' => sprintf('CEI-2026-%04d', $correlativo++),
+                'nombres' => $item['nombres'],
+                'apellidos' => $item['apellidos'],
+                'carrera_facultad' => $item['carrera'],
+                'fecha_nacimiento' => '2002-05-10',
+                'telefono' => $item['telefono'],
+                'direccion' => 'Santa Cruz de la Sierra - Campus Universitario',
+                'genero' => ($correlativo % 2 == 0) ? 'Femenino' : 'Masculino',
+                'estado' => 1,
+                'ppff_id' => null
+            ]);
 
-        // --- HIJOS DE P2 ---
-        $u4 = User::create(['name' => 'Luis Sosa', 'email' => 'luis.s@estudiante.com', 'password' => Hash::make('111004')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u4->id, 'ppff_id' => $p2->id, 'nombres' => 'Luis', 'apellidos' => 'Sosa', 'ci' => '111004', 'fecha_nacimiento' => '2009-01-20', 'telefono' => '60000004', 'direccion' => 'Barrio Equipetrol #12', 'foto' => 'uploads/estudiantes/est4.jpg', 'genero' => 'Masculino', 'estado' => 1]);
+            // Boleta Bancaria Universitaria de muestra
+            $boleta = BoletaPago::firstOrCreate(['numero_boleta' => 'BOL-2026-000' . $est->id], [
+                'estudiante_id' => $est->id,
+                'banco' => 'BANCO UNIÓN S.A.',
+                'fecha_deposito' => '2026-01-14',
+                'monto' => 350.00,
+                'concepto' => 'Matrícula Módulo 1 Inglés CEI',
+                'estado' => 'UTILIZADA',
+                'registrado_por' => $adminUser->id
+            ]);
 
-        $u5 = User::create(['name' => 'Ana Sosa', 'email' => 'ana.s@estudiante.com', 'password' => Hash::make('111005')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u5->id, 'ppff_id' => $p2->id, 'nombres' => 'Ana', 'apellidos' => 'Sosa', 'ci' => '111005', 'fecha_nacimiento' => '2011-03-12', 'telefono' => '60000005', 'direccion' => 'Barrio Equipetrol #12', 'foto' => 'uploads/estudiantes/est5.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u6 = User::create(['name' => 'Mario Sosa', 'email' => 'mario.s@estudiante.com', 'password' => Hash::make('111006')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u6->id, 'ppff_id' => $p2->id, 'nombres' => 'Mario', 'apellidos' => 'Sosa', 'ci' => '111006', 'fecha_nacimiento' => '2013-05-05', 'telefono' => '60000006', 'direccion' => 'Barrio Equipetrol #12', 'foto' => 'uploads/estudiantes/est6.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        // --- HIJOS DE P3 ---
-        $u7 = User::create(['name' => 'Hugo Guzmán', 'email' => 'hugo.g@estudiante.com', 'password' => Hash::make('111007')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u7->id, 'ppff_id' => $p3->id, 'nombres' => 'Hugo', 'apellidos' => 'Guzmán', 'ci' => '111007', 'fecha_nacimiento' => '2008-11-30', 'telefono' => '60000007', 'direccion' => 'Zona Sur #300', 'foto' => 'uploads/estudiantes/est7.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u8 = User::create(['name' => 'Sofia Guzmán', 'email' => 'sofia.g@estudiante.com', 'password' => Hash::make('111008')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u8->id, 'ppff_id' => $p3->id, 'nombres' => 'Sofia', 'apellidos' => 'Guzmán', 'ci' => '111008', 'fecha_nacimiento' => '2013-02-14', 'telefono' => '60000008', 'direccion' => 'Zona Sur #300', 'foto' => 'uploads/estudiantes/est8.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u9 = User::create(['name' => 'Mateo Guzmán', 'email' => 'mateo.g@estudiante.com', 'password' => Hash::make('111009')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u9->id, 'ppff_id' => $p3->id, 'nombres' => 'Mateo', 'apellidos' => 'Guzmán', 'ci' => '111009', 'fecha_nacimiento' => '2015-06-10', 'telefono' => '60000009', 'direccion' => 'Zona Sur #300', 'foto' => 'uploads/estudiantes/est9.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        // --- HIJOS DE P4 ---
-        $u10 = User::create(['name' => 'Pedro Paredes', 'email' => 'pedro.p@estudiante.com', 'password' => Hash::make('111010')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u10->id, 'ppff_id' => $p4->id, 'nombres' => 'Pedro', 'apellidos' => 'Paredes', 'ci' => '111010', 'fecha_nacimiento' => '2010-07-07', 'telefono' => '60000010', 'direccion' => 'Cond. La Riviera', 'foto' => 'uploads/estudiantes/est10.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u11 = User::create(['name' => 'Marta Paredes', 'email' => 'marta.p@estudiante.com', 'password' => Hash::make('111011')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u11->id, 'ppff_id' => $p4->id, 'nombres' => 'Marta', 'apellidos' => 'Paredes', 'ci' => '111011', 'fecha_nacimiento' => '2012-12-25', 'telefono' => '60000011', 'direccion' => 'Cond. La Riviera', 'foto' => 'uploads/estudiantes/est11.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u12 = User::create(['name' => 'Lucía Paredes', 'email' => 'lucia.p@estudiante.com', 'password' => Hash::make('111012')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u12->id, 'ppff_id' => $p4->id, 'nombres' => 'Lucía', 'apellidos' => 'Paredes', 'ci' => '111012', 'fecha_nacimiento' => '2014-01-15', 'telefono' => '60000012', 'direccion' => 'Cond. La Riviera', 'foto' => 'uploads/estudiantes/est12.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        // --- HIJOS DE P5 ---
-        $u13 = User::create(['name' => 'Jorge Peña', 'email' => 'jorge.pe@estudiante.com', 'password' => Hash::make('111013')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u13->id, 'ppff_id' => $p5->id, 'nombres' => 'Jorge', 'apellidos' => 'Peña', 'ci' => '111013', 'fecha_nacimiento' => '2009-04-05', 'telefono' => '60000013', 'direccion' => 'Urb. Los Pinos', 'foto' => 'uploads/estudiantes/est13.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u14 = User::create(['name' => 'Lucas Peña', 'email' => 'lucas.pe@estudiante.com', 'password' => Hash::make('111014')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u14->id, 'ppff_id' => $p5->id, 'nombres' => 'Lucas', 'apellidos' => 'Peña', 'ci' => '111014', 'fecha_nacimiento' => '2011-06-18', 'telefono' => '60000014', 'direccion' => 'Urb. Los Pinos', 'foto' => 'uploads/estudiantes/est14.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u15 = User::create(['name' => 'Sara Peña', 'email' => 'sara.pe@estudiante.com', 'password' => Hash::make('111015')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u15->id, 'ppff_id' => $p5->id, 'nombres' => 'Sara', 'apellidos' => 'Peña', 'ci' => '111015', 'fecha_nacimiento' => '2013-09-22', 'telefono' => '60000015', 'direccion' => 'Urb. Los Pinos', 'foto' => 'uploads/estudiantes/est15.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        // --- HIJOS DE P6 ---
-        $u16 = User::create(['name' => 'Valeria Ortiz', 'email' => 'valeria.o@estudiante.com', 'password' => Hash::make('111016')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u16->id, 'ppff_id' => $p6->id, 'nombres' => 'Valeria', 'apellidos' => 'Ortiz', 'ci' => '111016', 'fecha_nacimiento' => '2010-09-01', 'telefono' => '60000016', 'direccion' => 'Av. Piraí #88', 'foto' => 'uploads/estudiantes/est16.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u17 = User::create(['name' => 'Bruno Ortiz', 'email' => 'bruno.o@estudiante.com', 'password' => Hash::make('111017')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u17->id, 'ppff_id' => $p6->id, 'nombres' => 'Bruno', 'apellidos' => 'Ortiz', 'ci' => '111017', 'fecha_nacimiento' => '2012-10-10', 'telefono' => '60000017', 'direccion' => 'Av. Piraí #88', 'foto' => 'uploads/estudiantes/est17.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u18 = User::create(['name' => 'Claudio Ortiz', 'email' => 'claudio.o@estudiante.com', 'password' => Hash::make('111018')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u18->id, 'ppff_id' => $p6->id, 'nombres' => 'Claudio', 'apellidos' => 'Ortiz', 'ci' => '111018', 'fecha_nacimiento' => '2014-02-28', 'telefono' => '60000018', 'direccion' => 'Av. Piraí #88', 'foto' => 'uploads/estudiantes/est18.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        // --- HIJOS DE P7 ---
-        $u19 = User::create(['name' => 'Fabio Ramos', 'email' => 'fabio.r@estudiante.com', 'password' => Hash::make('111019')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u19->id, 'ppff_id' => $p7->id, 'nombres' => 'Fabio', 'apellidos' => 'Ramos', 'ci' => '111019', 'fecha_nacimiento' => '2008-05-20', 'telefono' => '60000019', 'direccion' => 'Barrio Lujan #150', 'foto' => 'uploads/estudiantes/est19.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u20 = User::create(['name' => 'Andrea Ramos', 'email' => 'andrea.r@estudiante.com', 'password' => Hash::make('111020')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u20->id, 'ppff_id' => $p7->id, 'nombres' => 'Andrea', 'apellidos' => 'Ramos', 'ci' => '111020', 'fecha_nacimiento' => '2010-11-05', 'telefono' => '60000020', 'direccion' => 'Barrio Lujan #150', 'foto' => 'uploads/estudiantes/est20.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u21 = User::create(['name' => 'Iker Ramos', 'email' => 'iker.r@estudiante.com', 'password' => Hash::make('111021')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u21->id, 'ppff_id' => $p7->id, 'nombres' => 'Iker', 'apellidos' => 'Ramos', 'ci' => '111021', 'fecha_nacimiento' => '2013-07-14', 'telefono' => '60000021', 'direccion' => 'Barrio Lujan #150', 'foto' => 'uploads/estudiantes/est21.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        // --- HIJOS DE P8 ---
-        $u22 = User::create(['name' => 'Isabela Vaca', 'email' => 'isabela.v@estudiante.com', 'password' => Hash::make('111022')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u22->id, 'ppff_id' => $p8->id, 'nombres' => 'Isabela', 'apellidos' => 'Vaca', 'ci' => '111022', 'fecha_nacimiento' => '2011-11-11', 'telefono' => '60000022', 'direccion' => 'Villa 1ro de Mayo', 'foto' => 'uploads/estudiantes/est22.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u23 = User::create(['name' => 'Julian Vaca', 'email' => 'julian.v@estudiante.com', 'password' => Hash::make('111023')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u23->id, 'ppff_id' => $p8->id, 'nombres' => 'Julian', 'apellidos' => 'Vaca', 'ci' => '111023', 'fecha_nacimiento' => '2013-01-22', 'telefono' => '60000023', 'direccion' => 'Villa 1ro de Mayo', 'foto' => 'uploads/estudiantes/est23.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u24 = User::create(['name' => 'Noelia Vaca', 'email' => 'noelia.v@estudiante.com', 'password' => Hash::make('111024')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u24->id, 'ppff_id' => $p8->id, 'nombres' => 'Noelia', 'apellidos' => 'Vaca', 'ci' => '111024', 'fecha_nacimiento' => '2015-08-30', 'telefono' => '60000024', 'direccion' => 'Villa 1ro de Mayo', 'foto' => 'uploads/estudiantes/est24.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        // --- HIJOS DE P9 ---
-        $u25 = User::create(['name' => 'Mateo Rojas', 'email' => 'mateo.r@estudiante.com', 'password' => Hash::make('111025')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u25->id, 'ppff_id' => $p9->id, 'nombres' => 'Mateo', 'apellidos' => 'Rojas', 'ci' => '111025', 'fecha_nacimiento' => '2012-01-30', 'telefono' => '60000025', 'direccion' => 'Plan 3000 #22', 'foto' => 'uploads/estudiantes/est25.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u26 = User::create(['name' => 'Elena Rojas', 'email' => 'elena.ro@estudiante.com', 'password' => Hash::make('111026')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u26->id, 'ppff_id' => $p9->id, 'nombres' => 'Elena', 'apellidos' => 'Rojas', 'ci' => '111026', 'fecha_nacimiento' => '2014-04-12', 'telefono' => '60000026', 'direccion' => 'Plan 3000 #22', 'foto' => 'uploads/estudiantes/est26.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u27 = User::create(['name' => 'Victor Rojas', 'email' => 'victor.r@estudiante.com', 'password' => Hash::make('111027')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u27->id, 'ppff_id' => $p9->id, 'nombres' => 'Victor', 'apellidos' => 'Rojas', 'ci' => '111027', 'fecha_nacimiento' => '2016-02-05', 'telefono' => '60000027', 'direccion' => 'Plan 3000 #22', 'foto' => 'uploads/estudiantes/est27.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        // --- HIJOS DE P10 ---
-        $u28 = User::create(['name' => 'Oscar Zeballos', 'email' => 'oscar.z@estudiante.com', 'password' => Hash::make('111028')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u28->id, 'ppff_id' => $p10->id, 'nombres' => 'Oscar', 'apellidos' => 'Zeballos', 'ci' => '111028', 'fecha_nacimiento' => '2009-10-10', 'telefono' => '60000028', 'direccion' => 'Av. Santos Dumont', 'foto' => 'uploads/estudiantes/est28.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-        $u29 = User::create(['name' => 'Paula Zeballos', 'email' => 'paula.z@estudiante.com', 'password' => Hash::make('111029')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u29->id, 'ppff_id' => $p10->id, 'nombres' => 'Paula', 'apellidos' => 'Zeballos', 'ci' => '111029', 'fecha_nacimiento' => '2011-12-01', 'telefono' => '60000029', 'direccion' => 'Av. Santos Dumont', 'foto' => 'uploads/estudiantes/est29.jpg', 'genero' => 'Femenino', 'estado' => 1]);
-
-        $u30 = User::create(['name' => 'Raúl Zeballos', 'email' => 'raul.z@estudiante.com', 'password' => Hash::make('111030')])->assignRole('ESTUDIANTE');
-        Estudiante::create(['usuario_id' => $u30->id, 'ppff_id' => $p10->id, 'nombres' => 'Raúl', 'apellidos' => 'Zeballos', 'ci' => '111030', 'fecha_nacimiento' => '2013-05-18', 'telefono' => '60000030', 'direccion' => 'Av. Santos Dumont', 'foto' => 'uploads/estudiantes/est30.jpg', 'genero' => 'Masculino', 'estado' => 1]);
-
-
-        Matriculacion::create(['estudiante_id' => 1, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 2, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 3, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 4, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 5, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 6, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 7, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 8, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 9, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 10, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 11, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 12, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 13, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 14, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 15, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 16, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 17, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 18, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 19, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-        Matriculacion::create(['estudiante_id' => 20, 'turno_id' => 1, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 10, 'paralelo_id' => 10, 'fecha_matriculacion' => '2025-01-15']);
-
-        Asignacion::create(['personal_id' => 7, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'materia_id' => 9, 'turno_id' => 1, 'fecha_asignacion' => '2025-01-15']);
-        Asignacion::create(['personal_id' => 8, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'materia_id' => 11, 'turno_id' => 1, 'fecha_asignacion' => '2025-01-15']);
+            // Inscripción Activa al Módulo 1 en el ciclo
+            Inscripcion::firstOrCreate([
+                'estudiante_id' => $est->id,
+                'ciclo_id' => $ciclo1->id,
+                'modulo_id' => $m1->id
+            ], [
+                'paralelo_id' => ($correlativo % 2 == 0) ? $paralelo1->id : $paralelo2->id,
+                'boleta_pago_id' => $boleta->id,
+                'costo_matricula' => 350.00,
+                'fecha_inscripcion' => '2026-01-15',
+                'estado' => 'ACTIVA',
+                'observacion' => 'Inscripción modular regular ciclo 2026-I',
+                'usuario_id' => $adminUser->id
+            ]);
         }
     }
 }
