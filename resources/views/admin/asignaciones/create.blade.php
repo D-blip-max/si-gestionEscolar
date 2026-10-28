@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-user-plus text-primary mr-2"></i>Asignar Docente a Grupo</h1>
-                <small class="text-muted">CU-09: Selección de Docente Titular y Grupo Modular</small>
+                <small class="text-muted">Selección de Docente Titular y Grupo Modular</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -155,11 +155,11 @@
                         </div>
 
                         <div class="callout callout-info text-sm bg-light">
-                            <h5><i class="fas fa-info-circle text-info"></i> Reglas de Asignación (CU-09)</h5>
+                            <h5><i class="fas fa-info-circle text-info"></i> Reglas de Asignación</h5>
                             <ul class="pl-3 mb-0">
                                 <li>Solo puede existir <strong>un docente titular</strong> por cada grupo modular.</li>
                                 <li>Se verifica automáticamente la <strong>disponibilidad de horario</strong> en el ciclo bimestral.</li>
-                                <li>Esta asignación autoriza al docente a evaluar y asentar calificaciones (CU-16).</li>
+                                <li>Esta asignación autoriza al docente a evaluar y asentar calificaciones.</li>
                             </ul>
                         </div>
                     </div>

@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-user-graduate text-primary mr-2"></i>Padrón de Estudiantes</h1>
-                <small class="text-muted">CU-10: Registro y Gestión de Estudiantes Autónomos del Instituto</small>
+                <small class="text-muted">Registro y Gestión de Estudiantes Autónomos del Instituto</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -107,7 +107,7 @@
                                 </td>
                                 <td class="text-center align-middle">
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.estudiantes.kardex', $estudiante->id) }}" class="btn btn-outline-primary" title="Kárdex Académico (CU-12)">
+                                        <a href="{{ route('admin.estudiantes.kardex', $estudiante->id) }}" class="btn btn-outline-primary" title="Kárdex Académico">
                                             <i class="fas fa-graduation-cap"></i>
                                         </a>
                                         <a href="{{ route('admin.estudiantes.show', $estudiante->id) }}" class="btn btn-info" title="Ver Perfil">

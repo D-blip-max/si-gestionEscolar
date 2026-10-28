@@ -92,7 +92,7 @@
                             <i class="fas fa-exclamation-circle mr-1"></i> <strong>Atención:</strong> Este estudiante no tiene ninguna boleta bancaria disponible.
                             <div class="mt-2">
                                 <a href="{{ route('admin.boletas.index') }}" target="_blank" class="btn btn-warning btn-xs font-weight-bold">
-                                    <i class="fas fa-plus-circle mr-1"></i> Registrar Boleta en CU-11
+                                    <i class="fas fa-plus-circle mr-1"></i> Registrar Boleta de Pago
                                 </a>
                             </div>
                         </div>

@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-file-pdf text-danger mr-2"></i>Actas Oficiales de Calificación</h1>
-                <small class="text-muted">CU-18: Emisión y Descarga de Actas Definitivas en Formato PDF</small>
+                <small class="text-muted">Emisión y Descarga de Actas Definitivas en Formato PDF</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

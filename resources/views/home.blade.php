@@ -82,17 +82,17 @@
         </div>
     </div>
 
-    <!-- Módulos de Acceso Rápido por los 8 Paquetes -->
+    <!-- Módulos de Acceso Rápido -->
     <div class="card card-outline card-secondary shadow-sm mb-4">
         <div class="card-header bg-white">
-            <h5 class="card-title text-bold mb-0"><i class="fas fa-th-large text-primary mr-1"></i> Mapa de Operaciones por Paquetes Temáticos</h5>
+            <h5 class="card-title text-bold mb-0"><i class="fas fa-th-large text-primary mr-1"></i> Módulos Principales del Sistema</h5>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-shield-alt fa-2x text-primary mb-2"></i>
-                        <h6 class="font-weight-bold">Paquete 1: Seguridad</h6>
+                        <h6 class="font-weight-bold">Seguridad y Usuarios</h6>
                         <small class="text-muted d-block mb-2">Configuración, Usuarios y Roles</small>
                         <a href="{{ route('admin.usuarios.index') }}" class="btn btn-outline-primary btn-xs">Administrar</a>
                     </div>
@@ -101,7 +101,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-book-open fa-2x text-success mb-2"></i>
-                        <h6 class="font-weight-bold">Paquete 2: Catálogos</h6>
+                        <h6 class="font-weight-bold">Catálogos Académicos</h6>
                         <small class="text-muted d-block mb-2">Idiomas, Módulos 1-9 y Paralelos</small>
                         <a href="{{ route('admin.idiomas.index') }}" class="btn btn-outline-success btn-xs">Catálogos</a>
                     </div>
@@ -110,7 +110,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-chalkboard-teacher fa-2x text-info mb-2"></i>
-                        <h6 class="font-weight-bold">Paquete 3: Personal</h6>
+                        <h6 class="font-weight-bold">Personal y Docentes</h6>
                         <small class="text-muted d-block mb-2">Padrón Docente y Asignaciones</small>
                         <a href="{{ route('admin.asignaciones.index') }}" class="btn btn-outline-info btn-xs">Asignaciones</a>
                     </div>
@@ -119,7 +119,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-user-graduate fa-2x text-warning mb-2"></i>
-                        <h6 class="font-weight-bold">Paquete 4: Estudiantes</h6>
+                        <h6 class="font-weight-bold">Padrón de Estudiantes</h6>
                         <small class="text-muted d-block mb-2">Padrón, Boletas y Kárdex</small>
                         <a href="{{ route('admin.estudiantes.index') }}" class="btn btn-outline-warning btn-xs">Estudiantes</a>
                     </div>
@@ -128,7 +128,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-clipboard-check fa-2x text-danger mb-2"></i>
-                        <h6 class="font-weight-bold">Paquete 5: Matrícula</h6>
+                        <h6 class="font-weight-bold">Inscripciones y Matrícula</h6>
                         <small class="text-muted d-block mb-2">Inscripción Modular y Ficha PDF</small>
                         <a href="{{ route('admin.inscripciones.create') }}" class="btn btn-outline-danger btn-xs">Nueva Matrícula</a>
                     </div>
@@ -137,7 +137,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-marker fa-2x text-purple mb-2" style="color: #6f42c1;"></i>
-                        <h6 class="font-weight-bold">Paquete 6: Notas</h6>
+                        <h6 class="font-weight-bold">Control de Notas</h6>
                         <small class="text-muted d-block mb-2">Planilla Docente y Actas PDF</small>
                         <a href="{{ route('docente.grupos.index') }}" class="btn btn-outline-dark btn-xs">Calificaciones</a>
                     </div>
@@ -146,7 +146,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-laptop-code fa-2x text-indigo mb-2" style="color: #6610f2;"></i>
-                        <h6 class="font-weight-bold">Paquete 7: Portal Alumno</h6>
+                        <h6 class="font-weight-bold">Portal del Estudiante</h6>
                         <small class="text-muted d-block mb-2">Mi Aula, Avance y Certificados</small>
                         <a href="{{ route('estudiante.clases.index') }}" class="btn btn-outline-info btn-xs">Mi Aula</a>
                     </div>
@@ -155,7 +155,7 @@
                 <div class="col-md-3 col-sm-6 mb-3">
                     <div class="border rounded p-3 text-center h-100 hover-card bg-light">
                         <i class="fas fa-chart-line fa-2x text-teal mb-2" style="color: #20c997;"></i>
-                        <h6 class="font-weight-bold">Paquete 8: Reportes</h6>
+                        <h6 class="font-weight-bold">Reportes y Finanzas</h6>
                         <small class="text-muted d-block mb-2">Conciliación, Modalidad y Graduados</small>
                         <a href="{{ route('admin.reportes.conciliacion') }}" class="btn btn-outline-success btn-xs">Reportes</a>
                     </div>

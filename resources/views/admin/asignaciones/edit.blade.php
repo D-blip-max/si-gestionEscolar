@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-edit text-warning mr-2"></i>Modificar Asignación Docente</h1>
-                <small class="text-muted">CU-09: Actualización de Asignación Académica</small>
+                <small class="text-muted">Actualización de Asignación Académica</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

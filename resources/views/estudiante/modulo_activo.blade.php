@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-chalkboard text-primary mr-2"></i>Mi Módulo Activo y Acceso a Clases</h1>
-                <small class="text-muted">CU-19: Portal del Estudiante - Conexión Directa a Clases</small>
+                <small class="text-muted">Portal del Estudiante - Conexión Directa a Clases</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

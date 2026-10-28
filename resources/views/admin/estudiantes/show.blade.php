@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-id-badge text-info mr-2"></i>Perfil del Estudiante</h1>
-                <small class="text-muted">CU-10: Ficha Integral de Estudiante y Resumen de Estado</small>
+                <small class="text-muted">Ficha Integral de Estudiante y Resumen de Estado</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -60,7 +60,7 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="{{ route('admin.estudiantes.kardex', $estudiante->id) }}" class="btn btn-outline-primary btn-block mr-1">
-                            <i class="fas fa-graduation-cap mr-1"></i> Kárdex (CU-12)
+                            <i class="fas fa-graduation-cap mr-1"></i> Kárdex Académico
                         </a>
                         <a href="{{ route('admin.estudiantes.edit', $estudiante->id) }}" class="btn btn-outline-warning btn-block ml-1 mt-0">
                             <i class="fas fa-edit mr-1"></i> Editar
@@ -75,7 +75,7 @@
             <!-- Boletas Bancarias Registradas -->
             <div class="card card-outline card-success shadow-sm mb-3">
                 <div class="card-header bg-white">
-                    <h3 class="card-title text-bold"><i class="fas fa-file-invoice-dollar mr-1"></i> Boletas Bancarias Registradas (CU-11)</h3>
+                    <h3 class="card-title text-bold"><i class="fas fa-file-invoice-dollar mr-1"></i> Boletas Bancarias Registradas</h3>
                     <div class="card-tools">
                         <a href="{{ route('admin.boletas.index') }}" class="btn btn-xs btn-success">
                             <i class="fas fa-plus-circle mr-1"></i> Registrar Boleta

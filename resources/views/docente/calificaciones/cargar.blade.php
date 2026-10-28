@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-edit text-primary mr-2"></i>Asentar Notas Finales del Módulo</h1>
-                <small class="text-muted">CU-17: Planilla de Evaluación Modular [0 - 100 Puntos]</small>
+                <small class="text-muted">Planilla de Evaluación Modular [0 - 100 Puntos]</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

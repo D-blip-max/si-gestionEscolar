@@ -202,7 +202,7 @@
         </div>
     </div>
 
-    <!-- Recuadro Destacado de Modalidad y Ubicación (CU-14) -->
+    <!-- Recuadro Destacado de Modalidad y Ubicación -->
     @php
         $esVirtual = strtoupper(optional($inscripcion->paralelo)->modalidad) === 'VIRTUAL';
     @endphp
@@ -226,7 +226,7 @@
         @endif
     </div>
 
-    <!-- Respaldo Financiero (CU-11 Boleta) -->
+    <!-- Respaldo Financiero -->
     <div class="financial-box">
         <table style="width: 100%;">
             <tr>

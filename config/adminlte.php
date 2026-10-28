@@ -309,26 +309,26 @@ return [
         ['header' => 'MÓDULOS DE GESTIÓN ACADÉMICA'],
 
         // =========================================================================
-        // PAQUETE 1: ADMINISTRACIÓN Y SEGURIDAD
+        // SEGURIDAD Y CONFIGURACIÓN
         // =========================================================================
         [
-            'text'    => 'Paquete 1: Seguridad y Config.',
+            'text'    => 'Seguridad y Configuración',
             'icon'    => 'fas fa-fw fa-shield-alt',
             'submenu' => [
                 [
-                    'text' => 'CU-01: Config. Institución',
+                    'text' => 'Configuración Institucional',
                     'url'  => 'admin/configuracion',
                     'icon' => 'fas fa-fw fa-university',
                     'can'  => 'admin.configuracion.index',
                 ],
                 [
-                    'text' => 'CU-02: Gestión de Usuarios',
+                    'text' => 'Gestión de Usuarios',
                     'url'  => 'admin/usuarios',
                     'icon' => 'fas fa-fw fa-users-cog',
                     'can'  => 'admin.usuarios.index',
                 ],
                 [
-                    'text' => 'CU-03: Roles y Permisos',
+                    'text' => 'Roles y Permisos',
                     'url'  => 'admin/roles',
                     'icon' => 'fas fa-fw fa-user-tag',
                     'can'  => 'admin.roles.index',
@@ -337,48 +337,48 @@ return [
         ],
 
         // =========================================================================
-        // PAQUETE 2: CATÁLOGOS ACADÉMICOS
+        // CATÁLOGOS ACADÉMICOS
         // =========================================================================
         [
-            'text'    => 'Paquete 2: Catálogos Académicos',
+            'text'    => 'Catálogos Académicos',
             'icon'    => 'fas fa-fw fa-book-open',
             'submenu' => [
                 [
-                    'text' => 'CU-04: Gestión de Idiomas',
+                    'text' => 'Gestión de Idiomas',
                     'url'  => 'admin/idiomas',
                     'icon' => 'fas fa-fw fa-language',
                 ],
                 [
-                    'text' => 'CU-05: Módulos y Niveles',
+                    'text' => 'Módulos y Niveles',
                     'url'  => 'admin/modulos',
                     'icon' => 'fas fa-fw fa-layer-group',
                 ],
                 [
-                    'text' => 'CU-06: Ciclos y Paralelos',
+                    'text' => 'Ciclos y Paralelos',
                     'url'  => 'admin/paralelos',
                     'icon' => 'fas fa-fw fa-chalkboard',
                 ],
             ],
         ],
         // =========================================================================
-        // PAQUETE 3: PERSONAL Y ASIGNACIONES
+        // PERSONAL Y DOCENCIA
         // =========================================================================
         [
-            'text'    => 'Paquete 3: Personal y Docencia',
+            'text'    => 'Personal y Docencia',
             'icon'    => 'fas fa-fw fa-chalkboard-teacher',
             'submenu' => [
                 [
-                    'text' => 'CU-07: Padrón de Personal',
+                    'text' => 'Padrón de Personal',
                     'url'  => 'admin/personal',
                     'icon' => 'fas fa-fw fa-id-badge',
                 ],
                 [
-                    'text' => 'CU-08: Formación Académica',
+                    'text' => 'Formación Académica',
                     'url'  => 'admin/personal/formaciones',
                     'icon' => 'fas fa-fw fa-graduation-cap',
                 ],
                 [
-                    'text' => 'CU-09: Asignación a Grupos',
+                    'text' => 'Asignación a Grupos',
                     'url'  => 'admin/asignaciones',
                     'icon' => 'fas fa-fw fa-tasks',
                 ],
@@ -386,24 +386,24 @@ return [
         ],
 
         // =========================================================================
-        // PAQUETE 4: PADRÓN DE ESTUDIANTES Y BOLETAS BANCARIAS
+        // ESTUDIANTES Y BOLETAS
         // =========================================================================
         [
-            'text'    => 'Paquete 4: Estudiantes y Boletas',
+            'text'    => 'Estudiantes y Boletas',
             'icon'    => 'fas fa-fw fa-user-graduate',
             'submenu' => [
                 [
-                    'text' => 'CU-10: Padrón de Estudiantes',
+                    'text' => 'Padrón de Estudiantes',
                     'url'  => 'admin/estudiantes',
                     'icon' => 'fas fa-fw fa-users',
                 ],
                 [
-                    'text' => 'CU-11: Registro de Boletas',
+                    'text' => 'Registro de Boletas',
                     'url'  => 'admin/boletas',
                     'icon' => 'fas fa-fw fa-file-invoice-dollar',
                 ],
                 [
-                    'text' => 'CU-12: Kárdex Académico',
+                    'text' => 'Kárdex Académico',
                     'url'  => 'admin/estudiantes/kardex',
                     'icon' => 'fas fa-fw fa-address-book',
                 ],
@@ -411,24 +411,24 @@ return [
         ],
 
         // =========================================================================
-        // PAQUETE 5: INSCRIPCIONES Y MATRÍCULA
+        // INSCRIPCIONES Y MATRÍCULA
         // =========================================================================
         [
-            'text'    => 'Paquete 5: Inscripción Modular',
+            'text'    => 'Inscripciones y Matrícula',
             'icon'    => 'fas fa-fw fa-clipboard-check',
             'submenu' => [
                 [
-                    'text' => 'CU-13: Nueva Inscripción',
+                    'text' => 'Nueva Inscripción',
                     'url'  => 'admin/inscripciones/create',
                     'icon' => 'fas fa-fw fa-user-plus',
                 ],
                 [
-                    'text' => 'CU-14: Listado de Matrículas',
+                    'text' => 'Listado de Matrículas',
                     'url'  => 'admin/inscripciones',
                     'icon' => 'fas fa-fw fa-list-alt',
                 ],
                 [
-                    'text' => 'CU-15: Historial y Anulaciones',
+                    'text' => 'Historial y Anulaciones',
                     'url'  => 'admin/inscripciones/anulaciones',
                     'icon' => 'fas fa-fw fa-undo-alt',
                 ],
@@ -436,24 +436,24 @@ return [
         ],
 
         // =========================================================================
-        // PAQUETE 6: EVALUACIÓN Y CALIFICACIONES (DOCENTE)
+        // CONTROL DE CALIFICACIONES
         // =========================================================================
         [
-            'text'    => 'Paquete 6: Control de Notas',
+            'text'    => 'Control de Calificaciones',
             'icon'    => 'fas fa-fw fa-marker',
             'submenu' => [
                 [
-                    'text' => 'CU-16: Mis Grupos Asignados',
+                    'text' => 'Mis Grupos Asignados',
                     'url'  => 'docente/grupos',
                     'icon' => 'fas fa-fw fa-users',
                 ],
                 [
-                    'text' => 'CU-17: Cargar Nota Final',
+                    'text' => 'Cargar Nota Final',
                     'url'  => 'docente/calificaciones',
                     'icon' => 'fas fa-fw fa-edit',
                 ],
                 [
-                    'text' => 'CU-18: Actas Oficiales (PDF)',
+                    'text' => 'Actas Oficiales (PDF)',
                     'url'  => 'docente/actas',
                     'icon' => 'fas fa-fw fa-file-pdf',
                 ],
@@ -461,24 +461,24 @@ return [
         ],
 
         // =========================================================================
-        // PAQUETE 7: PORTAL DEL ESTUDIANTE (AUTOGESTIÓN)
+        // PORTAL DEL ESTUDIANTE
         // =========================================================================
         [
-            'text'    => 'Paquete 7: Mi Aula y Avance',
+            'text'    => 'Portal del Estudiante',
             'icon'    => 'fas fa-fw fa-laptop-code',
             'submenu' => [
                 [
-                    'text' => 'CU-19: Mi Módulo y Clases',
+                    'text' => 'Mi Módulo y Clases',
                     'url'  => 'estudiante/modulo-activo',
                     'icon' => 'fas fa-fw fa-video',
                 ],
                 [
-                    'text' => 'CU-20: Avance a Graduación',
+                    'text' => 'Avance a Graduación',
                     'url'  => 'estudiante/avance-curricular',
                     'icon' => 'fas fa-fw fa-award',
                 ],
                 [
-                    'text' => 'CU-21: Historial y Certificados',
+                    'text' => 'Historial y Certificados',
                     'url'  => 'estudiante/mis-documentos',
                     'icon' => 'fas fa-fw fa-certificate',
                 ],
@@ -486,24 +486,24 @@ return [
         ],
 
         // =========================================================================
-        // PAQUETE 8: REPORTES Y CONCILIACIÓN GERENCIAL
+        // REPORTES Y FINANZAS
         // =========================================================================
         [
-            'text'    => 'Paquete 8: Reportes y Finanzas',
+            'text'    => 'Reportes y Finanzas',
             'icon'    => 'fas fa-fw fa-chart-line',
             'submenu' => [
                 [
-                    'text' => 'CU-22: Conciliación de Boletas',
+                    'text' => 'Conciliación de Boletas',
                     'url'  => 'admin/reportes/conciliacion-boletas',
                     'icon' => 'fas fa-fw fa-money-check-alt',
                 ],
                 [
-                    'text' => 'CU-23: Inscritos por Modalidad',
+                    'text' => 'Inscritos por Modalidad',
                     'url'  => 'admin/reportes/inscritos-modalidad',
                     'icon' => 'fas fa-fw fa-chart-pie',
                 ],
                 [
-                    'text' => 'CU-24: Graduados Intermedio/Avanzado',
+                    'text' => 'Graduados Intermedio/Avanzado',
                     'url'  => 'admin/reportes/estudiantes-graduados',
                     'icon' => 'fas fa-fw fa-user-check',
                 ],

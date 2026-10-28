@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-award text-primary mr-2"></i>Avance Curricular y Ruta de Graduación</h1>
-                <small class="text-muted">CU-20: Trazabilidad de Módulos Aprobados del 1 al 9</small>
+                <small class="text-muted">Trazabilidad de Módulos Aprobados del 1 al 9</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

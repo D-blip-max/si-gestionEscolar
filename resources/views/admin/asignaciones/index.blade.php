@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-chalkboard-teacher text-primary mr-2"></i>Asignación de Docentes a Grupos</h1>
-                <small class="text-muted">CU-09: Gestión de Docentes Titulares por Paralelo Presencial / Virtual</small>
+                <small class="text-muted">Gestión de Docentes Titulares por Paralelo Presencial / Virtual</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

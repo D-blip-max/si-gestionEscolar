@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-user-edit text-warning mr-2"></i>Modificar Datos del Estudiante</h1>
-                <small class="text-muted">CU-10: Actualización de Padrón Estudiantil</small>
+                <small class="text-muted">Actualización de Padrón Estudiantil</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

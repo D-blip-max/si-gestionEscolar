@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-graduation-cap text-primary mr-2"></i>Kárdex Académico Modular</h1>
-                <small class="text-muted">CU-12: Historial Académico, Trazabilidad Modular y Ruta de Graduación</small>
+                <small class="text-muted">Historial Académico, Trazabilidad Modular y Ruta de Graduación</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-user-plus text-primary mr-2"></i>Registrar Nuevo Estudiante</h1>
-                <small class="text-muted">CU-10: Padrón de Estudiantes Universitarios y Adultos Autónomos</small>
+                <small class="text-muted">Padrón de Estudiantes Universitarios y Adultos Autónomos</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -143,7 +143,7 @@
                 </div>
 
                 <div class="callout callout-info mt-3 bg-light">
-                    <h5><i class="fas fa-info-circle text-info"></i> Generación Automática de Credenciales (CU-10)</h5>
+                    <h5><i class="fas fa-info-circle text-info"></i> Generación Automática de Credenciales</h5>
                     <p class="mb-0 text-sm">
                         Al guardar, el sistema generará automáticamente su <strong>Código Institucional CEI</strong> correlativo (Ej: <code>CEI-{{ date('Y') }}-0001</code>) y una cuenta de acceso con el rol <code>ESTUDIANTE</code> donde su usuario será su correo electrónico y su contraseña inicial su número de CI.
                     </p>

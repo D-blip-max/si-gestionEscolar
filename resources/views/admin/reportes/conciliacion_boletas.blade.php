@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-money-check-alt text-primary mr-2"></i>Conciliación de Boletas para Tesorería</h1>
-                <small class="text-muted">CU-22: Fiscalización y Auditoría Financiera de Depósitos Bancarios (Cero Efectivo)</small>
+                <small class="text-muted">Fiscalización y Auditoría Financiera de Depósitos Bancarios (Cero Efectivo)</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

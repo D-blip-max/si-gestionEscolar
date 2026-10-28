@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-id-badge text-info mr-2"></i>Detalle de Asignación Académica</h1>
-                <small class="text-muted">CU-09: Ficha Informativa de Docente y Grupo Modular</small>
+                <small class="text-muted">Ficha Informativa de Docente y Grupo Modular</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

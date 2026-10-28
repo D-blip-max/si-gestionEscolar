@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-clipboard-check text-primary mr-2"></i>Matrículas e Inscripciones Modulares</h1>
-                <small class="text-muted">CU-14: Control de Estudiantes Matriculados por Ciclo y Modalidad</small>
+                <small class="text-muted">Control de Estudiantes Matriculados por Ciclo y Modalidad</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -147,7 +147,7 @@
                                             <i class="fas fa-file-pdf"></i>
                                         </a>
                                         @if($ins->estado === 'ACTIVA')
-                                            <button type="button" class="btn btn-warning" onclick="abrirModalAnular({{ $ins->id }}, '{{ optional($ins->estudiante)->apellidos }} {{ optional($ins->estudiante)->nombres }}', '{{ optional($ins->modulo)->nombre }}')" title="Anular Matrícula (CU-15)">
+                                            <button type="button" class="btn btn-warning" onclick="abrirModalAnular({{ $ins->id }}, '{{ optional($ins->estudiante)->apellidos }} {{ optional($ins->estudiante)->nombres }}', '{{ optional($ins->modulo)->nombre }}')" title="Anular Matrícula">
                                                 <i class="fas fa-undo-alt"></i>
                                             </button>
                                         @endif
@@ -162,7 +162,7 @@
     </div>
 </div>
 
-<!-- Modal para Anulación y Reversión de Inscripción (CU-15) -->
+<!-- Modal para Anulación y Reversión de Inscripción -->
 <div class="modal fade" id="modal-anular-inscripcion" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <form id="form-anular-inscripcion" action="" method="POST">

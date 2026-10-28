@@ -22,7 +22,7 @@
                 @csrf
                 <div class="card card-outline card-primary shadow-sm mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title"><i class="fas fa-shield-alt"></i> Matriz de Permisos RBAC por Paquete Temático</h3>
+                        <h3 class="card-title"><i class="fas fa-shield-alt"></i> Matriz de Permisos RBAC por Módulo del Sistema</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-sm btn-outline-primary" id="btn-check-all-global">
                                 <i class="fas fa-check-double"></i> Seleccionar Todos

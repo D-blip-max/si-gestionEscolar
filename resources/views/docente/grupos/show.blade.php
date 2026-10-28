@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-users text-info mr-2"></i>Nómina de Estudiantes</h1>
-                <small class="text-muted">CU-16: Lista Oficial de Alumnos Inscritos en el Grupo Modular</small>
+                <small class="text-muted">Lista Oficial de Alumnos Inscritos en el Grupo Modular</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

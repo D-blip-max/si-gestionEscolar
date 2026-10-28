@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-file-invoice-dollar text-primary mr-2"></i>Boletas de Depósito Bancario</h1>
-                <small class="text-muted">CU-11: Fiscalización de Comprobantes Bancarios Universitarios (Cero Efectivo)</small>
+                <small class="text-muted">Fiscalización de Comprobantes Bancarios Universitarios (Cero Efectivo)</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

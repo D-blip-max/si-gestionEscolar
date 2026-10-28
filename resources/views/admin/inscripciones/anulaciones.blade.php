@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-history text-danger mr-2"></i>Historial de Anulaciones de Matrícula</h1>
-                <small class="text-muted">CU-15: Auditoría y Trazabilidad de Reversiones de Inscripción Modular</small>
+                <small class="text-muted">Auditoría y Trazabilidad de Reversiones de Inscripción Modular</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
