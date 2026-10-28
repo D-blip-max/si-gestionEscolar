@@ -258,15 +258,15 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Identificador del Grupo <span class="text-danger">(*)</span></label>
-                                    <input type="text" name="nombre" class="form-control text-uppercase font-weight-bold" placeholder="Ej: A, B, C, P1" maxlength="10" required>
+                                    <input type="text" name="nombre" class="form-control text-uppercase font-weight-bold" placeholder="Ej: A, B, C, P1" maxlength="100" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Modalidad de Cursado <span class="text-danger">(*)</span></label>
                                     <select name="modalidad" id="create_modalidad" class="form-control font-weight-bold" onchange="actualizarPlaceholderModalidad(this.value, 'create')" required>
-                                        <option value="PRESENCIAL" selected>🏫 PRESENCIAL (Aula en Campus)</option>
-                                        <option value="VIRTUAL">💻 VIRTUAL (Meet / Zoom)</option>
+                                        <option value="PRESENCIAL" selected>PRESENCIAL (Aula en Campus)</option>
+                                        <option value="VIRTUAL">VIRTUAL (Meet / Zoom)</option>
                                     </select>
                                 </div>
                             </div>
@@ -358,15 +358,15 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Grupo</label>
-                                    <input type="text" name="nombre" id="edit_nombre" class="form-control text-uppercase font-weight-bold" maxlength="10" required>
+                                    <input type="text" name="nombre" id="edit_nombre" class="form-control text-uppercase font-weight-bold" maxlength="100" required>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Modalidad</label>
                                     <select name="modalidad" id="edit_modalidad" class="form-control font-weight-bold" onchange="actualizarPlaceholderModalidad(this.value, 'edit')" required>
-                                        <option value="PRESENCIAL">🏫 PRESENCIAL</option>
-                                        <option value="VIRTUAL">💻 VIRTUAL</option>
+                                        <option value="PRESENCIAL">PRESENCIAL</option>
+                                        <option value="VIRTUAL">VIRTUAL</option>
                                     </select>
                                 </div>
                             </div>

@@ -7,7 +7,7 @@
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-dark"><i class="fas fa-chart-pie text-primary mr-2"></i>Reporte de Inscritos por Modalidad</h1>
-                <small class="text-muted">Análisis Estadístico Comparativo: Presencial 🏫 vs Virtual 💻</small>
+                <small class="text-muted">Análisis Estadístico Comparativo: Presencial vs Virtual</small>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">

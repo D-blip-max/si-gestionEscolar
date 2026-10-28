@@ -126,7 +126,7 @@
                                 @foreach ($paralelos as $p)
                                     @php
                                         $esVirtual = strtoupper($p->modalidad) === 'VIRTUAL';
-                                        $icono = $esVirtual ? '💻 Virtual' : '🏫 Presencial';
+                                        $icono = $esVirtual ? 'Virtual' : 'Presencial';
                                         $cuposLibres = $p->cupo_maximo - $p->cupo_ocupado;
                                         $label = optional($p->ciclo)->nombre . ' | ' . 
                                                  optional($p->modulo->idioma)->nombre . ' - ' . 

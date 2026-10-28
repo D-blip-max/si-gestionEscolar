@@ -130,7 +130,7 @@
                                 @foreach ($paralelos as $paralelo)
                                     @php
                                         $esVirtual = strtoupper($paralelo->modalidad) === 'VIRTUAL';
-                                        $iconoMod = $esVirtual ? '💻 Virtual' : '🏫 Presencial';
+                                        $iconoMod = $esVirtual ? 'Virtual' : 'Presencial';
                                         $label = optional($paralelo->ciclo)->nombre . ' | ' . 
                                                  optional($paralelo->modulo->idioma)->nombre . ' - ' . 
                                                  optional($paralelo->modulo)->nombre . ' [' . $paralelo->nombre . '] (' . 
