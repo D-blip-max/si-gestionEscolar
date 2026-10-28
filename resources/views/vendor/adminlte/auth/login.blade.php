@@ -20,7 +20,7 @@
     }
 @endphp
 
-@section('auth_header', __('adminlte::adminlte.login_message'))
+@section('auth_header', 'Acceso al Sistema Académico')
 
 @section('auth_body')
     <form action="{{ $loginUrl }}" method="post">

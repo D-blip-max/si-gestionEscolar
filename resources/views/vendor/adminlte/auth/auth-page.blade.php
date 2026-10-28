@@ -28,8 +28,8 @@
     <div class="{{ $authType }}-box">
 
         {{-- Logo --}}
-        <div class="{{ $authType }}-logo">
-            <a href="{{ $dashboardUrl }}">
+        <div class="{{ $authType }}-logo text-center mb-3">
+            <a href="{{ $dashboardUrl }}" class="d-inline-flex flex-column align-items-center text-decoration-none">
 
                 {{-- Logo Image --}}
                 @if (config('adminlte.auth_logo.enabled', false))
@@ -46,11 +46,16 @@
                          @endif>
                 @else
                     <img src="{{ asset(config('adminlte.logo_img')) }}"
-                         alt="{{ config('adminlte.logo_img_alt') }}" height="50">
+                         alt="{{ config('adminlte.logo_img_alt') }}" height="60">
                 @endif
 
                 {{-- Logo Label --}}
-                {!! config('adminlte.logo', '<b>Admin</b>LTE') !!}
+                <div class="mt-2 font-weight-bold" style="font-size: 1.45rem; letter-spacing: 0.5px; color: #0c2340;">
+                    {!! config('adminlte.logo', '<b>CEI</b> UAGRM') !!}
+                </div>
+                <small class="text-muted font-weight-normal" style="font-size: 0.88rem;">
+                    Centro de Extensión de Idiomas
+                </small>
 
             </a>
         </div>

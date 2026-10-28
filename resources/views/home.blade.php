@@ -4,13 +4,16 @@
 
 @section('content_header')
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1 class="m-0 text-dark"><i class="fas fa-university text-primary mr-2"></i>Panel de Gestión Académica CEI</h1>
-                <small class="text-muted">Centro de Enseñanza Integral de Idiomas - Sistema Modular</small>
+        <div class="row align-items-center mb-2">
+            <div class="col-sm-8 d-flex align-items-center">
+                <img src="{{ asset('img/logo_cei.png') }}" alt="Logo CEI UAGRM" class="img-circle elevation-2 mr-3 bg-white p-1" style="width: 55px; height: 55px; object-fit: contain;">
+                <div>
+                    <h1 class="m-0 text-dark font-weight-bold" style="font-size: 1.45rem;">Centro de Extensión de Idiomas - UAGRM</h1>
+                    <small class="text-muted font-weight-bold">Sistema Integral de Gestión Académica y Modular CEI</small>
+                </div>
             </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
+            <div class="col-sm-4">
+                <ol class="breadcrumb float-sm-right bg-transparent p-0 mb-0">
                     <li class="breadcrumb-item"><a href="{{ url('/home') }}">Inicio</a></li>
                     <li class="breadcrumb-item active">Dashboard</li>
                 </ol>

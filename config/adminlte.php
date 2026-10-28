@@ -14,9 +14,9 @@ return [
     |
     */
 
-    'title' => 'Sistema de Gestion Escolar', //cambiamos el nombre
+    'title' => 'CEI - UAGRM',
     'title_prefix' => '',
-    'title_postfix' => '',
+    'title_postfix' => ' | Centro de Extensión de Idiomas',
 
     /*
     |--------------------------------------------------------------------------
@@ -63,12 +63,12 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-    'logo_img_class' => 'brand-image img-circle elevation-3',
+    'logo' => '<b>CEI</b> UAGRM',
+    'logo_img' => 'img/logo_cei.png',
+    'logo_img_class' => 'brand-image img-circle elevation-3 bg-white',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
-    'logo_img_alt' => 'Admin Logo',
+    'logo_img_alt' => 'CEI UAGRM Logo',
 
     /*
     |--------------------------------------------------------------------------
@@ -84,13 +84,13 @@ return [
     */
 
     'auth_logo' => [
-        'enabled' => false,
+        'enabled' => true,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'alt' => 'Auth Logo',
-            'class' => '',
-            'width' => 50,
-            'height' => 50,
+            'path' => 'img/logo_cei.png',
+            'alt' => 'CEI UAGRM',
+            'class' => 'img-circle elevation-3 bg-white p-1 mb-2',
+            'width' => 110,
+            'height' => 110,
         ],
     ],
 
@@ -113,11 +113,11 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
-            'alt' => 'AdminLTE Preloader Image',
+            'path' => 'img/logo_cei.png',
+            'alt' => 'CEI UAGRM',
             'effect' => 'animation__shake',
-            'width' => 60,
-            'height' => 60,
+            'width' => 100,
+            'height' => 100,
         ],
     ],
 
