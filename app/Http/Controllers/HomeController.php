@@ -42,11 +42,9 @@ class HomeController extends Controller
         }
 
         // Dashboard Gerencial / Administrativo CEI
-        $totalEstudiantes = Estudiante::where('estado', 'activo')->count();
-        $totalDocentes = Personal::where('tipo', 'docente')->where('estado', 'ACTIVO')->count();
-        $totalParalelos = Paralelo::whereHas('ciclo', function ($q) {
-            $q->where('estado', 'ACTIVO');
-        })->count();
+        $totalEstudiantes = Estudiante::count();
+        $totalDocentes = Personal::where('tipo', 'docente')->count();
+        $totalParalelos = Paralelo::count();
         $totalInscripciones = Inscripcion::where('estado', 'ACTIVA')->count();
         $totalRecaudado = BoletaPago::where('estado', '!=', 'ANULADA')->sum('monto');
 
