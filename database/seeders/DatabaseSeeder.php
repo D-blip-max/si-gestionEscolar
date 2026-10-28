@@ -25,27 +25,38 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
+    private array $usersByEmail = [];
+    private array $rolesByName = [];
+    private array $rolePivots = [];
+
     /**
-     * Crear u obtener usuario sin recalcular bcrypt si ya existe
+     * Crear u obtener usuario en memoria con hash rápido (cost=4 compatible con bcrypt/Auth)
      */
     private function getOrCreateUser(string $email, string $name, string $rawPassword, string $roleName): User
     {
-        $user = User::where('email', $email)->first();
+        $user = $this->usersByEmail[$email] ?? null;
         if (!$user) {
             $user = User::create([
                 'name'     => $name,
                 'email'    => $email,
-                'password' => Hash::make($rawPassword, ['rounds' => 10]),
+                'password' => password_hash($rawPassword, PASSWORD_BCRYPT, ['cost' => 4]),
             ]);
+            $this->usersByEmail[$email] = $user;
         }
-        if (!$user->hasRole($roleName)) {
-            $user->syncRoles([$roleName]);
+
+        if (isset($this->rolesByName[$roleName])) {
+            $this->rolePivots[] = [
+                'role_id'    => $this->rolesByName[$roleName],
+                'model_type' => User::class,
+                'model_id'   => $user->id,
+            ];
         }
+
         return $user;
     }
 
     /**
-     * Registrar boleta, inscripción y calificación manteniendo integridad referencial y cupo
+     * Registrar boleta, inscripción y calificación con inserción directa (sin SELECT redundantes)
      */
     private function registrarMatricula(
         Estudiante $est,
@@ -60,46 +71,34 @@ class DatabaseSeeder extends Seeder
         ?string $observacionCalificacion,
         int $adminId
     ): Inscripcion {
-        $boleta = BoletaPago::firstOrCreate(
-            ['numero_boleta' => $nroBoleta],
-            [
-                'estudiante_id'  => $est->id,
-                'banco_entidad'  => $banco,
-                'fecha_deposito' => $fechaDeposito,
-                'monto'          => 250.00,
-                'concepto'       => 'Matrícula ' . $modulo->nombre,
-                'estado'         => 'UTILIZADA',
-                'registrado_por' => $adminId,
-            ]
-        );
+        $boleta = BoletaPago::create([
+            'numero_boleta'  => $nroBoleta,
+            'estudiante_id'  => $est->id,
+            'banco_entidad'  => $banco,
+            'fecha_deposito' => $fechaDeposito,
+            'monto'          => 250.00,
+            'concepto'       => 'Matrícula ' . $modulo->nombre,
+            'estado'         => 'UTILIZADA',
+            'registrado_por' => $adminId,
+        ]);
 
-        $inscripcion = Inscripcion::firstOrCreate(
-            [
-                'estudiante_id' => $est->id,
-                'paralelo_id'   => $paralelo->id,
-            ],
-            [
-                'modulo_id'         => $modulo->id,
-                'boleta_pago_id'    => $boleta->id,
-                'fecha_inscripcion' => $fechaInscripcion,
-                'estado'            => 'ACTIVA',
-                'inscrito_por'      => $adminId,
-            ]
-        );
+        $inscripcion = Inscripcion::create([
+            'estudiante_id'     => $est->id,
+            'paralelo_id'       => $paralelo->id,
+            'modulo_id'         => $modulo->id,
+            'boleta_pago_id'    => $boleta->id,
+            'fecha_inscripcion' => $fechaInscripcion,
+            'estado'            => 'ACTIVA',
+            'inscrito_por'      => $adminId,
+        ]);
 
-        if ($inscripcion->wasRecentlyCreated) {
-            $paralelo->increment('cupo_ocupado');
-        }
-
-        Calificacion::updateOrCreate(
-            ['inscripcion_id' => $inscripcion->id],
-            [
-                'nota_final'    => $notaFinal,
-                'estado'        => $estadoCalificacion,
-                'observaciones' => $observacionCalificacion,
-                'updated_by'    => $adminId,
-            ]
-        );
+        Calificacion::create([
+            'inscripcion_id' => $inscripcion->id,
+            'nota_final'     => $notaFinal,
+            'estado'         => $estadoCalificacion,
+            'observaciones'  => $observacionCalificacion,
+            'updated_by'     => $adminId,
+        ]);
 
         return $inscripcion;
     }
@@ -112,29 +111,36 @@ class DatabaseSeeder extends Seeder
         // 1. Matriz de Roles y Permisos RBAC
         $this->call(RoleSeeder::class);
 
-        // Si la base de datos aún tiene solo los 5 alumnos de prueba iniciales (< 110),
-        // limpiar estudiantes, paralelos, boletas e inscripciones previas para poblar el semestre completo sin colisiones de código/CI
-        if (Estudiante::count() < 110) {
-            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            AuditoriaCalificacion::truncate();
-            Calificacion::truncate();
-            Inscripcion::truncate();
-            BoletaPago::truncate();
-            Asignacion::truncate();
-            Paralelo::truncate();
-            CicloBimestral::truncate();
-            Estudiante::truncate();
-            Formacion::truncate();
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-            User::whereIn('email', [
-                'luis.gomez@cei.com',
-                'andrea.perez@cei.com',
-                'diego.vargas@cei.com',
-                'valeria.castro@cei.com',
-                'mateo.roca@cei.com',
-            ])->delete();
+        // Si ya están cargados los 110 estudiantes del semestre, asegurar monto 250.00 Bs y terminar de inmediato
+        if (Estudiante::count() >= 110) {
+            BoletaPago::where('monto', '!=', 250.00)->update(['monto' => 250.00]);
+            return;
         }
+
+        // Limpiar tablas académicas previas para poblar el semestre completo de forma limpia y rápida
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        AuditoriaCalificacion::truncate();
+        Calificacion::truncate();
+        Inscripcion::truncate();
+        BoletaPago::truncate();
+        Asignacion::truncate();
+        Paralelo::truncate();
+        CicloBimestral::truncate();
+        Estudiante::truncate();
+        Formacion::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        User::whereIn('email', [
+            'luis.gomez@cei.com',
+            'andrea.perez@cei.com',
+            'diego.vargas@cei.com',
+            'valeria.castro@cei.com',
+            'mateo.roca@cei.com',
+        ])->delete();
+
+        $this->usersByEmail = User::all()->keyBy('email')->all();
+        $this->rolesByName = DB::table('roles')->pluck('id', 'name')->all();
+        $this->rolePivots = [];
 
         DB::transaction(function () {
             // 2. Superadministrador Principal
@@ -497,7 +503,8 @@ class DatabaseSeeder extends Seeder
 
                     $uEst = $this->getOrCreateUser($email, "{$nombre} {$apellidos}", $ci, 'ESTUDIANTE');
 
-                    $est = Estudiante::updateOrCreate(['codigo_estudiante' => $codigoEst], [
+                    $est = Estudiante::create([
+                        'codigo_estudiante' => $codigoEst,
                         'ci'                => $ci,
                         'usuario_id'        => $uEst->id,
                         'nombres'           => $nombre,
@@ -611,18 +618,16 @@ class DatabaseSeeder extends Seeder
 
                     // C) Boletas DISPONIBLES adicionales para los primeros 15 estudiantes (para probar Nueva Matrícula en vivo)
                     if ($idx <= 15) {
-                        BoletaPago::firstOrCreate(
-                            ['numero_boleta' => sprintf('BOL-2026-DISP-%04d', $idx)],
-                            [
-                                'estudiante_id'  => $est->id,
-                                'banco_entidad'  => $banco,
-                                'fecha_deposito' => '2026-06-15',
-                                'monto'          => 250.00,
-                                'concepto'       => 'Depósito Adelantado Próximo Módulo CEI',
-                                'estado'         => 'DISPONIBLE',
-                                'registrado_por' => $adminUser->id,
-                            ]
-                        );
+                        BoletaPago::create([
+                            'numero_boleta'  => sprintf('BOL-2026-DISP-%04d', $idx),
+                            'estudiante_id'  => $est->id,
+                            'banco_entidad'  => $banco,
+                            'fecha_deposito' => '2026-06-15',
+                            'monto'          => 250.00,
+                            'concepto'       => 'Depósito Adelantado Próximo Módulo CEI',
+                            'estado'         => 'DISPONIBLE',
+                            'registrado_por' => $adminUser->id,
+                        ]);
                     }
 
                     $correlativoGlobal++;
@@ -652,7 +657,8 @@ class DatabaseSeeder extends Seeder
 
                 $uEst = $this->getOrCreateUser($email, "{$nombre} {$apellidos}", $ci, 'ESTUDIANTE');
 
-                $est = Estudiante::updateOrCreate(['codigo_estudiante' => $codigoEst], [
+                $est = Estudiante::create([
+                    'codigo_estudiante' => $codigoEst,
                     'ci'                => $ci,
                     'usuario_id'        => $uEst->id,
                     'nombres'           => $nombre,
@@ -702,73 +708,61 @@ class DatabaseSeeder extends Seeder
                 $estAnulado = Estudiante::where('codigo_estudiante', sprintf('CEI-2026-%04d', $num))->first();
                 $parAnulado = $paralelosHist[7][$num]; // En Bimestre I - 2026, sin colisionar con sus módulos actuales
                 if ($estAnulado && $parAnulado) {
-                    $bolAnulada = BoletaPago::firstOrCreate(
-                        ['numero_boleta' => sprintf('BOL-2026-ANUL-%04d', $num)],
-                        [
-                            'estudiante_id'  => $estAnulado->id,
-                            'banco_entidad'  => 'BANCO UNIÓN S.A.',
-                            'fecha_deposito' => '2026-01-08',
-                            'monto'          => 250.00,
-                            'concepto'       => 'Matrícula Reversada / Anulada',
-                            'estado'         => 'ANULADA',
-                            'registrado_por' => $adminUser->id,
-                        ]
-                    );
+                    $bolAnulada = BoletaPago::create([
+                        'numero_boleta'  => sprintf('BOL-2026-ANUL-%04d', $num),
+                        'estudiante_id'  => $estAnulado->id,
+                        'banco_entidad'  => 'BANCO UNIÓN S.A.',
+                        'fecha_deposito' => '2026-01-08',
+                        'monto'          => 250.00,
+                        'concepto'       => 'Matrícula Reversada / Anulada',
+                        'estado'         => 'ANULADA',
+                        'registrado_por' => $adminUser->id,
+                    ]);
 
-                    $insAnul = Inscripcion::firstOrCreate(
-                        [
-                            'estudiante_id' => $estAnulado->id,
-                            'paralelo_id'   => $parAnulado->id,
-                        ],
-                        [
-                            'modulo_id'         => $parAnulado->modulo_id,
-                            'boleta_pago_id'    => $bolAnulada->id,
-                            'fecha_inscripcion' => '2026-01-10',
-                            'estado'            => 'ANULADA',
-                            'motivo_anulacion'  => $motivo,
-                            'inscrito_por'      => $adminUser->id,
-                        ]
-                    );
+                    $insAnul = Inscripcion::create([
+                        'estudiante_id'     => $estAnulado->id,
+                        'paralelo_id'       => $parAnulado->id,
+                        'modulo_id'         => $parAnulado->modulo_id,
+                        'boleta_pago_id'    => $bolAnulada->id,
+                        'fecha_inscripcion' => '2026-01-10',
+                        'estado'            => 'ANULADA',
+                        'motivo_anulacion'  => $motivo,
+                        'inscrito_por'      => $adminUser->id,
+                    ]);
 
-                    Calificacion::firstOrCreate(
-                        ['inscripcion_id' => $insAnul->id],
-                        [
-                            'nota_final'    => 0,
-                            'estado'        => 'ANULADA',
-                            'observaciones' => 'Inscripción anulada',
-                            'updated_by'    => $adminUser->id,
-                        ]
-                    );
+                    Calificacion::create([
+                        'inscripcion_id' => $insAnul->id,
+                        'nota_final'     => 0,
+                        'estado'         => 'ANULADA',
+                        'observaciones'  => 'Inscripción anulada',
+                        'updated_by'     => $adminUser->id,
+                    ]);
                 }
             }
 
-            // 12. Sincronizar exactamente cupo_ocupado en todos los paralelos y asegurar arancel oficial de 250.00 Bs
-            BoletaPago::where('monto', 350.00)->update(['monto' => 250.00]);
-            $todosParalelos = Paralelo::all();
-            foreach ($todosParalelos as $p) {
-                $inscritosActivos = Inscripcion::where('paralelo_id', $p->id)->where('estado', 'ACTIVA')->count();
-                if ($p->cupo_ocupado !== $inscritosActivos) {
-                    $p->update(['cupo_ocupado' => $inscritosActivos]);
-                }
+            // 12. Asignación masiva de roles en 1 sola consulta y sincronización de cupo_ocupado en 1 sola consulta SQL
+            if (!empty($this->rolePivots)) {
+                DB::table('model_has_roles')->insertOrIgnore($this->rolePivots);
+                app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
             }
+
+            DB::statement("UPDATE paralelos p SET cupo_ocupado = (SELECT COUNT(*) FROM inscripciones i WHERE i.paralelo_id = p.id AND i.estado = 'ACTIVA')");
 
             // 13. Registros de Auditoría de Calificaciones (8 casos en /admin/roles/auditoria-notas)
-            if (AuditoriaCalificacion::count() === 0) {
-                foreach ($inscripcionesParaAuditoria as $k => $insAud) {
-                    $cal = $insAud->calificacion;
-                    if ($cal) {
-                        $notaNueva = (float)$cal->nota_final;
-                        $notaAnterior = max(51, $notaNueva - 6);
-                        AuditoriaCalificacion::create([
-                            'calificacion_id' => $cal->id,
-                            'inscripcion_id'  => $insAud->id,
-                            'nota_anterior'   => $notaAnterior,
-                            'nota_nueva'      => $notaNueva,
-                            'modificado_por'  => $adminUser->id,
-                            'motivo'          => 'Rectificación de nota tras revisión de evaluación oral bimestral #' . ($k + 1),
-                            'created_at'      => now()->subDays(12 - $k),
-                        ]);
-                    }
+            foreach ($inscripcionesParaAuditoria as $k => $insAud) {
+                $cal = $insAud->calificacion;
+                if ($cal) {
+                    $notaNueva = (float)$cal->nota_final;
+                    $notaAnterior = max(51, $notaNueva - 6);
+                    AuditoriaCalificacion::create([
+                        'calificacion_id' => $cal->id,
+                        'inscripcion_id'  => $insAud->id,
+                        'nota_anterior'   => $notaAnterior,
+                        'nota_nueva'      => $notaNueva,
+                        'modificado_por'  => $adminUser->id,
+                        'motivo'          => 'Rectificación de nota tras revisión de evaluación oral bimestral #' . ($k + 1),
+                        'created_at'      => now()->subDays(12 - $k),
+                    ]);
                 }
             }
         });

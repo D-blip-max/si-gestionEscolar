@@ -22,27 +22,19 @@ mkdir -p storage/framework/sessions \
 
 chmod -R 777 storage bootstrap/cache public/uploads
 
-# 3. Limpiar cachés anteriores
-echo "==> Limpiando caché temporal..."
-php artisan config:clear
-php artisan cache:clear || true
-
-# 4. Esperar disponibilidad de base de datos antes de migrar
-echo "==> Verificando conexión a la base de datos..."
-for i in $(seq 1 30); do
-    if php artisan migrate:status > /dev/null 2>&1; then
-        echo "==> Conexión a la base de datos exitosa."
+# 3. Esperar disponibilidad de base de datos y ejecutar migraciones en un solo paso
+echo "==> Ejecutando migraciones de base de datos..."
+for i in $(seq 1 15); do
+    if php artisan migrate --force; then
+        echo "==> Migraciones completadas exitosamente."
         break
     fi
-    echo "Esperando a la base de datos ($i/30)..."
-    sleep 2
+    echo "Esperando conexión a la base de datos ($i/15)..."
+    sleep 1
 done
 
-# 5. Migración y Seeding de la base de datos
-echo "==> Ejecutando migraciones de base de datos..."
-php artisan migrate --force
-
-echo "==> Sincronizando catálogo CEI, roles y administrador..."
+# 4. Sincronizar catálogo CEI, roles y seeder
+echo "==> Sincronizando catálogo CEI, roles y datos del semestre..."
 php artisan db:seed --force
 
 # 6. Generar symlink de almacenamiento si no existe
