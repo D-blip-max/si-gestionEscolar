@@ -66,7 +66,7 @@
                     <p>Docentes Titulares</p>
                 </div>
                 <div class="icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                <a href="{{ route('admin.personal.index') }}" class="small-box-footer">Padrón de Personal <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="{{ route('admin.personal.index', ['tipo' => 'docente']) }}" class="small-box-footer">Padrón de Personal <i class="fas fa-arrow-circle-right"></i></a>
             </div>
         </div>
 

@@ -161,8 +161,8 @@ Route::delete('/admin/paralelos/{id}', [App\Http\Controllers\ParaleloController:
 //rutas que van a ser de Personal del sitema CreateReadUpdateDelete
 //trabajando con vistas
 //rutas para el personal del sistema
-Route::get('/admin/personal/{tipo}', [App\Http\Controllers\PersonalController::class, 'index'])->name('admin.personal.index')->middleware('auth','can:admin.personal.index');//retorna la vista indexx
-Route::get('/admin/personal/create/{tipo}', [App\Http\Controllers\PersonalController::class, 'create'])->name('admin.personal.create')->middleware('auth','can:admin.personal.create');//retorna la vista create
+Route::get('/admin/personal/{tipo?}', [App\Http\Controllers\PersonalController::class, 'index'])->name('admin.personal.index')->middleware('auth','can:admin.personal.index');//retorna la vista indexx
+Route::get('/admin/personal/create/{tipo?}', [App\Http\Controllers\PersonalController::class, 'create'])->name('admin.personal.create')->middleware('auth','can:admin.personal.create');//retorna la vista create
 Route::post('/admin/personal/create', [App\Http\Controllers\PersonalController::class, 'store'])->name('admin.personal.store')->middleware('auth','can:admin.personal.store');//Create
 Route::get('/admin/personal/show/{id}', [App\Http\Controllers\PersonalController::class, 'show'])->name('admin.personal.show')->middleware('auth','can:admin.personal.show');//retorna la vista show
 Route::get('/admin/personal/{id}/edit', [App\Http\Controllers\PersonalController::class, 'edit'])->name('admin.personal.edit')->middleware('auth','can:admin.personal.edit');//Read
