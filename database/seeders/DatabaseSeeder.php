@@ -38,22 +38,29 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         $this->call(RoleSeeder::class);
 
-        User::create([
+        // Admin user
+        $adminUser = User::firstOrCreate([
+            'email' => 'admin@admin.com'
+        ], [
             'name' => 'Cossio Dylan',
-            'email' => 'admin@admin.com',
             'password' => Hash::make('12345678')
-        ])->assignRole('ADMINISTRADOR');
-
-        Configuracion::create([
-            'nombre' => 'Cei',
-            'descripcion' => 'Curso de Extension de Idiomas',
-            'direccion' => 'Ñuflo de Chavez',
-            'telefono' => '75657007 - 54646787',
-            'divisa' => 'Bs',
-            'correo_electronico' => 'cei@gmail.com',
-            'web' => 'https://cei.com',
-            'logo' => 'uploads\logos\1772770542_cei Logo.png'
         ]);
+        if (!$adminUser->hasRole('ADMINISTRADOR')) {
+            $adminUser->assignRole('ADMINISTRADOR');
+        }
+
+        if (Configuracion::count() == 0) {
+            Configuracion::create([
+                'nombre' => 'Cei',
+                'descripcion' => 'Curso de Extension de Idiomas',
+                'direccion' => 'Ñuflo de Chavez',
+                'telefono' => '75657007 - 54646787',
+                'divisa' => 'Bs',
+                'correo_electronico' => 'cei@gmail.com',
+                'web' => 'https://cei.com',
+                'logo' => 'uploads\logos\1772770542_cei Logo.png'
+            ]);
+        }
 
         // --- PAQUETE 2: IDIOMAS Y MÓDULOS DEL CEI ---
         $ingles = Idioma::firstOrCreate(['codigo' => 'ENG'], [
@@ -112,7 +119,9 @@ class DatabaseSeeder extends Seeder
             'nombre' => 'Módulo 9', 'nivel' => 'AVANZADO', 'duracion_meses' => 2, 'prerrequisito_id' => $m8->id, 'es_modulo_graduacion' => true
         ]);
 
-        Gestion::create(['nombre' => '2023']);
+        // Datos de compatibilidad inicial (sólo si no existen)
+        if (Gestion::count() == 0) {
+            Gestion::create(['nombre' => '2023']);
         Gestion::create(['nombre' => '2024']);
         Gestion::create(['nombre' => '2025']);
 
@@ -541,5 +550,6 @@ class DatabaseSeeder extends Seeder
 
         Asignacion::create(['personal_id' => 7, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'materia_id' => 9, 'turno_id' => 1, 'fecha_asignacion' => '2025-01-15']);
         Asignacion::create(['personal_id' => 8, 'gestion_id' => 3, 'nivel_id' => 3, 'grado_id' => 9, 'paralelo_id' => 9, 'materia_id' => 11, 'turno_id' => 1, 'fecha_asignacion' => '2025-01-15']);
+        }
     }
 }

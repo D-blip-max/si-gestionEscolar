@@ -39,11 +39,9 @@ RUN mkdir -p storage/framework/{sessions,views,cache,testing} storage/logs boots
     && chmod -R 777 storage bootstrap/cache
 
 COPY nginx.conf /etc/nginx/sites-available/default
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-CMD sh -c "php artisan config:clear && \
-    php artisan migrate --force && \
-    php artisan storage:link && \
-    php artisan route:cache && \
-    php artisan view:cache && \
-    php-fpm -D && \
-    nginx -g 'daemon off;'"
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

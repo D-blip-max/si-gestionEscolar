@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,5 +25,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('ADMINISTRADOR') ? true : null;
         });
+
+        // Forzar HTTPS en entorno de producción o cuando se defina en config
+        if (config('app.env') === 'production' || config('app.force_https', false)) {
+            URL::forceScheme('https');
+        }
     }
 }
